@@ -22,14 +22,24 @@ Use this skill when the task is to operate Sequenzy, not to change Sequenzy's so
 Read [references/use-cases.md](references/use-cases.md) before executing anything non-trivial. The currently implemented CLI flows are:
 
 - login and logout
-- session check with `whoami`
+- local auth/session check with `whoami`
+- account inspection with `account`
+- company inspection or creation with `companies list|get|create`
 - stats overview or stats by campaign/sequence ID
 - subscribers `list`, `add`, `get`, and `remove`
+- lists `list` and `create`
+- tags `list`
+- segments `list`, `create`, and `count`
+- templates `list`, `get`, `create`, `update`, and `delete`
+- campaigns `list`, `get`, `create`, `update`, and `test`
+- sequences `list`, `get`, `create`, `update`, `enable`, `disable`, and `delete`
+- websites `list`, `add`, `check`, and `guide`
+- API key creation with `api-keys create`
 - send one transactional email by template or raw HTML
 
 ## Unsupported Or Placeholder Workflows
 
-The CLI currently advertises extra nouns such as `campaigns`, `sequences`, `templates`, `tags`, `lists`, `segments`, `account`, `websites`, and `generate`, but the current command tree does not attach handlers for them. Treat these as unsupported until the implementation changes.
+Treat `sequenzy generate ...` as unsupported placeholder surface. Also treat missing subcommands as unsupported even when the noun exists. For example: campaign send/schedule flows, list deletion, tag mutation, bulk subscriber import, and AI-generated sequence creation are not available through the current CLI handlers.
 
 ## Execution Pattern
 
@@ -38,6 +48,7 @@ The CLI currently advertises extra nouns such as `campaigns`, `sequences`, `temp
 3. Validate IDs, recipient email, subject, template, or HTML input before issuing a mutation.
 4. Surface CLI limitations directly instead of inventing a workaround.
 5. If the workflow is unsupported in the CLI, say whether the next-best path is the Sequenzy dashboard or direct API use.
+6. Call out implementation caveats that matter operationally, such as `whoami` using cached local auth state, sequence creation being explicit-step only in the CLI, and `campaigns test` being a stubbed success path in the current backend.
 
 ## References
 

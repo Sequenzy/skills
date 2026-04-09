@@ -33,6 +33,22 @@ Interpretation:
 
 Remember that this is local-state validation, not a fresh server-side account lookup.
 
+## "Show me account or company info"
+
+Use:
+
+```bash
+sequenzy account
+sequenzy companies list
+sequenzy companies get comp_123
+```
+
+Choose:
+
+- `account` for user ID, current company, and accessible companies
+- `companies list` for a compact list with localization info
+- `companies get` when the user already has a company ID
+
 ## "Show me delivery performance"
 
 Use:
@@ -63,9 +79,9 @@ sequenzy subscribers get user@example.com
 
 Guidance:
 
-- use `add` for single-recipient creation
+- use `add` for single-recipient creation or upsert
 - use repeated `--attr key=value` pairs for metadata
-- use only one `--tag` value unless the CLI implementation is fixed
+- use only one `--tag` value unless the backend path changes
 
 What does not work well today:
 
@@ -94,7 +110,7 @@ sequenzy subscribers remove user@example.com --hard
 Template flow:
 
 ```bash
-sequenzy send user@example.com --template welcome --var name=John
+sequenzy send user@example.com --template tmpl_123 --var name=John
 ```
 
 Raw HTML flow:
@@ -112,26 +128,146 @@ Checklist:
 
 This command is for one-off transactional send behavior, not bulk campaign sends.
 
-## "Create or manage campaigns"
+## "Create a list, tag view, or saved segment"
 
-Do not rely on the CLI yet.
+What works today:
 
-Reason:
+```bash
+sequenzy lists create Newsletter --description "Public newsletter list"
+sequenzy tags
+sequenzy segments list
+sequenzy segments count seg_123
+sequenzy segments create --name "Bought Pro" --stripe-product prod_pro
+```
 
-- `campaigns` appears in help/docs
-- the current command tree does not attach action handlers for those subcommands
+For Stripe purchase thresholds:
 
-Preferred fallback:
+```bash
+sequenzy segments create --name "3+ Pro Payments" --stripe-product prod_pro --purchase-operator at-least --payments 3
+```
+
+Guidance:
+
+- use `tags` for inspection only; there are no CLI tag mutations
+- use Stripe product IDs, not product names
+- use `--filter-json` when the user needs a non-Stripe or mixed filter payload
+- `segments count` is the quickest way to preview impact before using a segment in a campaign
+
+For MCP-driven workflows, `create_segment` supports the same Stripe filter shape:
+
+```json
+[
+  {
+    "id": "filter-1",
+    "field": "stripeProduct",
+    "operator": "at_least",
+    "value": "prod_pro:3"
+  }
+]
+```
+
+## "Create or manage a template"
+
+What works today:
+
+```bash
+sequenzy templates list
+sequenzy templates get tmpl_123
+sequenzy templates create welcome --subject "Welcome" --html-file ./welcome.html
+sequenzy templates update tmpl_123 --subject "Updated" --html-file ./welcome-v2.html
+```
+
+Guidance:
+
+- use HTML input; this API path stores it as a single text block
+- use `get` before `update` or `delete` when the user is uncertain about the target ID
+- warn that delete can fail when the template is still referenced by a campaign or sequence
+
+## "Create or manage a campaign"
+
+What works today:
+
+```bash
+sequenzy campaigns list --status draft
+sequenzy campaigns get camp_123
+sequenzy campaigns create "April Launch" --subject "We shipped" --html-file ./campaign.html
+sequenzy campaigns update camp_123 --subject "Updated subject"
+sequenzy campaigns test camp_123 --to you@example.com
+```
+
+Guidance:
+
+- the CLI only handles draft creation, draft updates, inspection, and test requests
+- there is no CLI command for sending or scheduling a campaign
+- in the current backend checkout, `campaigns test` returns a success message path rather than confirmed delivery
+
+Preferred fallback for unsupported campaign workflows:
 
 - use the dashboard
 - use direct API calls only if the task explicitly allows it and the relevant API is available
 
-## "Manage sequences or templates"
+## "Create or manage a sequence"
 
-Treat these as unsupported in the current CLI for the same reason as campaigns: the nouns are declared, but the handlers are not wired.
+What works today:
+
+```bash
+sequenzy sequences list
+sequenzy sequences get seq_123
+sequenzy sequences create onboarding --trigger contact_added --list-id list_123 --steps-file ./steps.json
+sequenzy sequences update seq_123 --steps-file ./sequence-updates.json
+sequenzy sequences enable seq_123
+sequenzy sequences disable seq_123
+```
+
+Minimal `steps.json` shape:
+
+```json
+[
+  {
+    "subject": "Welcome to Acme",
+    "html": "<p>Hi there</p>",
+    "delay": { "days": 0 }
+  },
+  {
+    "subject": "Day 3 follow-up",
+    "html": "<p>Here is the next step</p>",
+    "delay": { "days": 3 }
+  }
+]
+```
+
+Guidance:
+
+- CLI sequence creation is explicit-step only
+- choose the correct trigger options for `--trigger`
+- use `--steps-file` for create and either `--steps-file` or `--emails-file` for update
+- enable/disable are real CLI actions
+
+If the user wants AI-generated sequence creation:
+
+- the direct API supports `goal`, but the CLI does not expose that mode
+- use direct API only if the task explicitly allows it; otherwise prefer the dashboard
+
+## "Create an API key or inspect website/domain setup"
+
+Use:
+
+```bash
+sequenzy api-keys create --name "CI deploy key" --company comp_123
+sequenzy websites list --company comp_123
+sequenzy websites add example.com --company comp_123
+sequenzy websites check example.com --company comp_123
+sequenzy websites guide --framework nextjs --use-case transactional
+```
+
+Guidance:
+
+- save API keys immediately; the raw key is only returned on creation
+- use `websites check` when the user needs DNS verification details
+- use `websites guide` for integration code snippets rather than inventing framework examples
 
 ## "Generate email content with AI"
 
-Treat `sequenzy generate ...` as unsupported for now. The command names exist, but the current CLI does not attach handlers.
+Treat `sequenzy generate ...` as unsupported in the current CLI. The command names exist, but the current handlers intentionally exit with a not-implemented message.
 
 If the user still needs copy, generate it outside the CLI and clearly state that the Sequenzy CLI path is not implemented yet.

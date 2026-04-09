@@ -17,10 +17,10 @@ If docs and code disagree, trust the code.
 sequenzy login
 ```
 
-- Starts device auth against `POST /api/device-auth/initiate`
-- Polls `POST /api/device-auth/poll`
-- Opens `${SEQUENZY_APP_URL}/setup/auth?code=...` in the browser
-- Stores the API key in `Bun.secrets` when available, otherwise in local config
+- starts device auth against `POST /api/device-auth/initiate`
+- polls `POST /api/device-auth/poll`
+- opens `${SEQUENZY_APP_URL}/setup/auth?code=...` in the browser
+- stores the API key in `Bun.secrets` when available, otherwise in local config
 
 ### Non-interactive auth
 
@@ -30,10 +30,19 @@ Set `SEQUENZY_API_KEY` in the environment. `packages/cli/src/config.ts` checks t
 
 ```bash
 sequenzy whoami
+sequenzy account
 sequenzy logout
 ```
 
-Caveat: `whoami` prints cached local config, not a fresh API lookup. It is good for "am I authenticated here?" but not for authoritative account discovery.
+Behavior:
+
+- `whoami` prints cached local config only
+- `account`: `GET /api/v1/account`
+- `logout` removes locally stored auth
+
+Caveat:
+
+- treat `whoami` as "is this machine authenticated?" rather than authoritative server-side account discovery
 
 ## Environment Variables
 
@@ -47,7 +56,7 @@ Notes:
 
 - `SEQUENZY_API_KEY` overrides local keychain/config state
 - the current CLI code defaults `SEQUENZY_APP_URL` to `https://sequenzy.com`
-- older docs may mention `https://app.sequenzy.com`; do not assume that is current
+- many company-scoped commands accept `--company`, which sends `x-company-id` for personal API keys
 
 ## Stats
 
@@ -106,7 +115,7 @@ Behavior:
 
 Caveat:
 
-- The current handler treats `--tag` as a single value in practice. Do not rely on multiple tags in one call unless the CLI implementation changes.
+- the current handler accepts repeated `--tag`, but only one tag is reliably supported by the backend path
 
 ### Get
 
@@ -117,7 +126,6 @@ sequenzy subscribers get user@example.com
 Behavior:
 
 - sends `GET /api/v1/subscribers/:email`
-- prints the raw JSON payload
 
 ### Remove
 
@@ -137,7 +145,7 @@ Behavior:
 ### Template-based
 
 ```bash
-sequenzy send user@example.com --template welcome --var name=John
+sequenzy send user@example.com --template tmpl_123 --var name=John
 ```
 
 ### Raw HTML
@@ -157,25 +165,194 @@ Validation enforced by the CLI:
 - require either `--template` or `--html`/`--html-file`
 - require `--subject` when sending raw HTML
 
+## Companies, Lists, Tags, And Segments
+
+### Companies
+
+```bash
+sequenzy companies list
+sequenzy companies get comp_123
+sequenzy companies create example.com --name Example
+```
+
+Behavior:
+
+- `companies list`: `GET /api/v1/companies`
+- `companies get`: `GET /api/v1/companies/:id`
+- `companies create`: `POST /api/v1/companies`
+
+### Lists
+
+```bash
+sequenzy lists list
+sequenzy lists create Newsletter --description "Public newsletter list"
+sequenzy lists create VIP --private --company comp_123
+```
+
+Behavior:
+
+- `lists list`: `GET /api/v1/lists`
+- `lists create`: `POST /api/v1/lists`
+- create body shape is `{ name, description, isPrivate }`
+
+### Tags
+
+```bash
+sequenzy tags
+sequenzy tags --company comp_123 --json
+```
+
+Behavior:
+
+- sends `GET /api/v1/tags`
+- this is list-only; there are no tag mutation commands in the current CLI
+
+### Segments
+
+```bash
+sequenzy segments list
+sequenzy segments count seg_123
+sequenzy segments create --name "Bought Pro" --stripe-product prod_pro
+sequenzy segments create --name "3+ Pro Payments" --stripe-product prod_pro --purchase-operator at-least --payments 3
+```
+
+Behavior:
+
+- `segments list`: `GET /api/v1/segments`
+- `segments count`: `GET /api/v1/segments/:id/count`
+- `segments create`: `POST /api/v1/segments`
+- `--filter-json` accepts the raw segment filter array used by the API/MCP
+- Stripe product filters use `field: "stripeProduct"` and product IDs, not product names
+- threshold operators encode the count as `productId:count`, for example `prod_pro:3`
+
+## Templates
+
+```bash
+sequenzy templates list
+sequenzy templates get tmpl_123
+sequenzy templates create welcome --subject "Welcome" --html-file ./welcome.html
+sequenzy templates update tmpl_123 --subject "Updated" --html-file ./welcome-v2.html
+sequenzy templates delete tmpl_123
+```
+
+Behavior:
+
+- `templates list`: `GET /api/v1/templates`
+- `templates get`: `GET /api/v1/templates/:id`
+- `templates create`: `POST /api/v1/templates`
+- `templates update`: `PUT /api/v1/templates/:id`
+- `templates delete`: `DELETE /api/v1/templates/:id`
+
+Caveats:
+
+- create requires `name`, `subject`, and `html`
+- update accepts `name`, `subject`, and `html` only
+- HTML content is stored as a single text block by the current API path
+- deletion can fail if the template is still referenced by a campaign or sequence
+
+## Campaigns
+
+```bash
+sequenzy campaigns list
+sequenzy campaigns list --status draft --company comp_123
+sequenzy campaigns get camp_123
+sequenzy campaigns create "April Launch" --subject "We shipped" --html-file ./campaign.html
+sequenzy campaigns update camp_123 --subject "Updated subject"
+sequenzy campaigns test camp_123 --to you@example.com
+```
+
+Behavior:
+
+- `campaigns list`: `GET /api/v1/campaigns`
+- `campaigns get`: `GET /api/v1/campaigns/:id`
+- `campaigns create`: `POST /api/v1/campaigns`
+- `campaigns update`: `PUT /api/v1/campaigns/:id`
+- `campaigns test`: `POST /api/v1/campaigns/:id/test`
+
+Caveats:
+
+- create and update currently support `name`, `subject`, and `html` only
+- only draft campaigns can be updated through this API path
+- there is no CLI command for sending, scheduling, pausing, or cancelling campaigns
+- in the current backend checkout, `campaigns test` returns a success message path rather than a confirmed email send
+
+## Sequences
+
+```bash
+sequenzy sequences list
+sequenzy sequences get seq_123
+sequenzy sequences create onboarding --trigger contact_added --list-id list_123 --steps-file ./steps.json
+sequenzy sequences update seq_123 --steps-file ./sequence-updates.json
+sequenzy sequences enable seq_123
+sequenzy sequences disable seq_123
+sequenzy sequences delete seq_123
+```
+
+Behavior:
+
+- `sequences list`: `GET /api/v1/sequences`
+- `sequences get`: `GET /api/v1/sequences/:id`
+- `sequences create`: `POST /api/v1/sequences`
+- `sequences update`: `PUT /api/v1/sequences/:id`
+- `sequences enable`: `POST /api/v1/sequences/:id/enable`
+- `sequences disable`: `POST /api/v1/sequences/:id/disable`
+- `sequences delete`: `DELETE /api/v1/sequences/:id`
+
+Caveats:
+
+- CLI sequence creation is explicit-step only; use `--steps-json` or `--steps-file`
+- direct API supports AI `goal` mode, but the CLI does not expose it
+- trigger-specific options depend on `--trigger`
+- updates accept either step payloads or email payloads via `--steps-*` or `--emails-*`
+
+## API Keys
+
+```bash
+sequenzy api-keys create
+sequenzy api-keys create --name "CI deploy key" --company comp_123
+```
+
+Behavior:
+
+- sends `POST /api/v1/api-keys`
+- body shape is `{ name }`
+
+Caveat:
+
+- the plain API key is returned only at creation time; save it immediately
+
+## Websites
+
+```bash
+sequenzy websites list --company comp_123
+sequenzy websites add example.com --company comp_123
+sequenzy websites check example.com --company comp_123
+sequenzy websites guide --framework nextjs --use-case transactional
+```
+
+Behavior:
+
+- `websites list`: `GET /api/v1/websites`
+- `websites add`: `POST /api/v1/websites`
+- `websites check`: `GET /api/v1/websites/:domain`
+- `websites guide`: `POST /api/v1/integration-guide`
+
 ## Commands To Treat As Unsupported
 
-The following command groups appear in registration or docs but do not currently attach handlers in `packages/cli/src/index.tsx`:
+The following command group is intentionally placeholder-only in the current CLI:
 
-- `campaigns`
-- `sequences`
-- `templates`
-- `tags`
-- `lists`
-- `segments`
-- `account`
-- `websites`
 - `generate`
 
-Do not tell an agent to execute these as if they are working end-to-end.
+Also treat these requested workflows as unsupported in the CLI even though related nouns exist:
+
+- AI-generated sequence creation
+- campaign send, schedule, pause, cancel, or resume flows
+- bulk subscriber import
+- tag creation, update, or deletion
+- list update or deletion
 
 ## Operational Caveats
 
-- The CLI has no implemented company-selection flow yet.
-- `whoami` mentions `sequenzy account`, but `account` is currently just a placeholder command.
-- Bulk subscriber import is not exposed in the current CLI. Use the dashboard or API instead.
-- Marketing campaign creation and sequence management are not currently usable through the implemented CLI handlers.
+- prefer `SEQUENZY_API_KEY` for automation instead of interactive login
+- use `--json` when another tool or agent needs the raw response
+- when the user asks for a workflow outside the current CLI surface, say so directly and choose between dashboard or direct API use instead of inventing commands
