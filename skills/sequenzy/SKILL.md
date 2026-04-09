@@ -39,7 +39,7 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 
 ## Unsupported Or Placeholder Workflows
 
-Treat `sequenzy generate ...` as unsupported placeholder surface. Also treat missing subcommands as unsupported even when the noun exists. For example: campaign send/schedule flows, list deletion, tag mutation, bulk subscriber import, and AI-generated sequence creation are not available through the current CLI handlers.
+Treat `sequenzy generate ...` as unsupported placeholder surface. Also treat missing subcommands as unsupported even when the noun exists. For example: campaign send/schedule flows, list deletion, tag mutation, and bulk subscriber import are not available through the current CLI handlers.
 
 ## Execution Pattern
 
@@ -48,7 +48,7 @@ Treat `sequenzy generate ...` as unsupported placeholder surface. Also treat mis
 3. Validate IDs, recipient email, subject, template, or HTML input before issuing a mutation.
 4. Surface CLI limitations directly instead of inventing a workaround.
 5. If the workflow is unsupported in the CLI, say whether the next-best path is the Sequenzy dashboard or direct API use.
-6. Call out implementation caveats that matter operationally, such as `whoami` using cached local auth state, sequence creation being explicit-step only in the CLI, and `campaigns test` being a stubbed success path in the current backend.
+6. Call out implementation caveats that matter operationally, such as `whoami` using cached local auth state, sequence creation supporting both `--goal` and explicit step modes, and `campaigns test` being a stubbed success path in the current backend.
 
 ## References
 

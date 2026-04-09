@@ -213,6 +213,7 @@ What works today:
 ```bash
 sequenzy sequences list
 sequenzy sequences get seq_123
+sequenzy sequences create onboarding --trigger event_received --event-name signup.completed --goal "Guide new users to activation" --email-count 4
 sequenzy sequences create onboarding --trigger contact_added --list-id list_123 --steps-file ./steps.json
 sequenzy sequences update seq_123 --steps-file ./sequence-updates.json
 sequenzy sequences enable seq_123
@@ -238,15 +239,11 @@ Minimal `steps.json` shape:
 
 Guidance:
 
-- CLI sequence creation is explicit-step only
+- CLI sequence creation supports either AI `--goal` mode or explicit step files
 - choose the correct trigger options for `--trigger`
-- use `--steps-file` for create and either `--steps-file` or `--emails-file` for update
+- use `--goal` when you want AI-generated drafts, or `--steps-file` when you already know the exact step content
+- use either `--steps-file` or `--emails-file` for update
 - enable/disable are real CLI actions
-
-If the user wants AI-generated sequence creation:
-
-- the direct API supports `goal`, but the CLI does not expose that mode
-- use direct API only if the task explicitly allows it; otherwise prefer the dashboard
 
 ## "Create an API key or inspect website/domain setup"
 

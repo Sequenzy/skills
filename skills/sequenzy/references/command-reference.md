@@ -281,6 +281,7 @@ Caveats:
 ```bash
 sequenzy sequences list
 sequenzy sequences get seq_123
+sequenzy sequences create onboarding --trigger event_received --event-name signup.completed --goal "Guide new users to activation" --email-count 4
 sequenzy sequences create onboarding --trigger contact_added --list-id list_123 --steps-file ./steps.json
 sequenzy sequences update seq_123 --steps-file ./sequence-updates.json
 sequenzy sequences enable seq_123
@@ -300,8 +301,8 @@ Behavior:
 
 Caveats:
 
-- CLI sequence creation is explicit-step only; use `--steps-json` or `--steps-file`
-- direct API supports AI `goal` mode, but the CLI does not expose it
+- CLI sequence creation supports either AI `--goal` mode or explicit `--steps-json` / `--steps-file` mode
+- `--email-count` is only meaningful with `--goal`
 - trigger-specific options depend on `--trigger`
 - updates accept either step payloads or email payloads via `--steps-*` or `--emails-*`
 
@@ -345,7 +346,6 @@ The following command group is intentionally placeholder-only in the current CLI
 
 Also treat these requested workflows as unsupported in the CLI even though related nouns exist:
 
-- AI-generated sequence creation
 - campaign send, schedule, pause, cancel, or resume flows
 - bulk subscriber import
 - tag creation, update, or deletion
