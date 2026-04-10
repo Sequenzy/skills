@@ -74,6 +74,7 @@ What works today:
 
 ```bash
 sequenzy subscribers add user@example.com --tag premium --attr name=John
+sequenzy subscribers add user@example.com --tag premium --tag beta --company comp_123
 sequenzy subscribers get user@example.com
 ```
 
@@ -81,7 +82,9 @@ Guidance:
 
 - use `add` for single-recipient creation or upsert
 - use repeated `--attr key=value` pairs for metadata
-- use only one `--tag` value unless the backend path changes
+- repeated `--tag` values are supported
+- use `--company` when the API key can access multiple companies
+- use `subscribers get` when you need the full profile, list memberships, sequence enrollments, email stats, or recent activity
 
 What does not work well today:
 
@@ -95,6 +98,7 @@ For those, prefer the Sequenzy dashboard or direct API use.
 Use:
 
 ```bash
+sequenzy subscribers list --tag vip
 sequenzy subscribers get user@example.com
 sequenzy subscribers remove user@example.com
 ```
@@ -104,6 +108,11 @@ Use `--hard` only when the task explicitly requires permanent deletion:
 ```bash
 sequenzy subscribers remove user@example.com --hard
 ```
+
+Notes:
+
+- plain `remove` performs a full unsubscribe workflow rather than a hard delete
+- use `--company` when operating with a personal API key across multiple companies
 
 ## "Send one transactional email"
 

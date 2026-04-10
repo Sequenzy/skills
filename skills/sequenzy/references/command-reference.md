@@ -92,6 +92,7 @@ sequenzy subscribers list
 sequenzy subscribers list --tag vip
 sequenzy subscribers list --segment seg_123
 sequenzy subscribers list --limit 100
+sequenzy subscribers list --tag vip --company comp_123 --json
 ```
 
 Behavior:
@@ -100,45 +101,50 @@ Behavior:
 - maps `--segment` to `segmentId`
 - maps `--tag` to `tags`
 - maps `--limit` to `limit`
+- fetches every result page by default when `--limit` is omitted
+- supports `--company` and `--json`
 
 ### Add
 
 ```bash
 sequenzy subscribers add user@example.com
 sequenzy subscribers add user@example.com --tag premium --attr name=John --attr plan=pro
+sequenzy subscribers add user@example.com --tag premium --tag beta --company comp_123 --json
 ```
 
 Behavior:
 
 - sends `POST /api/v1/subscribers`
-- body shape is `{ email, tags, attributes }`
-
-Caveat:
-
-- the current handler accepts repeated `--tag`, but only one tag is reliably supported by the backend path
+- body shape is `{ email, tags, customAttributes }`
+- supports repeated `--tag` values
+- supports `--company` and `--json`
 
 ### Get
 
 ```bash
 sequenzy subscribers get user@example.com
+sequenzy subscribers get user@example.com --company comp_123 --json
 ```
 
 Behavior:
 
 - sends `GET /api/v1/subscribers/:email`
+- returns the full subscriber profile, including list memberships, sequence enrollments, email stats, and recent activity
+- supports `--company` and `--json`
 
 ### Remove
 
 ```bash
 sequenzy subscribers remove user@example.com
 sequenzy subscribers remove user@example.com --hard
+sequenzy subscribers remove user@example.com --company comp_123 --json
 ```
 
 Behavior:
 
-- sends `DELETE /api/v1/subscribers/:email`
-- body is `{ hardDelete: boolean }`
-- without `--hard`, the CLI frames this as unsubscribe
+- without `--hard`, sends `PATCH /api/v1/subscribers/:email` with `{ status: "unsubscribed" }`
+- with `--hard`, sends `DELETE /api/v1/subscribers/:email`
+- supports `--company` and `--json`
 
 ## Transactional Send
 
