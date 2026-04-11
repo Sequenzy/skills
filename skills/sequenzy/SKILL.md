@@ -7,15 +7,16 @@ description: Agent guide for operating Sequenzy. Use when Codex needs to authent
 
 ## Overview
 
-Use this skill when the task is to operate Sequenzy, not to change Sequenzy's source code. Prefer the `sequenzy` CLI for supported workflows and explicitly call out when a requested workflow is not wired in the current implementation.
+Use this skill when the task is to operate Sequenzy, not to change Sequenzy's source code. Prefer the `sequenzy` CLI for supported workflows, treat `packages/mcp/src/tools/index.ts` as the MCP source of truth when the task goes through MCP tools, and explicitly call out when a requested workflow is not wired in the current implementation.
 
 ## Ground Rules
 
 1. Treat `packages/cli/src/index.tsx` as the source of truth for which commands are actually wired.
-2. Treat `packages/cli/src/commands/` and `packages/cli/src/api.ts` as the source of truth for behavior, payload shape, and API routes.
-3. Do not promise support for commands that only appear in docs or `--help` text without an attached action handler.
-4. Prefer `sequenzy login` for interactive auth and `SEQUENZY_API_KEY` for automation.
-5. Prefer inspection before mutation whenever the workflow allows it.
+2. Treat `packages/cli/src/commands/` and `packages/cli/src/api.ts` as the source of truth for CLI behavior, payload shape, and API routes.
+3. Treat `packages/mcp/src/tools/index.ts` as the source of truth for MCP tool names, arguments, and preflight validation.
+4. Do not promise support for commands or tools that only appear in docs or `--help` text without an attached implementation.
+5. Prefer `sequenzy login` for interactive auth and `SEQUENZY_API_KEY` for automation.
+6. Prefer inspection before mutation whenever the workflow allows it.
 
 ## Supported Workflows
 
@@ -32,6 +33,7 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - segments `list`, `create`, and `count`
 - templates `list`, `get`, `create`, `update`, and `delete`
 - campaigns `list`, `get`, `create`, `update` including reply-to updates, and `test`
+- MCP `update_campaign` calls including `replyTo` and `replyProfileId`
 - sequences `list`, `get`, `create`, `update`, `enable`, `disable`, and `delete`
 - websites `list`, `add`, `check`, and `guide`
 - API key creation with `api-keys create`

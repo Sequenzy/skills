@@ -288,6 +288,13 @@ Caveats:
 - there is no CLI command for sending, scheduling, pausing, or cancelling campaigns
 - in the current backend checkout, `campaigns test` returns a success message path rather than a confirmed email send
 
+MCP parity:
+
+- `update_campaign` accepts `name`, `subject`, `html`, `replyTo`, and `replyProfileId`
+- `replyTo` and `replyProfileId` are mutually exclusive
+- MCP rejects calls that omit all update fields before hitting the API
+- MCP rejects unsupported extra update fields before hitting the API
+
 ## Sequences
 
 ```bash

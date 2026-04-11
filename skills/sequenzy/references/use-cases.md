@@ -216,6 +216,17 @@ Guidance:
 - there is no CLI command for sending or scheduling a campaign
 - in the current backend checkout, `campaigns test` returns a success message path rather than confirmed delivery
 
+For MCP-driven campaign updates, `update_campaign` supports the same reply-to behavior:
+
+```json
+{
+  "campaignId": "camp_123",
+  "replyTo": "support@example.com"
+}
+```
+
+Use `replyProfileId` instead when the caller already has the reply profile ID, and never send both fields together.
+
 Preferred fallback for unsupported campaign workflows:
 
 - use the dashboard
