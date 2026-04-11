@@ -31,7 +31,7 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - tags `list`
 - segments `list`, `create`, and `count`
 - templates `list`, `get`, `create`, `update`, and `delete`
-- campaigns `list`, `get`, `create`, `update`, and `test`
+- campaigns `list`, `get`, `create`, `update` including reply-to updates, and `test`
 - sequences `list`, `get`, `create`, `update`, `enable`, `disable`, and `delete`
 - websites `list`, `add`, `check`, and `guide`
 - API key creation with `api-keys create`

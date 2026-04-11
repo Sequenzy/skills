@@ -264,6 +264,8 @@ sequenzy campaigns list --status draft --company comp_123
 sequenzy campaigns get camp_123
 sequenzy campaigns create "April Launch" --subject "We shipped" --html-file ./campaign.html
 sequenzy campaigns update camp_123 --subject "Updated subject"
+sequenzy campaigns update camp_123 --reply-to support@example.com
+sequenzy campaigns update camp_123 --reply-profile reply_123
 sequenzy campaigns test camp_123 --to you@example.com
 ```
 
@@ -277,7 +279,11 @@ Behavior:
 
 Caveats:
 
-- create and update currently support `name`, `subject`, and `html` only
+- create supports `name`, `subject`, and `html`
+- update supports `name`, `subject`, `html`, `--reply-to`, and `--reply-profile`
+- `--reply-to` resolves an existing reply profile by email and `--reply-profile` sets it directly by ID
+- `--reply-to` and `--reply-profile` are mutually exclusive
+- `campaigns get` now includes saved reply-to details when the campaign has a reply profile
 - only draft campaigns can be updated through this API path
 - there is no CLI command for sending, scheduling, pausing, or cancelling campaigns
 - in the current backend checkout, `campaigns test` returns a success message path rather than a confirmed email send

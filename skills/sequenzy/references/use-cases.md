@@ -201,12 +201,18 @@ sequenzy campaigns list --status draft
 sequenzy campaigns get camp_123
 sequenzy campaigns create "April Launch" --subject "We shipped" --html-file ./campaign.html
 sequenzy campaigns update camp_123 --subject "Updated subject"
+sequenzy campaigns update camp_123 --reply-to support@example.com
+sequenzy campaigns update camp_123 --reply-profile reply_123
 sequenzy campaigns test camp_123 --to you@example.com
 ```
 
 Guidance:
 
 - the CLI only handles draft creation, draft updates, inspection, and test requests
+- use `--reply-to` when the user knows the reply profile email and it already exists for the company
+- use `--reply-profile` when the user already has the reply profile ID
+- do not pass `--reply-to` and `--reply-profile` together
+- use `campaigns get` after an update when you want to confirm the saved reply-to details
 - there is no CLI command for sending or scheduling a campaign
 - in the current backend checkout, `campaigns test` returns a success message path rather than confirmed delivery
 
