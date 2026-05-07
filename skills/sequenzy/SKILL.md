@@ -30,11 +30,11 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - subscribers `list`, `add`, `get`, and `remove`
 - lists `list` and `create`
 - tags `list`
-- segments `list`, `create`, and `count`, including `--match any` in the CLI and `filterJoinOperator: "or"` in MCP/API calls
+- segments `list`, `create`, and `count`, including `--match any`, nested filter roots, custom event filters, and saved-segment composition filters
 - templates `list`, `get`, `create`, `update`, and `delete`, with `create` and `update` accepting raw HTML or Sequenzy block JSON
 - campaigns `list`, `get`, `create`, `update` including reply-to updates, and `test`, with `create` accepting raw HTML, Sequenzy block JSON, or prompt-generated content and `update` accepting raw HTML or Sequenzy block JSON
 - MCP `update_campaign` calls including `replyTo` and `replyProfileId`
-- sequences `list`, `get`, `create`, `update`, `enable`, `disable`, and `delete`
+- sequences `list`, `get`, `create`, `update`, `enable`, `disable`, `delete`, and `cancel-enrollments`, including explicit discount action steps, cancellation by subscriber ID or event-property field values, and `update` branch insertion with tag, list, segment, event, clicked-link, and field conditions; event and clicked-link branch checks can use `activityScope` (`this_sequence`, `previous_email`, `ever`)
 - AI generation with `generate email`, `generate sequence`, and `generate subjects`
 - dashboard URL generation with CLI `urls`, MCP `get_app_urls`, and `appUrls`/`url` fields on campaign, sequence, template, and company results
 - websites `list`, `add`, `check`, and `guide`
@@ -53,7 +53,7 @@ Treat missing subcommands as unsupported even when the noun exists. For example:
 4. Surface CLI limitations directly instead of inventing a workaround.
 5. If the workflow is unsupported in the CLI, say whether the next-best path is the Sequenzy dashboard or direct API use.
 6. When you create or inspect a campaign, sequence, template, or company and the user may want to review/edit it, surface the dashboard URL from `url` or `appUrls` in the tool/CLI output. If needed, generate it with `sequenzy urls` or MCP `get_app_urls`.
-7. Call out implementation caveats that matter operationally, such as `whoami` using cached local auth state, sequence creation supporting both `--goal` and explicit step modes, generated sequences being capped at 10 emails, `campaigns test` being a stubbed success path in the current backend, and conditional email content requiring block JSON rather than raw HTML.
+7. Call out implementation caveats that matter operationally, such as `whoami` using cached local auth state, sequence creation supporting both `--goal` and explicit step modes, explicit discount steps requiring Stripe before activation, generated sequences being capped at 10 emails, `campaigns test` being a stubbed success path in the current backend, and conditional email content requiring block JSON rather than raw HTML.
 
 ## Dashboard URLs
 

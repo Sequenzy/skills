@@ -247,6 +247,7 @@ sequenzy segments count seg_123
 sequenzy segments create --name "Bought Pro" --stripe-product prod_pro
 sequenzy segments create --name "3+ Pro Payments" --stripe-product prod_pro --purchase-operator at-least --payments 3
 sequenzy segments create --name "VIP or Churn Risk" --match any --filter-json '[{"field":"tag","operator":"contains","value":"vip"},{"field":"emailOpened","operator":"is_not","value":"30d"}]'
+sequenzy segments create --name "Active non-paying" --filter-json '{"kind":"group","id":"root","joinOperator":"and","children":[{"kind":"filter","id":"f1","field":"attribute","operator":"gte","value":"last_login_days_ago:0"},{"kind":"group","id":"g1","joinOperator":"or","children":[{"kind":"filter","id":"f2","field":"attribute","operator":"is_empty","value":"plan_end"},{"kind":"filter","id":"f3","field":"attribute","operator":"lt","value":"plan_end:2026-04-21"}]}]}'
 ```
 
 Behavior:
@@ -254,9 +255,12 @@ Behavior:
 - `segments list`: `GET /api/v1/segments`
 - `segments count`: `GET /api/v1/segments/:id/count`
 - `segments create`: `POST /api/v1/segments`
-- `--filter-json` accepts the raw segment filter array used by the API/MCP
+- `--filter-json` accepts either the legacy raw segment filter array or a nested filter `root` object
 - `--match all|any` controls whether top-level filters are combined with `and` or `or`
 - MCP/API use `filterJoinOperator: "and" | "or"` for the same behavior
+- nested segment logic uses `{ "kind": "group", "joinOperator": "and" | "or", "children": [...] }`
+- custom event filters use `field: "event"` with values like `saas.purchase:30d`, `saas.purchase:all`, or `saas.purchase:5:30d`
+- saved segment composition uses `field: "segment"` with `operator: "is" | "is_not"` and the referenced segment id as `value`
 - Stripe product filters use `field: "stripeProduct"` and product IDs, not product names
 - threshold operators encode the count as `productId:count`, for example `prod_pro:3`
 
@@ -342,10 +346,15 @@ sequenzy sequences list
 sequenzy sequences get seq_123
 sequenzy sequences create onboarding --trigger event_received --event-name signup.completed --goal "Guide new users to activation" --email-count 4
 sequenzy sequences create onboarding --trigger contact_added --list-id list_123 --steps-file ./steps.json
+sequenzy sequences create winback --trigger tag_added --tag-name cancelled --steps-file ./discount-steps.json
 sequenzy sequences update seq_123 --steps-file ./sequence-updates.json
+sequenzy sequences update seq_123 --branch-file ./branch.json
 sequenzy sequences enable seq_123
 sequenzy sequences disable seq_123
 sequenzy sequences delete seq_123
+sequenzy sequences cancel-enrollments seq_123 --subscriber-id sub_123 --reason "Converted"
+sequenzy sequences cancel-enrollments seq_123 --field-path order.id --field-values ord_123,ord_456
+sequenzy sequences cancel-enrollments seq_123 --field-values price_123 --apply
 ```
 
 Behavior:
@@ -357,15 +366,25 @@ Behavior:
 - `sequences enable`: `POST /api/v1/sequences/:id/enable`
 - `sequences disable`: `POST /api/v1/sequences/:id/disable`
 - `sequences delete`: `DELETE /api/v1/sequences/:id`
+- `sequences cancel-enrollments`: `POST /api/v1/sequences/:id/enrollments/cancel`
 - dashboard-aware responses include `url` on sequence records and `appUrls` on the top-level JSON when the company can be resolved
 
 Caveats:
 
 - CLI sequence creation supports either AI `--goal` mode or explicit `--steps-json` / `--steps-file` mode
+- explicit create steps can include `{ "type": "create_discount" }`; emails after that action can reference `{{discount.code}}`, `{{discount.percentOff}}`, and related `discount.*` merge tags
+- discount action sequences require a connected Stripe integration before activation
 - `--email-count` is only meaningful with `--goal`
 - `--email-count` accepts 1 to 10 generated emails
 - trigger-specific options depend on `--trigger`
 - updates accept either step payloads or email payloads via `--steps-*` or `--emails-*`
+- branch insertion uses `--branch-json` or `--branch-file` with condition types `has_tag`, `in_list`, `in_segment`, `event_received`, `link_clicked`, and `field_*`
+- branch condition fields are `tagId`/`tagName`, `listId`, `segmentId`/`segmentName`, `eventName`, `linkUrl`, `activityScope`, or `fieldName`/`fieldValue`; omit `linkUrl` to match any clicked link
+- for `event_received` and `link_clicked`, set `activityScope` to `this_sequence`, `previous_email`, or `ever`; omitting it checks the contact's full history
+- `cancel-enrollments` requires a sequence ID and exactly one target: `--subscriber-id` or `--field-values`
+- `--field-values` matches active/waiting enrollments by the stored entry event property at `--field-path`, or the sequence's configured `enrollmentFieldPath` when `--field-path` is omitted
+- CLI cancellation is a dry run unless `--apply` is passed; use dry runs for field-value/bulk checks before mutating enrollments
+- MCP uses `cancel_sequence_enrollments` with the same target rule; set `dryRun: false` to apply field-value cancellation
 
 ## AI Generation
 

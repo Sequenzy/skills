@@ -180,6 +180,7 @@ sequenzy segments list
 sequenzy segments count seg_123
 sequenzy segments create --name "Bought Pro" --stripe-product prod_pro
 sequenzy segments create --name "VIP or Churn Risk" --match any --filter-json '[{"field":"tag","operator":"contains","value":"vip"},{"field":"emailOpened","operator":"is_not","value":"30d"}]'
+sequenzy segments create --name "Active non-paying" --filter-json '{"kind":"group","id":"root","joinOperator":"and","children":[{"kind":"filter","id":"f1","field":"attribute","operator":"gte","value":"last_login_days_ago:0"},{"kind":"group","id":"g1","joinOperator":"or","children":[{"kind":"filter","id":"f2","field":"attribute","operator":"is_empty","value":"plan_end"},{"kind":"filter","id":"f3","field":"attribute","operator":"lt","value":"plan_end:2026-04-21"}]}]}'
 ```
 
 For Stripe purchase thresholds:
@@ -192,11 +193,11 @@ Guidance:
 
 - use `tags` for inspection only; there are no CLI tag mutations
 - use Stripe product IDs, not product names
-- use `--filter-json` when the user needs a non-Stripe or mixed filter payload
+- use `--filter-json` when the user needs a non-Stripe, mixed, nested, custom event, or saved-segment payload
 - use `--match any` when the segment should match any top-level filter instead of all filters
 - `segments count` is the quickest way to preview impact before using a segment in a campaign
 
-For MCP-driven workflows, `create_segment` supports the same Stripe filter shape and `filterJoinOperator: "or"` for match-any segments:
+For MCP-driven workflows, `create_segment` supports the same legacy filter array with `filterJoinOperator: "or"` for match-any segments:
 
 ```json
 {
@@ -209,6 +210,34 @@ For MCP-driven workflows, `create_segment` supports the same Stripe filter shape
       "value": "prod_pro:3"
     }
   ]
+}
+```
+
+For nested AND/OR logic, send a `root` instead of `filters`. Event filters use `field: "event"` and values like `saas.purchase:30d` or `saas.purchase:5:30d`; segment-of-segment filters use `field: "segment"` with the referenced segment id as `value`.
+
+```json
+{
+  "root": {
+    "kind": "group",
+    "id": "root",
+    "joinOperator": "and",
+    "children": [
+      {
+        "kind": "filter",
+        "id": "filter-1",
+        "field": "event",
+        "operator": "at_least",
+        "value": "saas.purchase:2:30d"
+      },
+      {
+        "kind": "filter",
+        "id": "filter-2",
+        "field": "segment",
+        "operator": "is_not",
+        "value": "seg_churned"
+      }
+    ]
+  }
 }
 ```
 
@@ -288,9 +317,13 @@ sequenzy sequences list
 sequenzy sequences get seq_123
 sequenzy sequences create onboarding --trigger event_received --event-name signup.completed --goal "Guide new users to activation" --email-count 4
 sequenzy sequences create onboarding --trigger contact_added --list-id list_123 --steps-file ./steps.json
+sequenzy sequences create winback --trigger tag_added --tag-name cancelled --steps-file ./discount-steps.json
 sequenzy sequences update seq_123 --steps-file ./sequence-updates.json
 sequenzy sequences enable seq_123
 sequenzy sequences disable seq_123
+sequenzy sequences cancel-enrollments seq_123 --subscriber-id sub_123
+sequenzy sequences cancel-enrollments seq_123 --field-path order.id --field-values ord_123,ord_456
+sequenzy sequences cancel-enrollments seq_123 --field-values price_123 --apply
 ```
 
 Minimal `steps.json` shape:
@@ -310,14 +343,86 @@ Minimal `steps.json` shape:
 ]
 ```
 
+Discount step shape:
+
+```json
+[
+  {
+    "type": "create_discount",
+    "label": "Create win-back discount",
+    "discountType": "percent",
+    "percentOff": 20,
+    "duration": "once",
+    "appliesToAllPlans": true,
+    "maxRedemptions": 1,
+    "codePrefix": "WINBACK"
+  },
+  {
+    "subject": "Come back with {{discount.code}}",
+    "html": "<p>Use {{discount.code}} for {{discount.percentOff}}% off.</p>",
+    "delay": { "days": 1 }
+  }
+]
+```
+
+Branch insertion shape for "clicked invite, otherwise remind":
+
+```json
+{
+  "afterNodeId": "node_email",
+  "branches": [
+    {
+      "conditionType": "link_clicked",
+      "linkUrl": "project-invites",
+      "activityScope": "previous_email",
+      "steps": [
+        {
+          "subject": "Project invite accepted",
+          "html": "<p>Here is your next project step.</p>"
+        }
+      ]
+    }
+  ],
+  "elseSteps": [
+    {
+      "subject": "Reminder: accept your invite",
+      "html": "<p>Please accept your project invite.</p>"
+    }
+  ]
+}
+```
+
 Guidance:
 
 - CLI sequence creation supports either AI `--goal` mode or explicit step files
 - create, get, update, and list outputs include dashboard URLs when the company can be resolved
 - choose the correct trigger options for `--trigger`
 - use `--goal` when you want AI-generated drafts, or `--steps-file` when you already know the exact step content
+- discount action steps require Stripe to be connected before activation
 - use either `--steps-file` or `--emails-file` for update
+- use `--branch-file` for if/else insertion; branch conditions support tag, list, segment, event, clicked-link, and field checks
+- for `link_clicked`, set `linkUrl` to part of the target URL or omit it to match any tracked click
+- for `event_received` and `link_clicked`, set `activityScope` to `this_sequence`, `previous_email`, or `ever`
 - enable/disable are real CLI actions
+
+## "Stop people in a sequence"
+
+Use:
+
+```bash
+sequenzy sequences cancel-enrollments seq_123 --subscriber-id sub_123 --reason "Converted"
+sequenzy sequences cancel-enrollments seq_123 --field-path order.id --field-values ord_123,ord_456
+sequenzy sequences cancel-enrollments seq_123 --field-values price_123 --apply
+```
+
+Guidance:
+
+- require the sequence ID; never attempt cross-sequence cancellation from only an event or field value
+- use `--subscriber-id` when the caller knows the exact subscriber enrollment to stop
+- use `--field-values` when the caller wants to stop all active/waiting enrollments whose stored entry event property matches specific IDs
+- include `--field-path` unless the sequence already has the correct `enrollmentFieldPath`
+- omit `--apply` for a dry run; pass `--apply` only after reviewing the matched count
+- MCP equivalent is `cancel_sequence_enrollments` with exactly one of `subscriberId` or `fieldValues`; set `dryRun: false` to apply a field-value cancellation
 
 ## "Create an API key or inspect website/domain setup"
 
