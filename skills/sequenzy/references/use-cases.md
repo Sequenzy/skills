@@ -247,10 +247,11 @@ What works today:
 
 ```bash
 sequenzy templates list
+sequenzy templates list --label edm
 sequenzy templates get tmpl_123
-sequenzy templates create welcome --subject "Welcome" --html-file ./welcome.html
+sequenzy templates create welcome --subject "Welcome" --label edm --html-file ./welcome.html
 sequenzy templates create welcome --subject "Welcome" --blocks-file ./welcome-blocks.json
-sequenzy templates update tmpl_123 --subject "Updated" --html-file ./welcome-v2.html
+sequenzy templates update tmpl_123 --subject "Updated" --label edm --html-file ./welcome-v2.html
 sequenzy templates update tmpl_123 --blocks-file ./welcome-v2-blocks.json
 ```
 
@@ -258,6 +259,7 @@ Guidance:
 
 - use block JSON when the user needs conditional content or an exact editor-compatible structure
 - use HTML input for simpler one-off content; this API path stores raw HTML as a single text block
+- use `--label` on `list` to filter by label, and on `create` or `update` to assign replacement labels
 - a conditional block uses a block-level `condition` object with merge-tag variable names and no `{{ }}` braces
 - use `get` before `update` or `delete` when the user is uncertain about the target ID
 - warn that delete can fail when the template is still referenced by a campaign or sequence
@@ -267,37 +269,52 @@ Guidance:
 What works today:
 
 ```bash
-sequenzy campaigns list --status draft
+sequenzy campaigns list --status draft --label edm
 sequenzy campaigns get camp_123
 sequenzy campaigns create "April Launch" --prompt "Announce our new dashboard"
-sequenzy campaigns create "April Launch" --subject "We shipped" --html-file ./campaign.html
+sequenzy campaigns create "April Launch" --subject "We shipped" --label edm --html-file ./campaign.html
 sequenzy campaigns create "April Launch" --subject "We shipped" --blocks-file ./campaign-blocks.json
-sequenzy campaigns update camp_123 --subject "Updated subject"
+sequenzy campaigns update camp_123 --subject "Updated subject" --label edm
 sequenzy campaigns update camp_123 --blocks-file ./campaign-v2-blocks.json
 sequenzy campaigns update camp_123 --reply-to support@example.com
 sequenzy campaigns update camp_123 --reply-profile reply_123
+sequenzy campaigns schedule camp_123 --at "2026-06-01T14:00:00Z"
 sequenzy campaigns test camp_123 --to you@example.com
 ```
 
 Guidance:
 
-- the CLI only handles draft creation, draft updates, inspection, and test requests
-- create, get, update, list, and test outputs include dashboard URLs when the company can be resolved
+- the CLI handles draft creation, draft updates, inspection, scheduling, and test requests
+- create, get, update, schedule, list, and test outputs include dashboard URLs when the company can be resolved; campaign outputs include a review `previewUrl`
 - use `--prompt` for AI-generated draft content; do not combine it with HTML or block flags
+- use `--label` on `list` to filter by campaign label, and on `create` or `update` to assign replacement labels
 - use block JSON when the user needs conditional content or an exact editor-compatible structure
 - use `--reply-to` when the user knows the reply profile email and it already exists for the company
 - use `--reply-profile` when the user already has the reply profile ID
 - do not pass `--reply-to` and `--reply-profile` together
 - use `campaigns get` after an update when you want to confirm the saved reply-to details
-- there is no CLI command for sending or scheduling a campaign
+- use `campaigns schedule --at <future ISO datetime>` when the user asks to schedule a campaign; it requires a verified sending domain
+- use `--target-lists-json` or `--target-lists-file` only when the user explicitly needs new targeting at schedule time
+- there is no CLI command for immediately sending, pausing, or cancelling a campaign
 - in the current backend checkout, `campaigns test` returns a success message path rather than confirmed delivery
 
-For MCP-driven campaign updates, `update_campaign` supports the same reply-to behavior:
+For MCP-driven campaign updates, `update_campaign` supports labels and the same reply-to behavior:
 
 ```json
 {
   "campaignId": "camp_123",
+  "labels": ["edm"],
   "replyTo": "support@example.com"
+}
+```
+
+For MCP-driven scheduling, call `schedule_campaign`:
+
+```json
+{
+  "campaignId": "camp_123",
+  "scheduledAt": "2026-06-01T14:00:00Z",
+  "targetLists": { "type": "all" }
 }
 ```
 

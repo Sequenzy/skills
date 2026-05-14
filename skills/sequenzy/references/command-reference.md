@@ -268,17 +268,18 @@ Behavior:
 
 ```bash
 sequenzy templates list
+sequenzy templates list --label edm
 sequenzy templates get tmpl_123
-sequenzy templates create welcome --subject "Welcome" --html-file ./welcome.html
+sequenzy templates create welcome --subject "Welcome" --label edm --html-file ./welcome.html
 sequenzy templates create welcome --subject "Welcome" --blocks-file ./welcome-blocks.json
-sequenzy templates update tmpl_123 --subject "Updated" --html-file ./welcome-v2.html
+sequenzy templates update tmpl_123 --subject "Updated" --label edm --html-file ./welcome-v2.html
 sequenzy templates update tmpl_123 --blocks-file ./welcome-v2-blocks.json
 sequenzy templates delete tmpl_123
 ```
 
 Behavior:
 
-- `templates list`: `GET /api/v1/templates`
+- `templates list`: `GET /api/v1/templates`, optionally with `?label=...`
 - `templates get`: `GET /api/v1/templates/:id`
 - `templates create`: `POST /api/v1/templates`
 - `templates update`: `PUT /api/v1/templates/:id`
@@ -286,8 +287,9 @@ Behavior:
 
 Caveats:
 
-- create requires `name`, `subject`, and either `html` or `blocks`
-- update accepts `name`, `subject`, `html`, and `blocks`
+- list accepts `--label <labels...>` to filter by template label name
+- create requires `name`, `subject`, and either `html` or `blocks`; it can also assign labels with `--label <labels...>`
+- update accepts `name`, `subject`, `html`, `blocks`, and replacement labels with `--label <labels...>`
 - `--blocks-json` and `--blocks-file` pass Sequenzy block arrays through directly
 - conditional email content is only available through block JSON, using a block-level `condition` object
 - raw HTML is still stored as a single text block by the current API path
@@ -297,31 +299,38 @@ Caveats:
 
 ```bash
 sequenzy campaigns list
-sequenzy campaigns list --status draft --company comp_123
+sequenzy campaigns list --status draft --label edm --company comp_123
 sequenzy campaigns get camp_123
 sequenzy campaigns create "April Launch" --prompt "Announce our new dashboard"
-sequenzy campaigns create "April Launch" --subject "We shipped" --html-file ./campaign.html
+sequenzy campaigns create "April Launch" --subject "We shipped" --label edm --html-file ./campaign.html
 sequenzy campaigns create "April Launch" --subject "We shipped" --blocks-file ./campaign-blocks.json
-sequenzy campaigns update camp_123 --subject "Updated subject"
+sequenzy campaigns update camp_123 --subject "Updated subject" --label edm
 sequenzy campaigns update camp_123 --blocks-file ./campaign-v2-blocks.json
 sequenzy campaigns update camp_123 --reply-to support@example.com
 sequenzy campaigns update camp_123 --reply-profile reply_123
+sequenzy campaigns schedule camp_123 --at "2026-06-01T14:00:00Z"
+sequenzy campaigns schedule camp_123 --at "2026-06-01T14:00:00Z" --target-lists-json '{"type":"all"}'
 sequenzy campaigns test camp_123 --to you@example.com
 ```
 
 Behavior:
 
-- `campaigns list`: `GET /api/v1/campaigns`
+- `campaigns list`: `GET /api/v1/campaigns`, optionally with `?status=...` and `?label=...`
 - `campaigns get`: `GET /api/v1/campaigns/:id`
 - `campaigns create`: `POST /api/v1/campaigns`
 - `campaigns update`: `PUT /api/v1/campaigns/:id`
+- `campaigns schedule`: `POST /api/v1/campaigns/:id/schedule`
 - `campaigns test`: `POST /api/v1/campaigns/:id/test`
-- dashboard-aware responses include `url` on campaign records and `appUrls` on the top-level JSON when the company can be resolved
+- dashboard-aware responses include `url`, campaign review `previewUrl`, and `appUrls` when the company can be resolved
 
 Caveats:
 
-- create supports `name`, optional `subject` when `--prompt` is used, `html`, `blocks`, `--prompt`, `--style`, and `--tone`
-- update supports `name`, `subject`, `html`, `blocks`, `--reply-to`, and `--reply-profile`
+- list accepts `--status` and `--label <labels...>` filters
+- create supports `name`, optional `subject` when `--prompt` is used, `html`, `blocks`, `--prompt`, `--style`, `--tone`, and labels with `--label <labels...>`
+- update supports `name`, `subject`, `html`, `blocks`, replacement labels with `--label <labels...>`, `--reply-to`, and `--reply-profile`
+- schedule requires `--at <datetime>` with a future ISO timestamp and a verified sending domain
+- schedule can pass targeting with `--target-lists-json` or `--target-lists-file`; omit it to reuse saved targeting or default to all active subscribers
+- `--spread-over-hours` accepts integers from 1 to 72 and takes precedence over send-time optimization
 - `--prompt` generates draft campaign content through `POST /api/v1/generate/email`; do not combine it with HTML or block flags
 - `--blocks-json` and `--blocks-file` pass Sequenzy block arrays through directly
 - conditional email content is only available through block JSON, using block-level `condition` rules
@@ -329,12 +338,15 @@ Caveats:
 - `--reply-to` and `--reply-profile` are mutually exclusive
 - `campaigns get` now includes saved reply-to details when the campaign has a reply profile
 - only draft campaigns can be updated through this API path
-- there is no CLI command for sending, scheduling, pausing, or cancelling campaigns
+- there is no CLI command for immediate send, pausing, or cancelling campaigns
 - in the current backend checkout, `campaigns test` returns a success message path rather than a confirmed email send
 
 MCP parity:
 
-- `update_campaign` accepts `name`, `subject`, `html`, `blocks`, `replyTo`, and `replyProfileId`
+- `list_templates` and `list_campaigns` accept `label`
+- `create_template`, `update_template`, `create_campaign`, and `update_campaign` accept `labels`
+- `update_campaign` accepts `name`, `subject`, `html`, `blocks`, `labels`, `replyTo`, and `replyProfileId`
+- `schedule_campaign` accepts `campaignId`, `scheduledAt`, optional `targetLists`, `sendTimeOptimization`, and `spreadOverHours`
 - `replyTo` and `replyProfileId` are mutually exclusive
 - MCP rejects calls that omit all update fields before hitting the API
 - MCP rejects unsupported extra update fields before hitting the API

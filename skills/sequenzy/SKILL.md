@@ -31,9 +31,9 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - lists `list` and `create`
 - tags `list`
 - segments `list`, `create`, and `count`, including `--match any`, nested filter roots, custom event filters, and saved-segment composition filters
-- templates `list`, `get`, `create`, `update`, and `delete`, with `create` and `update` accepting raw HTML or Sequenzy block JSON
-- campaigns `list`, `get`, `create`, `update` including reply-to updates, and `test`, with `create` accepting raw HTML, Sequenzy block JSON, or prompt-generated content and `update` accepting raw HTML or Sequenzy block JSON
-- MCP `update_campaign` calls including `replyTo` and `replyProfileId`
+- templates `list`, `get`, `create`, `update`, and `delete`, with `list` supporting label filters and `create`/`update` accepting labels, raw HTML, or Sequenzy block JSON
+- campaigns `list`, `get`, `create`, `update` including label and reply-to updates, `schedule`, and `test`, with `list` supporting label filters, `create` accepting labels plus raw HTML, Sequenzy block JSON, or prompt-generated content, `update` accepting labels plus raw HTML or Sequenzy block JSON, and `schedule` returning a review preview link
+- MCP template and campaign tools support labels on list/create/update; MCP `update_campaign` also supports `replyTo` and `replyProfileId`, and MCP `schedule_campaign` schedules draft or already scheduled campaigns
 - sequences `list`, `get`, `create`, `update`, `enable`, `disable`, `delete`, and `cancel-enrollments`, including explicit discount action steps, cancellation by subscriber ID or event-property field values, and `update` branch insertion with tag, list, segment, event, clicked-link, and field conditions; event and clicked-link branch checks can use `activityScope` (`this_sequence`, `previous_email`, `ever`)
 - AI generation with `generate email`, `generate sequence`, and `generate subjects`
 - dashboard URL generation with CLI `urls`, MCP `get_app_urls`, and `appUrls`/`url` fields on campaign, sequence, template, and company results
@@ -43,7 +43,7 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 
 ## Unsupported Or Placeholder Workflows
 
-Treat missing subcommands as unsupported even when the noun exists. For example: campaign send/schedule flows, list deletion, tag mutation, and bulk subscriber import are not available through the current CLI handlers.
+Treat missing subcommands as unsupported even when the noun exists. For example: campaign immediate send, pause/cancel flows, list deletion, tag mutation, and bulk subscriber import are not available through the current CLI handlers.
 
 ## Execution Pattern
 
@@ -52,7 +52,7 @@ Treat missing subcommands as unsupported even when the noun exists. For example:
 3. Validate IDs, recipient email, subject, template, or content input before issuing a mutation.
 4. Surface CLI limitations directly instead of inventing a workaround.
 5. If the workflow is unsupported in the CLI, say whether the next-best path is the Sequenzy dashboard or direct API use.
-6. When you create or inspect a campaign, sequence, template, or company and the user may want to review/edit it, surface the dashboard URL from `url` or `appUrls` in the tool/CLI output. If needed, generate it with `sequenzy urls` or MCP `get_app_urls`.
+6. When you create, inspect, or schedule a campaign, sequence, template, or company and the user may want to review/edit it, surface the dashboard URL from `url`, `previewUrl`, or `appUrls` in the tool/CLI output. If needed, generate it with `sequenzy urls` or MCP `get_app_urls`.
 7. Call out implementation caveats that matter operationally, such as `whoami` using cached local auth state, sequence creation supporting both `--goal` and explicit step modes, explicit discount steps requiring Stripe before activation, generated sequences being capped at 10 emails, `campaigns test` being a stubbed success path in the current backend, and conditional email content requiring block JSON rather than raw HTML.
 
 ## Dashboard URLs
@@ -63,6 +63,7 @@ Prefer actual URLs returned by the CLI/MCP result:
 
 - sequence editor: `/dashboard/company/{companyId}/sequences/{sequenceId}`
 - campaign editor: `/dashboard/company/{companyId}/campaign/{campaignId}`
+- campaign preview/review: `/dashboard/company/{companyId}/campaign/{campaignId}?step=review`
 - template/email editor: `/dashboard/company/{companyId}/emails/{emailId}`
 - settings: `/dashboard/company/{companyId}/settings`
 - settings tab: `/dashboard/company/{companyId}/settings?tab={tab}`
