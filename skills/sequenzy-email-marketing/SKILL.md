@@ -1,9 +1,9 @@
 ---
-name: sequenzy
+name: sequenzy-email-marketing
 description: Agent guide for operating Sequenzy. Use when Codex needs to authenticate, inspect identity, manage subscribers, create or edit campaigns/sequences/templates, generate draft email content, send a transactional email, read delivery stats, or decide whether a requested Sequenzy workflow is currently supported. Prefer the CLI when it is implemented, and fall back to the dashboard or direct API use when the current CLI surface is only partial.
 ---
 
-# Sequenzy
+# Sequenzy Email Marketing
 
 ## Overview
 
