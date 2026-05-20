@@ -456,7 +456,7 @@ Behavior:
 
 Treat these requested workflows as unsupported in the CLI even though related nouns exist:
 
-- campaign send, schedule, pause, cancel, or resume flows
+- immediate campaign send, pause, cancel, or resume flows
 - bulk subscriber import
 - tag creation, update, or deletion
 - list update or deletion
