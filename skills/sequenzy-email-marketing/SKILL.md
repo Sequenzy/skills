@@ -28,7 +28,7 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - company inspection or creation with `companies list|get|create`
 - stats overview or stats by campaign/sequence ID
 - subscribers `list`, `add`, `get`, and `remove`
-- lists `list` and `create`
+- lists `list`, `create`, and `add-subscribers` (`import` is not the canonical command; use `add-subscribers` or direct API chunks)
 - tags `list`
 - segments `list`, `create`, and `count`, including `--match any`, nested filter roots, custom event filters, and saved-segment composition filters
 - templates `list`, `get`, `create`, `update`, and `delete`, with `list` supporting label filters and `create`/`update` accepting labels, raw HTML, or Sequenzy block JSON
@@ -43,7 +43,7 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 
 ## Unsupported Or Placeholder Workflows
 
-Treat missing subcommands as unsupported even when the noun exists. For example: campaign immediate send, pause/cancel flows, list deletion, tag mutation, and bulk subscriber import are not available through the current CLI handlers.
+Treat missing subcommands as unsupported even when the noun exists. For example: campaign immediate send, pause/cancel flows, list deletion, tag mutation, and `lists import` is not available through the current CLI handlers; for bulk list membership use `lists add-subscribers` or direct `POST /api/v1/lists/{listId}/subscribers` with `emails` arrays chunked to 100.
 
 ## Execution Pattern
 
@@ -72,5 +72,6 @@ Useful settings tabs include `domain`, `tracking`, `localization`, `integrations
 
 ## References
 
+- [references/list-bulk-subscriber-import.md](references/list-bulk-subscriber-import.md): correct endpoint, payload, CSV formats, and 100-email chunking for bulk list membership imports.
 - [references/command-reference.md](references/command-reference.md): exact command shapes, env vars, behavior, and caveats.
 - [references/use-cases.md](references/use-cases.md): decision trees and examples for the most common agent tasks.
