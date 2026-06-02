@@ -7,6 +7,35 @@
   "version": "1.0.0",
   "skills": [
     {
+      "name": "sequenzy",
+      "description": "Operate Sequenzy email marketing from an agent through the current CLI/API surface.",
+      "path": "skills/sequenzy/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/sequenzy",
+      "install": "npx skills add Sequenzy/skills --skill sequenzy",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email-marketing",
+        "lifecycle-automation",
+        "growth",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email marketing",
+        "campaigns",
+        "sequences",
+        "subscribers",
+        "segments",
+        "transactional email",
+        "Sequenzy"
+      ],
+      "license": "MIT"
+    },
+    {
       "name": "sequenzy-email-marketing",
       "description": "Operate Sequenzy email marketing from an agent: authenticate, inspect accounts, manage subscribers, lists, segments, templates, campaigns, sequences, transactional sends, stats, websites, and API keys.",
       "path": "skills/sequenzy-email-marketing/SKILL.md",

@@ -11,13 +11,20 @@ Versioned AI-agent skills for operating [Sequenzy](https://sequenzy.com) email m
 
 Agents are increasingly asked to do real lifecycle marketing work, not just draft copy. This repo gives them a precise operating guide for Sequenzy so they can inspect account state, manage subscribers and segments, create campaigns or sequences, generate email drafts, send transactional emails, and surface review URLs without guessing command names or API payloads.
 
-The primary skill is:
+The installable skills are:
 
+- [`sequenzy`](skills/sequenzy/SKILL.md): concise alias for operating Sequenzy through the current CLI/API surface.
 - [`sequenzy-email-marketing`](skills/sequenzy-email-marketing/SKILL.md): operate campaigns, sequences, subscribers, segments, templates, transactional sends, stats, websites, and API keys through Sequenzy's CLI/API surface.
 
 ## Install
 
-Install from GitHub:
+Install the concise alias from GitHub:
+
+```bash
+npx skills add Sequenzy/skills --skill sequenzy
+```
+
+Or install the explicit email-marketing slug:
 
 ```bash
 npx skills add Sequenzy/skills --skill sequenzy-email-marketing
@@ -88,6 +95,10 @@ This repo includes a machine-readable discovery file at [`.well-known/skills/ind
 ```text
 .well-known/skills/index.json
 skills/
+  sequenzy/
+    SKILL.md
+    agents/openai.yaml
+    references/
   sequenzy-email-marketing/
     SKILL.md
     agents/openai.yaml
