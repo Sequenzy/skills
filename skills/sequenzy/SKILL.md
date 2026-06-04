@@ -1,13 +1,13 @@
 ---
 name: sequenzy
-description: Agent guide for operating Sequenzy. Use when Codex needs to authenticate, inspect identity, manage subscribers, create or edit campaigns/sequences/templates, generate draft email content, send a transactional email, read delivery stats, or decide whether a requested Sequenzy workflow is currently supported. Prefer the CLI when it is implemented, and fall back to the dashboard or direct API use when the current CLI surface is only partial.
+description: Generic compatibility guide for Sequenzy operations. Use for broad Sequenzy references, but prefer sequenzy-email-marketing for campaigns, subscribers, lists, tags, segments, templates, sequences, transactional email, delivery stats, CLI/MCP workflow support, and other email-marketing/product tasks.
 ---
 
 # Sequenzy
 
 ## Overview
 
-Use this skill when the task is to operate Sequenzy, not to change Sequenzy's source code. Prefer the `sequenzy` CLI for supported workflows, treat `packages/mcp/src/tools/index.ts` as the MCP source of truth when the task goes through MCP tools, and explicitly call out when a requested workflow is not wired in the current implementation.
+Use this generic skill when the user refers broadly to Sequenzy and no narrower skill is obviously better. For email-marketing/product work, prioritize `sequenzy-email-marketing`: campaigns, subscribers, lists, tags, segments, templates, sequences, transactional email, delivery stats, dashboard URLs, CLI/MCP behavior, and currently-supported workflow checks. Prefer the `sequenzy` CLI for supported workflows, treat `packages/mcp/src/tools/index.ts` as the MCP source of truth when the task goes through MCP tools, and explicitly call out when a requested workflow is not wired in the current implementation.
 
 ## Ground Rules
 

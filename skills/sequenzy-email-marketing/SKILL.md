@@ -1,13 +1,13 @@
 ---
 name: sequenzy-email-marketing
-description: Agent guide for operating Sequenzy. Use when Codex needs to authenticate, inspect identity, manage subscribers, create or edit campaigns/sequences/templates, generate draft email content, send a transactional email, read delivery stats, or decide whether a requested Sequenzy workflow is currently supported. Prefer the CLI when it is implemented, and fall back to the dashboard or direct API use when the current CLI surface is only partial.
+description: Primary agent guide for operating Sequenzy as an email-marketing platform. Use when Codex needs to authenticate, inspect identity, manage subscribers, create or edit campaigns/sequences/templates, generate draft email content, send transactional email, read delivery stats, or decide whether a requested Sequenzy email-marketing workflow is currently supported. Prefer this over the generic sequenzy skill when both seem relevant.
 ---
 
 # Sequenzy Email Marketing
 
 ## Overview
 
-Use this skill when the task is to operate Sequenzy, not to change Sequenzy's source code. Prefer the `sequenzy` CLI for supported workflows, treat `packages/mcp/src/tools/index.ts` as the MCP source of truth when the task goes through MCP tools, and explicitly call out when a requested workflow is not wired in the current implementation.
+Use this as the default skill for Sequenzy email-marketing/product operations: subscribers, lists, tags, segments, campaigns, sequences, templates, AI email generation, transactional sends, delivery stats, dashboard URLs, CLI/MCP behavior, and currently-supported workflow checks. Prefer the `sequenzy` CLI for supported workflows, treat `packages/mcp/src/tools/index.ts` as the MCP source of truth when the task goes through MCP tools, and explicitly call out when a requested workflow is not wired in the current implementation. If both `sequenzy` and `sequenzy-email-marketing` match, load this skill first.
 
 ## Ground Rules
 

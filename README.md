@@ -13,21 +13,21 @@ Agents are increasingly asked to do real lifecycle marketing work, not just draf
 
 The installable skills are:
 
-- [`sequenzy`](skills/sequenzy/SKILL.md): concise alias for operating Sequenzy through the current CLI/API surface.
-- [`sequenzy-email-marketing`](skills/sequenzy-email-marketing/SKILL.md): operate campaigns, sequences, subscribers, segments, templates, transactional sends, stats, websites, and API keys through Sequenzy's CLI/API surface.
+- [`sequenzy-email-marketing`](skills/sequenzy-email-marketing/SKILL.md): primary skill for operating campaigns, sequences, subscribers, segments, templates, transactional sends, stats, websites, and API keys through Sequenzy's CLI/API surface.
+- [`sequenzy`](skills/sequenzy/SKILL.md): concise compatibility alias for broad Sequenzy references; use the explicit email-marketing skill when both apply.
 
 ## Install
 
-Install the concise alias from GitHub:
-
-```bash
-npx skills add Sequenzy/skills --skill sequenzy
-```
-
-Or install the explicit email-marketing slug:
+Install the explicit email-marketing skill from GitHub:
 
 ```bash
 npx skills add Sequenzy/skills --skill sequenzy-email-marketing
+```
+
+Or install the concise compatibility alias:
+
+```bash
+npx skills add Sequenzy/skills --skill sequenzy
 ```
 
 Install for a specific agent when your `skills` CLI supports agent adapters:

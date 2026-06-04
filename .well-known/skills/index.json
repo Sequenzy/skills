@@ -7,11 +7,11 @@
   "version": "1.0.0",
   "skills": [
     {
-      "name": "sequenzy",
-      "description": "Operate Sequenzy email marketing from an agent through the current CLI/API surface.",
-      "path": "skills/sequenzy/SKILL.md",
-      "url": "https://github.com/Sequenzy/skills/tree/main/skills/sequenzy",
-      "install": "npx skills add Sequenzy/skills --skill sequenzy",
+      "name": "sequenzy-email-marketing",
+      "description": "Primary Sequenzy email-marketing skill for agents: authenticate, inspect accounts, manage subscribers, lists, segments, templates, campaigns, sequences, transactional sends, stats, websites, and API keys.",
+      "path": "skills/sequenzy-email-marketing/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/sequenzy-email-marketing",
+      "install": "npx skills add Sequenzy/skills --skill sequenzy-email-marketing",
       "compatibility": [
         "Claude Code",
         "OpenAI Codex",
@@ -36,11 +36,11 @@
       "license": "MIT"
     },
     {
-      "name": "sequenzy-email-marketing",
-      "description": "Operate Sequenzy email marketing from an agent: authenticate, inspect accounts, manage subscribers, lists, segments, templates, campaigns, sequences, transactional sends, stats, websites, and API keys.",
-      "path": "skills/sequenzy-email-marketing/SKILL.md",
-      "url": "https://github.com/Sequenzy/skills/tree/main/skills/sequenzy-email-marketing",
-      "install": "npx skills add Sequenzy/skills --skill sequenzy-email-marketing",
+      "name": "sequenzy",
+      "description": "Generic compatibility alias for broad Sequenzy references; prefer sequenzy-email-marketing for email-marketing/product workflows.",
+      "path": "skills/sequenzy/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/sequenzy",
+      "install": "npx skills add Sequenzy/skills --skill sequenzy",
       "compatibility": [
         "Claude Code",
         "OpenAI Codex",
