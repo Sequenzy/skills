@@ -1,6 +1,7 @@
 # Sequenzy Skills
 
 [![Agent Skill](https://img.shields.io/badge/Agent%20Skill-SKILL.md-6f42c1)](skills/sequenzy-email-marketing/SKILL.md)
+[![skills.sh](https://skills.sh/b/Sequenzy/skills)](https://skills.sh/Sequenzy/skills)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-ready-111827)](#install)
 [![Codex](https://img.shields.io/badge/Codex-ready-111827)](#install)
 [![Hermes](https://img.shields.io/badge/Hermes-ready-111827)](#install)
