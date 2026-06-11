@@ -39,6 +39,7 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - AI generation with `generate email`, `generate sequence`, and `generate subjects`
 - dashboard URL generation with CLI `urls`, MCP `get_app_urls`, and `appUrls`/`url` fields on campaign, sequence, template, and company results
 - websites `list`, `add`, `check`, and `guide`
+- products `list`, `sync`, `attach-file`, and `detach-file` for digital product delivery, with `attach-file --file` uploading local files via presigned URLs; attached files are exposed on `saas.purchase` events as `{{event.download.url}}` / `{{event.download.name}}` (MCP: `list_products`, `attach_product_file`, `remove_product_file`, `sync_products`)
 - API key creation with `api-keys create`
 - send one transactional email by template or raw HTML
 

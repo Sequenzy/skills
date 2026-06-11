@@ -474,6 +474,34 @@ Guidance:
 - use `websites check` when the user needs DNS verification details
 - use `websites guide` for integration code snippets rather than inventing framework examples
 
+## "Sell a digital product and deliver the file after purchase"
+
+What works today:
+
+```bash
+sequenzy products sync
+sequenzy products list --provider stripe
+sequenzy products attach-file <product-id> --file ./guide.pdf
+```
+
+Then create the delivery sequence on the purchase event:
+
+```bash
+sequenzy sequences create ebook-delivery \
+  --trigger event_received \
+  --event-name saas.purchase \
+  --steps-json '[{"type":"email","subject":"Your download is ready","html":"<p>Thanks for your purchase! <a href=\"{{event.download.url}}\">Download {{event.download.name}}</a></p>"}]'
+```
+
+Guidance:
+
+- sync first so the Stripe catalog exists locally, then take the internal product ID from `products list`
+- `attach-file --file` uploads the file to Sequenzy storage in one step; use `--url` when the file is hosted elsewhere
+- the purchase event carries `download.url` and `download.name` only for products that have an attached file; `downloads` contains all files when an order has several products
+- per-product filtering (start the sequence only when one specific product is bought) is configured in the dashboard sequence trigger via the "Only for product" picker or a `productIds equals <stripe product id>` property filter; trigger property filters are not currently settable through the CLI or MCP, so say so and link the sequence editor URL
+- buyers become subscribers automatically when the Stripe purchase webhook arrives, so delivery works for brand-new customers
+- MCP flows use `list_products` + `attach_product_file`, then `create_sequence` with the same event trigger
+
 ## "Generate email content with AI"
 
 Use the CLI when the user wants draft copy or structured generated output:

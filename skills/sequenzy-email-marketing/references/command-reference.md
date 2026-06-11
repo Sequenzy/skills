@@ -275,6 +275,35 @@ Behavior:
 - Stripe product filters use `field: "stripeProduct"` and product IDs, not product names
 - threshold operators encode the count as `productId:count`, for example `prod_pro:3`
 
+## Products And Digital Delivery
+
+```bash
+sequenzy products list
+sequenzy products list --provider stripe --search guide
+sequenzy products sync
+sequenzy products attach-file <product-id> --file ./guide.pdf
+sequenzy products attach-file <product-id> --url https://example.com/template.zip --name template.zip
+sequenzy products detach-file <product-id>
+```
+
+Behavior:
+
+- `products list`: `GET /api/v1/products`, optionally with `?provider=stripe|shopify|woocommerce|manual&search=...`
+- `products sync`: `POST /api/v1/products/sync`; queues a Stripe catalog sync and returns 404 without an active Stripe integration
+- `products attach-file --file`: `POST /api/v1/products/delivery/upload-url` for a presigned URL, PUTs the file bytes there, then `PUT /api/v1/products/:id/delivery` with `source: "upload"`
+- `products attach-file --url`: `PUT /api/v1/products/:id/delivery` with `source: "url"`
+- `products detach-file`: `DELETE /api/v1/products/:id/delivery`
+- MCP equivalents: `list_products`, `attach_product_file` (URL attach only), `remove_product_file`, `sync_products`
+
+Caveats:
+
+- the `<product-id>` argument is the internal Sequenzy product ID from `products list`, not the Stripe `prod_...` ID; the Stripe ID is shown as the provider product ID in list output
+- uploads accept PDF, ePub, ZIP, images, audio, video, and text files up to 100MB; HTML, SVG, and executables are rejected
+- after attaching, purchases of the product enrich the `saas.purchase` event with `download.url` and `download.name`, so purchase sequences can deliver the file with `{{event.download.url}}` and `{{event.download.name}}`
+- to start a purchase sequence only for one product, the trigger needs a `productIds equals <stripe product id>` property filter on the `saas.purchase` event; this is configured in the dashboard sequence editor ("Only for product" picker), not through current CLI/MCP flags
+- products archived in Stripe stay listed with an archived flag, and attached files survive catalog re-syncs
+- the upload endpoint returns 503 when file storage is not configured on the server; fall back to `--url` in that case
+
 ## Templates
 
 ```bash
