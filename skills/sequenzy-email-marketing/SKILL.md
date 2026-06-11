@@ -1,6 +1,6 @@
 ---
 name: sequenzy-email-marketing
-description: Primary agent guide for operating Sequenzy as an email-marketing platform. Use when Codex needs to authenticate, inspect identity, manage subscribers, create or edit campaigns/sequences/templates, generate draft email content, send transactional email, read delivery stats, or decide whether a requested Sequenzy email-marketing workflow is currently supported. Prefer this over the generic sequenzy skill when both seem relevant.
+description: Primary agent guide for operating Sequenzy as an email-marketing platform. Use when Codex needs to authenticate, inspect identity, manage subscribers, create or edit campaigns/sequences/templates, control the campaign lifecycle (cancel, pause, resume, delete, duplicate), run campaign A/B tests, mutate lists/tags/segments, enroll subscribers into sequences, invite team members, triage and reply to inbox conversations, manage outbound webhooks, generate draft email content, send transactional email, read delivery stats, or decide whether a requested Sequenzy email-marketing workflow is currently supported. Prefer this over the generic sequenzy skill when both seem relevant.
 ---
 
 # Sequenzy Email Marketing
@@ -28,14 +28,20 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - company inspection or creation with `companies list|get|create`
 - stats overview or stats by campaign/sequence ID
 - subscribers `list`, `add`, `get`, and `remove`, with `list` fetching every page by default and supporting tag, segment, and list filters
-- lists `list`, `create`, `add-subscribers`, and `import` alias for bulk list population from emails, JSON, CSV, or newline files
-- tags `list`
-- segments `list`, `create`, and `count`, including `--match any`, nested filter roots, custom event filters, and saved-segment composition filters
+- lists `list`, `create`, `update`, `delete`, `add-subscribers`, `remove-subscribers`, and `import` alias for bulk list population from emails, JSON, CSV, or newline files
+- tags `list`, `create`, `update`, and `delete`, with bare `sequenzy tags` still listing tag definitions for backwards compatibility
+- segments `list`, `create`, `update`, `delete`, and `count`, including `--match any`, nested filter roots, custom event filters, and saved-segment composition filters
 - templates `list`, `get`, `create`, `update`, and `delete`, with `list` supporting label filters and `create`/`update` accepting labels, raw HTML, or Sequenzy block JSON
 - campaigns `list`, `get`, `create`, `update` including label and reply-to updates, `schedule`, and `test`, with `list` supporting label filters, `create` accepting labels plus raw HTML, Sequenzy block JSON, or prompt-generated content, `update` accepting labels plus raw HTML or Sequenzy block JSON, and `schedule` returning a review preview link
+- campaign lifecycle control with `campaigns cancel` (stops scheduled, paused, waiting-approval, or sending campaigns immediately, no confirmation prompt), `campaigns pause` and `campaigns resume` for an active send (resume supports `--spread-over-hours`), `campaigns delete` (blocked while sending, scheduled, or paused - cancel first), and `campaigns duplicate` with `--mode campaign|ab_test|variant`
+- ab-tests `list`, `get`, `stats`, `restart`, `update-variant`, `create`, `add-variant`, `delete-variant`, and `delete`; create/add-variant/delete-variant/delete work on campaign A/B tests in draft status, variant A is the protected control, and `restart` reruns a finished sequence A/B test
 - MCP template and campaign tools support labels on list/create/update; MCP `update_campaign` also supports `replyTo` and `replyProfileId`, and MCP `schedule_campaign` schedules draft or already scheduled campaigns
 - MCP `search_subscribers` supports list filters through `list`, `listId`, or `listName`; MCP `add_subscribers_to_list` accepts up to 500 emails per call
-- sequences `list`, `get`, `create`, `update`, `enable`, `disable`, `delete`, and `cancel-enrollments`, including explicit discount action steps, cancellation by subscriber ID or event-property field values, and `update` branch insertion with tag, list, segment, event, clicked-link, and field conditions; event and clicked-link branch checks can use `activityScope` (`this_sequence`, `previous_email`, `ever`)
+- sequences `list`, `get`, `create`, `update`, `enable`, `disable`, `delete`, `enroll`, and `cancel-enrollments`, including explicit discount action steps, cancellation by subscriber ID or event-property field values, and `update` branch insertion with tag, list, segment, event, clicked-link, and field conditions; event and clicked-link branch checks can use `activityScope` (`this_sequence`, `previous_email`, `ever`)
+- manual sequence enrollment with `sequences enroll` from emails, JSON, or files, optionally at a specific node with `--target-node-id`, reporting enrolled, skipped, and not-found subscribers
+- team `list`, `invite` with `--role admin|viewer` and owner-only `--billing-access`, and `cancel-invitation`
+- inbox `list` with status, search, unread, and pagination filters, `get`, `reply` including internal notes with `--note`, `close`, `reopen`, and `mark-read`
+- webhooks `list`, `create`, `update`, `delete`, `test`, `deliveries`, and `replay` for outbound webhook endpoints, with `create` printing the signing secret exactly once
 - AI generation with `generate email`, `generate sequence`, and `generate subjects`
 - dashboard URL generation with CLI `urls`, MCP `get_app_urls`, and `appUrls`/`url` fields on campaign, sequence, template, and company results
 - websites `list`, `add`, `check`, and `guide`
@@ -45,7 +51,7 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 
 ## Unsupported Or Placeholder Workflows
 
-Treat missing subcommands as unsupported even when the noun exists. For example: campaign immediate send, pause/cancel flows, list deletion, and tag mutation are not available through the current CLI handlers. Bulk list population is supported through `sequenzy lists add-subscribers` and its `sequenzy lists import` alias, not through `subscribers add`.
+Treat missing subcommands as unsupported even when the noun exists. The main remaining gap is campaign immediate send: there is no "send now" command, so schedule the campaign with a near-future `--at` timestamp instead. Bulk list population is supported through `sequenzy lists add-subscribers` and its `sequenzy lists import` alias, not through `subscribers add`.
 
 ## Execution Pattern
 
@@ -55,7 +61,9 @@ Treat missing subcommands as unsupported even when the noun exists. For example:
 4. Surface CLI limitations directly instead of inventing a workaround.
 5. If the workflow is unsupported in the CLI, say whether the next-best path is the Sequenzy dashboard or direct API use.
 6. When you create, inspect, or schedule a campaign, sequence, template, or company and the user may want to review/edit it, surface the dashboard URL from `url`, `previewUrl`, or `appUrls` in the tool/CLI output. If needed, generate it with `sequenzy urls` or MCP `get_app_urls`.
-7. Call out implementation caveats that matter operationally, such as `whoami` using cached local auth state, sequence creation supporting both `--goal` and explicit step modes, explicit discount steps requiring Stripe before activation, generated sequences being capped at 10 emails, `campaigns test` being a stubbed success path in the current backend, and conditional email content requiring block JSON rather than raw HTML.
+7. Destructive commands (`delete`, `delete-variant`, `cancel-invitation`, and similar) prompt for confirmation. Pass `--yes` (or `-y`) to skip the prompt; `--yes` is required when stdin is not a TTY, which covers most agent and CI runs.
+8. `webhooks create` returns a one-time signing secret. Surface it to the user immediately - it cannot be retrieved later.
+9. Call out implementation caveats that matter operationally, such as `whoami` using cached local auth state, sequence creation supporting both `--goal` and explicit step modes, explicit discount steps requiring Stripe before activation, generated sequences being capped at 10 emails, `campaigns test` being a stubbed success path in the current backend, and conditional email content requiring block JSON rather than raw HTML.
 
 ## Dashboard URLs
 

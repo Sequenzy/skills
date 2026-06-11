@@ -221,10 +221,15 @@ Behavior:
 sequenzy lists list
 sequenzy lists create Newsletter --description "Public newsletter list"
 sequenzy lists create VIP --private --company comp_123
+sequenzy lists update list_123 --name "Weekly Newsletter" --private
+sequenzy lists update list_123 --no-private
 sequenzy lists add-subscribers list_123 --email one@example.com two@example.com
 sequenzy lists add-subscribers list_123 --emails-json '["one@example.com","two@example.com"]'
 sequenzy lists add-subscribers list_123 --emails-file ./batch-001.csv
 sequenzy lists import list_123 --emails-file ./batch-001.csv
+sequenzy lists remove-subscribers list_123 --email one@example.com two@example.com
+sequenzy lists remove-subscribers list_123 --emails-file ./churned.csv
+sequenzy lists delete list_123 --yes
 ```
 
 Behavior:
@@ -232,23 +237,40 @@ Behavior:
 - `lists list`: `GET /api/v1/lists`
 - `lists create`: `POST /api/v1/lists`
 - create body shape is `{ name, description, isPrivate }`
+- `lists update`: `PATCH /api/v1/lists/:listId` with at least one of `--name`, `--description`, `--private`, or `--no-private`
+- `lists delete`: `DELETE /api/v1/lists/:listId`; removes the list and all of its memberships, reports `removedMemberships`, and keeps the subscribers themselves
 - `lists add-subscribers` and `lists import`: `POST /api/v1/lists/:listId/subscribers`
+- `lists remove-subscribers`: `POST /api/v1/lists/:listId/subscribers/remove`
 - add-subscribers body shape is `{ emails, duplicateStrategy, enrollInSequences, optInMode }`
-- the CLI splits large files into API-safe batches of up to 500 emails
+- remove-subscribers takes the same email input formats as add-subscribers, only removes list memberships, and reports `removed` plus `notFound` emails
+- the CLI splits large files into API-safe batches of up to 500 emails for both add and remove
 - files may be newline-separated, CSV with an email column, a JSON email array, or a JSON object with `emails` or `subscribers`
 - CSV headers named `email`, `e-mail`, `email address`, or `mail` are detected; otherwise the first column is used
+- `lists delete` prompts for confirmation; pass `--yes` to skip
+- MCP parity: `update_list`, `delete_list`, and `remove_subscribers_from_list` (max 500 emails per call)
 
 ### Tags
 
 ```bash
 sequenzy tags
-sequenzy tags --company comp_123 --json
+sequenzy tags list --company comp_123 --json
+sequenzy tags create vip --color purple
+sequenzy tags update tag_123 --color red
+sequenzy tags delete tag_123 --yes
 ```
 
 Behavior:
 
-- sends `GET /api/v1/tags`
-- this is list-only; there are no tag mutation commands in the current CLI
+- `tags list`: `GET /api/v1/tags`; bare `sequenzy tags` without a subcommand still lists tag definitions for backwards compatibility
+- `tags create`: `POST /api/v1/tags` with `{ name, color? }`
+- `tags update`: `PATCH /api/v1/tags/:tagId` with `{ color }` (`--color` is required)
+- `tags delete`: `DELETE /api/v1/tags/:tagId`
+- tag names are normalized to lowercase with dashes, so `VIP Customer` becomes `vip-customer`
+- the color defaults to `gray`; valid colors are `gray`, `red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, and `rose`
+- system tags cannot be updated or deleted
+- tags still referenced by sequences cannot be deleted until those sequences stop using them
+- deleting a tag removes it from every subscriber; the delete prompt warns about this, and `--yes` skips it
+- MCP parity: `list_tags`, `create_tag`, `update_tag`, and `delete_tag`
 
 ### Segments
 
@@ -259,6 +281,10 @@ sequenzy segments create --name "Bought Pro" --stripe-product prod_pro
 sequenzy segments create --name "3+ Pro Payments" --stripe-product prod_pro --purchase-operator at-least --payments 3
 sequenzy segments create --name "VIP or Churn Risk" --match any --filter-json '[{"field":"tag","operator":"contains","value":"vip"},{"field":"emailOpened","operator":"is_not","value":"30d"}]'
 sequenzy segments create --name "Active non-paying" --filter-json '{"kind":"group","id":"root","joinOperator":"and","children":[{"kind":"filter","id":"f1","field":"attribute","operator":"gte","value":"last_login_days_ago:0"},{"kind":"group","id":"g1","joinOperator":"or","children":[{"kind":"filter","id":"f2","field":"attribute","operator":"is_empty","value":"plan_end"},{"kind":"filter","id":"f3","field":"attribute","operator":"lt","value":"plan_end:2026-04-21"}]}]}'
+sequenzy segments update seg_123 --name "Churn Risk"
+sequenzy segments update seg_123 --filters-json '[{"field":"tag","operator":"contains","value":"vip"}]'
+sequenzy segments update seg_123 --join-operator or
+sequenzy segments delete seg_123 --yes
 ```
 
 Behavior:
@@ -266,6 +292,9 @@ Behavior:
 - `segments list`: `GET /api/v1/segments`
 - `segments count`: `GET /api/v1/segments/:id/count`
 - `segments create`: `POST /api/v1/segments`
+- `segments update`: `PATCH /api/v1/segments/:segmentId` with at least one of `--name`, `--filters-json`, `--filters-file`, or `--join-operator and|or`
+- `segments delete`: `DELETE /api/v1/segments/:segmentId`; prompts for confirmation, `--yes` skips
+- update filters replace the existing filter set; `--filters-json`/`--filters-file` accept the same array or `root` object shapes as create, and missing filter IDs are filled in by the CLI
 - `--filter-json` accepts either the legacy raw segment filter array or a nested filter `root` object
 - `--match all|any` controls whether top-level filters are combined with `and` or `or`
 - MCP/API use `filterJoinOperator: "and" | "or"` for the same behavior
@@ -274,6 +303,7 @@ Behavior:
 - saved segment composition uses `field: "segment"` with `operator: "is" | "is_not"` and the referenced segment id as `value`
 - Stripe product filters use `field: "stripeProduct"` and product IDs, not product names
 - threshold operators encode the count as `productId:count`, for example `prod_pro:3`
+- MCP parity: `update_segment` (reuses the create filter schemas) and `delete_segment`
 
 ## Products And Digital Delivery
 
@@ -351,6 +381,12 @@ sequenzy campaigns update camp_123 --reply-profile reply_123
 sequenzy campaigns schedule camp_123 --at "2026-06-01T14:00:00Z"
 sequenzy campaigns schedule camp_123 --at "2026-06-01T14:00:00Z" --target-lists-json '{"type":"all"}'
 sequenzy campaigns test camp_123 --to you@example.com
+sequenzy campaigns cancel camp_123
+sequenzy campaigns pause camp_123
+sequenzy campaigns resume camp_123 --spread-over-hours 6
+sequenzy campaigns delete camp_123 --yes
+sequenzy campaigns duplicate camp_123 --mode ab_test
+sequenzy campaigns duplicate camp_123 --mode variant --variant-id var_b
 ```
 
 Behavior:
@@ -361,6 +397,11 @@ Behavior:
 - `campaigns update`: `PUT /api/v1/campaigns/:id`
 - `campaigns schedule`: `POST /api/v1/campaigns/:id/schedule`
 - `campaigns test`: `POST /api/v1/campaigns/:id/test`
+- `campaigns cancel`: `POST /api/v1/campaigns/:id/cancel`
+- `campaigns pause`: `POST /api/v1/campaigns/:id/pause`
+- `campaigns resume`: `POST /api/v1/campaigns/:id/resume`
+- `campaigns delete`: `DELETE /api/v1/campaigns/:id`
+- `campaigns duplicate`: `POST /api/v1/campaigns/:id/duplicate`
 - dashboard-aware responses include `url`, campaign review `previewUrl`, and `appUrls` when the company can be resolved
 
 Caveats:
@@ -378,7 +419,12 @@ Caveats:
 - `--reply-to` and `--reply-profile` are mutually exclusive
 - `campaigns get` now includes saved reply-to details when the campaign has a reply profile
 - only draft campaigns can be updated through this API path
-- there is no CLI command for immediate send, pausing, or cancelling campaigns
+- there is no CLI command for immediate send; schedule with a near-future `--at` timestamp instead
+- `cancel` works from scheduled, sending, paused, waiting_approval, and rejected statuses; it shows no confirmation prompt so a bad send can be stopped fast
+- `pause` only works on a campaign in sending status; `resume` only works on a paused campaign
+- `resume --spread-over-hours` accepts integers from 1 to 72 to spread the remaining delivery
+- `delete` is blocked while the campaign is sending, scheduled, or paused; cancel it first
+- `duplicate --mode campaign` copies the campaign email, `--mode ab_test` also copies the A/B test with all variants, and `--mode variant` (requires `--variant-id`) copies one variant's content as a plain campaign; the copy is always a new draft
 - in the current backend checkout, `campaigns test` returns a success message path rather than a confirmed email send
 
 MCP parity:
@@ -387,6 +433,7 @@ MCP parity:
 - `create_template`, `update_template`, `create_campaign`, and `update_campaign` accept `labels`
 - `update_campaign` accepts `name`, `subject`, `html`, `blocks`, `labels`, `replyTo`, and `replyProfileId`
 - `schedule_campaign` accepts `campaignId`, `scheduledAt`, optional `targetLists`, `sendTimeOptimization`, and `spreadOverHours`
+- `cancel_campaign`, `pause_campaign`, `resume_campaign` (optional `spreadOverHours`), `delete_campaign`, and `duplicate_campaign` (optional `mode` and `variantId`) mirror the lifecycle commands
 - `replyTo` and `replyProfileId` are mutually exclusive
 - MCP rejects calls that omit all update fields before hitting the API
 - MCP rejects unsupported extra update fields before hitting the API
@@ -404,6 +451,9 @@ sequenzy sequences update seq_123 --branch-file ./branch.json
 sequenzy sequences enable seq_123
 sequenzy sequences disable seq_123
 sequenzy sequences delete seq_123
+sequenzy sequences enroll seq_123 --email one@example.com two@example.com
+sequenzy sequences enroll seq_123 --emails-file ./vips.csv
+sequenzy sequences enroll seq_123 --email one@example.com --target-node-id node_email_2
 sequenzy sequences cancel-enrollments seq_123 --subscriber-id sub_123 --reason "Converted"
 sequenzy sequences cancel-enrollments seq_123 --field-path order.id --field-values ord_123,ord_456
 sequenzy sequences cancel-enrollments seq_123 --field-values price_123 --apply
@@ -418,6 +468,7 @@ Behavior:
 - `sequences enable`: `POST /api/v1/sequences/:id/enable`
 - `sequences disable`: `POST /api/v1/sequences/:id/disable`
 - `sequences delete`: `DELETE /api/v1/sequences/:id`
+- `sequences enroll`: `POST /api/v1/sequences/:id/enroll`
 - `sequences cancel-enrollments`: `POST /api/v1/sequences/:id/enrollments/cancel`
 - dashboard-aware responses include `url` on sequence records and `appUrls` on the top-level JSON when the company can be resolved
 
@@ -433,10 +484,60 @@ Caveats:
 - branch insertion uses `--branch-json` or `--branch-file` with condition types `has_tag`, `in_list`, `in_segment`, `event_received`, `link_clicked`, and `field_*`
 - branch condition fields are `tagId`/`tagName`, `listId`, `segmentId`/`segmentName`, `eventName`, `linkUrl`, `activityScope`, or `fieldName`/`fieldValue`; omit `linkUrl` to match any clicked link
 - for `event_received` and `link_clicked`, set `activityScope` to `this_sequence`, `previous_email`, or `ever`; omitting it checks the contact's full history
+- `enroll` takes exactly one email source: repeated `--email`, `--emails-json`, or `--emails-file`, with the same file formats as `lists add-subscribers` and the same 500-email batching
+- `enroll` only enrolls active subscribers; unknown emails are reported as `notFound`, and inactive or already-enrolled subscribers count as `skipped`
+- `enroll` requires the sequence to be accepting entrants (enabled and not paused for enrollment)
+- `enroll` starts subscribers at the first step after the trigger unless `--target-node-id` points at a specific non-trigger node; the result reports `enrolled`, `skipped`, `notFound`, `targetNodeId`, and `scheduledFor`
+- MCP uses `enroll_subscribers_in_sequence` with `emails` (max 500 per call) and optional `targetNodeId`
 - `cancel-enrollments` requires a sequence ID and exactly one target: `--subscriber-id` or `--field-values`
 - `--field-values` matches active/waiting enrollments by the stored entry event property at `--field-path`, or the sequence's configured `enrollmentFieldPath` when `--field-path` is omitted
 - CLI cancellation is a dry run unless `--apply` is passed; use dry runs for field-value/bulk checks before mutating enrollments
 - MCP uses `cancel_sequence_enrollments` with the same target rule; set `dryRun: false` to apply field-value cancellation
+
+## A/B Tests
+
+```bash
+sequenzy ab-tests list
+sequenzy ab-tests list --sequence seq_123
+sequenzy ab-tests get ab_123
+sequenzy ab-tests stats ab_123 --period 7d
+sequenzy ab-tests stats ab_123 --start "2026-05-01T00:00:00Z" --end "2026-05-31T00:00:00Z"
+sequenzy ab-tests restart ab_123 --source-variant var_b --test-type content --variant-count 3
+sequenzy ab-tests update-variant ab_123 var_b --subject "New subject"
+sequenzy ab-tests update-variant ab_123 var_b --blocks-file ./variant-b.json
+sequenzy ab-tests create camp_123 --test-percentage 30 --duration-minutes 120 --winner-criteria click_rate
+sequenzy ab-tests create camp_123 --variants-json '[{"subject":"Alternative subject"}]'
+sequenzy ab-tests add-variant ab_123 --subject "Alternative subject" --blocks-file ./variant.json
+sequenzy ab-tests delete-variant ab_123 var_b --yes
+sequenzy ab-tests delete ab_123 --yes
+```
+
+Behavior:
+
+- `ab-tests list`: `GET /api/v1/ab-tests`, optionally with `?sequenceId=...` via `--sequence`
+- `ab-tests get`: `GET /api/v1/ab-tests/:id`
+- `ab-tests stats`: `GET /api/v1/ab-tests/:id/stats`
+- `ab-tests restart`: `POST /api/v1/ab-tests/:id/restart`
+- `ab-tests update-variant`: `PATCH /api/v1/ab-tests/:id/variants/:variantId`
+- `ab-tests create`: `POST /api/v1/ab-tests`
+- `ab-tests add-variant`: `POST /api/v1/ab-tests/:id/variants`
+- `ab-tests delete-variant`: `DELETE /api/v1/ab-tests/:id/variants/:variantId`
+- `ab-tests delete`: `DELETE /api/v1/ab-tests/:id`
+
+Caveats:
+
+- run `ab-tests get` first to discover variant IDs before targeting a variant
+- `stats` uses `--period` (`1h`, `24h`, `7d`, `30d`, `90d`) or both `--start` and `--end`; custom ranges max at 90 days
+- `restart` only applies to sequence A/B tests with a selected winner; options are `--source-variant`, `--test-type subject|content`, `--winner-threshold` (10-1000), and `--variant-count` (2-4 including control)
+- `update-variant` accepts `--subject`, `--preview-text`, and either HTML or blocks flags, not both; only draft A/B tests can be edited
+- `create` targets a campaign: the campaign must be in draft or rejected status and must not already have an A/B test
+- `create` builds variant A automatically as the control from the campaign's email; extra variants from `--variants-json`/`--variants-file` use `{subject, previewText?, blocks?}` objects
+- `create` accepts `--name`, `--test-percentage` (5-50, default 20), `--duration-minutes` (15-1440, default 240), and `--winner-criteria open_rate|click_rate` (default open_rate)
+- `add-variant` requires `--subject` and only works while the test is in draft status
+- `delete-variant` cannot remove variant A (the protected control) and must leave at least 2 variants; a test holds at most 5 variants
+- `delete` is blocked for running tests, and the linked campaign must be draft or rejected
+- `create`, `add-variant`, `delete-variant`, and `delete` support campaign A/B tests only
+- MCP parity: `list_ab_tests`, `get_ab_test`, `get_ab_test_stats`, `restart_ab_test`, `update_ab_test_variant`, `create_ab_test`, `add_ab_test_variant`, `delete_ab_test_variant`, and `delete_ab_test`
 
 ## AI Generation
 
@@ -459,6 +560,95 @@ Caveats:
 - generated content is draft content and should be reviewed before sending
 - `generate sequence --count` accepts 1 to 10 emails
 - `generate email` supports optional `--style` and `--tone`
+
+## Team
+
+```bash
+sequenzy team list
+sequenzy team invite teammate@example.com --role admin
+sequenzy team invite finance@example.com --role viewer --billing-access
+sequenzy team cancel-invitation inv_123 --yes
+```
+
+Behavior:
+
+- `team list`: `GET /api/v1/team`; returns the owner, members, and pending or expired invitations
+- `team invite`: `POST /api/v1/team/invitations` with `{ email, role, canManageBilling? }`
+- `team cancel-invitation`: `DELETE /api/v1/team/invitations/:invitationId`
+
+Caveats:
+
+- `--role` must be `admin` or `viewer`
+- inviting and cancelling invitations requires owner or admin access; `--billing-access` can only be granted by the company owner
+- existing Sequenzy users are added to the team immediately; new emails receive an invitation that expires after 14 days
+- run `team list` first to find invitation IDs before cancelling
+- `cancel-invitation` prompts for confirmation; pass `--yes` to skip
+- MCP parity: `list_team_members`, `invite_team_member`, and `cancel_team_invitation`
+
+## Inbox
+
+```bash
+sequenzy inbox list --status open --unread
+sequenzy inbox list --search "refund" --page 2 --limit 50
+sequenzy inbox get conv_123
+sequenzy inbox reply conv_123 --text "Thanks for reaching out!"
+sequenzy inbox reply conv_123 --html-file ./reply.html --subject "Re: your question"
+sequenzy inbox reply conv_123 --text "Customer asked for a refund" --note
+sequenzy inbox close conv_123
+sequenzy inbox reopen conv_123
+sequenzy inbox mark-read conv_123
+```
+
+Behavior:
+
+- `inbox list`: `GET /api/v1/conversations` with optional `status` (`open`, `closed`, `all`), `search`, `unread`, `page`, and `limit` (1-100, default 20) query parameters
+- `inbox get`: `GET /api/v1/conversations/:conversationId`; returns the conversation with its full message history
+- `inbox reply`: `POST /api/v1/conversations/:conversationId/messages`
+- `inbox close` and `inbox reopen`: `POST /api/v1/conversations/:conversationId/status` with `{ status: "closed" | "open" }`
+- `inbox mark-read`: `POST /api/v1/conversations/:conversationId/read`; reports how many messages were marked read
+
+Caveats:
+
+- the inbox collects subscriber replies to campaigns, sequences, and transactional email
+- `reply` requires a body from `--text` and/or `--html-file`
+- `--note` adds an internal note instead of emailing the subscriber
+- outbound replies are sent asynchronously by a worker, so the message starts in `pending` delivery status; they also reopen closed conversations
+- MCP parity: `list_conversations`, `get_conversation`, `reply_to_conversation`, `update_conversation_status`, and `mark_conversation_read`
+
+## Webhooks
+
+```bash
+sequenzy webhooks list
+sequenzy webhooks create --name CI --url https://example.com/hook --event email.bounced subscriber.unsubscribed
+sequenzy webhooks create --name "All events" --url https://example.com/hook
+sequenzy webhooks update wh_123 --url https://example.com/new-hook
+sequenzy webhooks update wh_123 --event email.bounced email.complained
+sequenzy webhooks update wh_123 --disable
+sequenzy webhooks delete wh_123 --yes
+sequenzy webhooks test wh_123
+sequenzy webhooks deliveries wh_123 --limit 50
+sequenzy webhooks replay wh_123 del_456
+```
+
+Behavior:
+
+- `webhooks list`: `GET /api/v1/webhooks`
+- `webhooks create`: `POST /api/v1/webhooks` with `{ name, url, events? }`
+- `webhooks update`: `PATCH /api/v1/webhooks/:id` with at least one of `--name`, `--url`, `--event`, `--enable`, or `--disable`
+- `webhooks delete`: `DELETE /api/v1/webhooks/:id`; this permanently deletes the endpoint and its delivery history
+- `webhooks test`: `POST /api/v1/webhooks/:id/test`
+- `webhooks deliveries`: `GET /api/v1/webhooks/:id/deliveries`, optionally with `?limit=` (1-100)
+- `webhooks replay`: `POST /api/v1/webhooks/:id/deliveries/:deliveryId/replay`
+
+Caveats:
+
+- valid event types are `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.bounced`, `email.complained`, `email.opened`, `email.clicked`, `email.unsubscribed`, `subscriber.invalid`, `subscriber.updated`, `subscriber.unsubscribed`, `sequence.finished`, and `sequence.failed`; omit `--event` to use the default set
+- `create` prints the signing secret exactly once and it cannot be retrieved later; surface it to the user immediately
+- `--enable` and `--disable` are mutually exclusive; changing the URL or re-enabling resets the failure circuit breaker
+- the webhook must be enabled to receive a test event
+- run `webhooks deliveries <id>` first to find delivery IDs before replaying
+- `delete` prompts for confirmation; pass `--yes` to skip
+- MCP parity: `list_webhooks`, `create_webhook`, `update_webhook`, `delete_webhook`, `test_webhook`, `list_webhook_deliveries`, and `replay_webhook_delivery`
 
 ## API Keys
 
@@ -496,12 +686,13 @@ Behavior:
 
 Treat these requested workflows as unsupported in the CLI even though related nouns exist:
 
-- campaign immediate send, pause, cancel, or resume flows
-- tag creation, update, or deletion
-- list update or deletion
+- campaign immediate send; there is no "send now" command, so schedule with a near-future `--at` timestamp instead
 
 ## Operational Caveats
 
 - prefer `SEQUENZY_API_KEY` for automation instead of interactive login
 - use `--json` when another tool or agent needs structured output; dashboard-aware commands add `url`/`appUrls` fields when possible
+- destructive commands (`delete`, `delete-variant`, `cancel-invitation`, and similar) prompt for confirmation; pass `--yes` (or `-y`) to skip, and note that `--yes` is required when stdin is not a TTY, which covers most agent and CI runs
+- `campaigns cancel` deliberately skips the confirmation prompt so a bad send can be stopped fast
+- `webhooks create` returns a one-time signing secret; surface it to the user immediately because it cannot be retrieved later
 - when the user asks for a workflow outside the current CLI surface, say so directly and choose between dashboard or direct API use instead of inventing commands

@@ -10,11 +10,11 @@ Versioned AI-agent skills for operating [Sequenzy](https://sequenzy.com) email m
 
 ## Why this exists
 
-Agents are increasingly asked to do real lifecycle marketing work, not just draft copy. This repo gives them a precise operating guide for Sequenzy so they can inspect account state, manage subscribers and segments, create campaigns or sequences, generate email drafts, send transactional emails, and surface review URLs without guessing command names or API payloads.
+Agents are increasingly asked to do real lifecycle marketing work, not just draft copy. This repo gives them a precise operating guide for Sequenzy so they can inspect account state, manage subscribers and segments, create campaigns or sequences and control their lifecycle (cancel, pause, resume), run A/B tests, enroll subscribers, invite teammates, triage inbox replies, manage outbound webhooks, generate email drafts, send transactional emails, and surface review URLs without guessing command names or API payloads.
 
 The installable skills are:
 
-- [`sequenzy-email-marketing`](skills/sequenzy-email-marketing/SKILL.md): primary skill for operating campaigns, sequences, subscribers, segments, templates, transactional sends, stats, websites, and API keys through Sequenzy's CLI/API surface.
+- [`sequenzy-email-marketing`](skills/sequenzy-email-marketing/SKILL.md): primary skill for operating campaigns and their lifecycle (cancel, pause, resume, delete, duplicate), A/B tests, sequences and manual enrollment, subscribers, lists, tags, segments, templates, team members, inbox conversations, outbound webhooks, transactional sends, stats, websites, and API keys through Sequenzy's CLI/API surface.
 - [`sequenzy`](skills/sequenzy/SKILL.md): concise compatibility alias for broad Sequenzy references; use the explicit email-marketing skill when both apply.
 
 ## Install
@@ -85,6 +85,14 @@ Add user@example.com as a subscriber with the tags beta and founder, then show t
 
 ```text
 Create a saved segment for users who purchased Pro at least 3 times and preview its count before we use it in a campaign.
+```
+
+```text
+The April launch campaign was scheduled with the wrong date - cancel it, fix the schedule, and give me the review URL.
+```
+
+```text
+Triage unread inbox replies: summarize each open conversation, reply to the simple ones, and leave internal notes on anything that needs my input.
 ```
 
 ## Discovery

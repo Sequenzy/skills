@@ -4,11 +4,11 @@
   "description": "Agent skills for operating Sequenzy email marketing workflows.",
   "homepage": "https://sequenzy.com",
   "repository": "https://github.com/Sequenzy/skills",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "skills": [
     {
       "name": "sequenzy-email-marketing",
-      "description": "Primary Sequenzy email-marketing skill for agents: authenticate, inspect accounts, manage subscribers, lists, segments, templates, campaigns, sequences, transactional sends, stats, websites, and API keys.",
+      "description": "Primary Sequenzy email-marketing skill for agents: authenticate, inspect accounts, manage subscribers, lists, tags, segments, templates, campaigns and their lifecycle (cancel/pause/resume/delete/duplicate), A/B tests, sequences and manual enrollment, team members, inbox conversations, outbound webhooks, transactional sends, stats, websites, and API keys.",
       "path": "skills/sequenzy-email-marketing/SKILL.md",
       "url": "https://github.com/Sequenzy/skills/tree/main/skills/sequenzy-email-marketing",
       "install": "npx skills add Sequenzy/skills --skill sequenzy-email-marketing",
@@ -31,13 +31,17 @@
         "subscribers",
         "segments",
         "transactional email",
+        "inbox",
+        "webhooks",
+        "a/b testing",
+        "team management",
         "Sequenzy"
       ],
       "license": "MIT"
     },
     {
       "name": "sequenzy",
-      "description": "Generic compatibility alias for broad Sequenzy references; prefer sequenzy-email-marketing for email-marketing/product workflows.",
+      "description": "Generic compatibility alias for broad Sequenzy references; prefer sequenzy-email-marketing for campaigns, audience, sequences, team, inbox, webhook, and other email-marketing tasks.",
       "path": "skills/sequenzy/SKILL.md",
       "url": "https://github.com/Sequenzy/skills/tree/main/skills/sequenzy",
       "install": "npx skills add Sequenzy/skills --skill sequenzy",
@@ -60,6 +64,10 @@
         "subscribers",
         "segments",
         "transactional email",
+        "inbox",
+        "webhooks",
+        "a/b testing",
+        "team management",
         "Sequenzy"
       ],
       "license": "MIT"
