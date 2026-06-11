@@ -1,7 +1,7 @@
 {
   "name": "sequenzy",
   "description": "Claude Code plugin for operating Sequenzy email marketing workflows with agent skills.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": {
     "name": "Sequenzy",
     "url": "https://sequenzy.com"
