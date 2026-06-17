@@ -121,3 +121,21 @@ skills/
 Keep the installable skill inside `skills/<skill-name>/` and treat `SKILL.md` as the source of truth for triggers, supported workflows, caveats, and verification steps. Reference files should contain longer command examples and decision trees so the main skill stays readable.
 
 When adding a new skill, also update `.well-known/skills/index.json` so catalogs can discover it.
+
+## Email Agent Skill Directory
+
+These provider-neutral email skills are also available as separate repos and landing pages. Install any single skill directly with the bare skill name when your skills CLI registry supports it, or from this collection with `--skill`.
+
+- [`emailworkflowskill`](skills/emailworkflowskill/SKILL.md): Workflow maps, lifecycle routing, trigger ownership, and agent-readable operating paths. Install: `npx skills add Sequenzy/skills --skill emailworkflowskill` or `npx skills add emailworkflowskill`.
+- [`openclawemailskill`](skills/openclawemailskill/SKILL.md): Open, inspectable email campaign operations and provider-neutral playbooks for agents. Install: `npx skills add Sequenzy/skills --skill openclawemailskill` or `npx skills add openclawemailskill`.
+- [`hermesemailskill`](skills/hermesemailskill/SKILL.md): Fast delivery decisions, message QA, launch coordination, and concise status handoffs. Install: `npx skills add Sequenzy/skills --skill hermesemailskill` or `npx skills add hermesemailskill`.
+- [`emaildesignskill`](skills/emaildesignskill/SKILL.md): Responsive email design, component systems, dark-mode behavior, and accessibility checks. Install: `npx skills add Sequenzy/skills --skill emaildesignskill` or `npx skills add emaildesignskill`.
+- [`claudeemailskill`](skills/claudeemailskill/SKILL.md): Claude-oriented email prompts, campaign drafting, critique loops, and human review. Install: `npx skills add Sequenzy/skills --skill claudeemailskill` or `npx skills add claudeemailskill`.
+- [`codexemailskill`](skills/codexemailskill/SKILL.md): Repo-aware email implementation workflows for codebases, content systems, templates, and tests. Install: `npx skills add Sequenzy/skills --skill codexemailskill` or `npx skills add codexemailskill`.
+- [`claudeemailmarketing`](skills/claudeemailmarketing/SKILL.md): Claude-assisted positioning, segmentation, lifecycle content, and marketing review systems. Install: `npx skills add Sequenzy/skills --skill claudeemailmarketing` or `npx skills add claudeemailmarketing`.
+- [`emaildeliverabilityskill`](skills/emaildeliverabilityskill/SKILL.md): Inbox placement, authentication, sender reputation, complaint control, and remediation workflows. Install: `npx skills add Sequenzy/skills --skill emaildeliverabilityskill` or `npx skills add emaildeliverabilityskill`.
+- [`newsletterskill`](skills/newsletterskill/SKILL.md): Editorial calendars, issue structure, sponsorship inventory, reader growth, and retention loops. Install: `npx skills add Sequenzy/skills --skill newsletterskill` or `npx skills add newsletterskill`.
+- [`dripcampaignskill`](skills/dripcampaignskill/SKILL.md): Time-based nurture streams, branching logic, lead scoring hooks, and conversion analysis. Install: `npx skills add Sequenzy/skills --skill dripcampaignskill` or `npx skills add dripcampaignskill`.
+- [`emailautomationskill`](skills/emailautomationskill/SKILL.md): Behavioral triggers, lifecycle journeys, automation governance, and operational safeguards. Install: `npx skills add Sequenzy/skills --skill emailautomationskill` or `npx skills add emailautomationskill`.
+- [`emailagentskill`](skills/emailagentskill/SKILL.md): Agentic email planning, tool handoffs, safe execution, review loops, and multi-agent coordination. Install: `npx skills add Sequenzy/skills --skill emailagentskill` or `npx skills add emailagentskill`.
+- [`emailcampaignskill`](skills/emailcampaignskill/SKILL.md): Campaign briefs, audience logic, creative QA, launch readiness, and post-send analysis. Install: `npx skills add Sequenzy/skills --skill emailcampaignskill` or `npx skills add emailcampaignskill`.

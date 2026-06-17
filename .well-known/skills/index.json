@@ -71,6 +71,409 @@
         "Sequenzy"
       ],
       "license": "MIT"
+    },
+    {
+      "name": "emailworkflowskill",
+      "description": "Workflow maps, lifecycle routing, trigger ownership, and agent-readable operating paths.",
+      "path": "skills/emailworkflowskill/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/emailworkflowskill",
+      "sourceRepository": "https://github.com/Sequenzy/emailworkflowskill",
+      "homepage": "https://emailworkflowskill.com",
+      "install": "npx skills add emailworkflowskill",
+      "collectionInstall": "npx skills add Sequenzy/skills --skill emailworkflowskill",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "OpenClaw",
+        "Cowork",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email",
+        "agent-skills",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email",
+        "agents",
+        "campaigns",
+        "automation",
+        "emailworkflowskill"
+      ],
+      "license": "MIT"
+    },
+    {
+      "name": "openclawemailskill",
+      "description": "Open, inspectable email campaign operations and provider-neutral playbooks for agents.",
+      "path": "skills/openclawemailskill/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/openclawemailskill",
+      "sourceRepository": "https://github.com/Sequenzy/openclawemailskill",
+      "homepage": "https://openclawemailskill.com",
+      "install": "npx skills add openclawemailskill",
+      "collectionInstall": "npx skills add Sequenzy/skills --skill openclawemailskill",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "OpenClaw",
+        "Cowork",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email",
+        "agent-skills",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email",
+        "agents",
+        "campaigns",
+        "automation",
+        "openclawemailskill"
+      ],
+      "license": "MIT"
+    },
+    {
+      "name": "hermesemailskill",
+      "description": "Fast delivery decisions, message QA, launch coordination, and concise status handoffs.",
+      "path": "skills/hermesemailskill/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/hermesemailskill",
+      "sourceRepository": "https://github.com/Sequenzy/hermesemailskill",
+      "homepage": "https://hermesemailskill.com",
+      "install": "npx skills add hermesemailskill",
+      "collectionInstall": "npx skills add Sequenzy/skills --skill hermesemailskill",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "OpenClaw",
+        "Cowork",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email",
+        "agent-skills",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email",
+        "agents",
+        "campaigns",
+        "automation",
+        "hermesemailskill"
+      ],
+      "license": "MIT"
+    },
+    {
+      "name": "emaildesignskill",
+      "description": "Responsive email design, component systems, dark-mode behavior, and accessibility checks.",
+      "path": "skills/emaildesignskill/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/emaildesignskill",
+      "sourceRepository": "https://github.com/Sequenzy/emaildesignskill",
+      "homepage": "https://emaildesignskill.com",
+      "install": "npx skills add emaildesignskill",
+      "collectionInstall": "npx skills add Sequenzy/skills --skill emaildesignskill",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "OpenClaw",
+        "Cowork",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email",
+        "agent-skills",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email",
+        "agents",
+        "campaigns",
+        "automation",
+        "emaildesignskill"
+      ],
+      "license": "MIT"
+    },
+    {
+      "name": "claudeemailskill",
+      "description": "Claude-oriented email prompts, campaign drafting, critique loops, and human review.",
+      "path": "skills/claudeemailskill/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/claudeemailskill",
+      "sourceRepository": "https://github.com/Sequenzy/claudeemailskill",
+      "homepage": "https://claudeemailskill.com",
+      "install": "npx skills add claudeemailskill",
+      "collectionInstall": "npx skills add Sequenzy/skills --skill claudeemailskill",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "OpenClaw",
+        "Cowork",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email",
+        "agent-skills",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email",
+        "agents",
+        "campaigns",
+        "automation",
+        "claudeemailskill"
+      ],
+      "license": "MIT"
+    },
+    {
+      "name": "codexemailskill",
+      "description": "Repo-aware email implementation workflows for codebases, content systems, templates, and tests.",
+      "path": "skills/codexemailskill/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/codexemailskill",
+      "sourceRepository": "https://github.com/Sequenzy/codexemailskill",
+      "homepage": "https://codexemailskill.com",
+      "install": "npx skills add codexemailskill",
+      "collectionInstall": "npx skills add Sequenzy/skills --skill codexemailskill",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "OpenClaw",
+        "Cowork",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email",
+        "agent-skills",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email",
+        "agents",
+        "campaigns",
+        "automation",
+        "codexemailskill"
+      ],
+      "license": "MIT"
+    },
+    {
+      "name": "claudeemailmarketing",
+      "description": "Claude-assisted positioning, segmentation, lifecycle content, and marketing review systems.",
+      "path": "skills/claudeemailmarketing/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/claudeemailmarketing",
+      "sourceRepository": "https://github.com/Sequenzy/claudeemailmarketing",
+      "homepage": "https://claudeemailmarketing.com",
+      "install": "npx skills add claudeemailmarketing",
+      "collectionInstall": "npx skills add Sequenzy/skills --skill claudeemailmarketing",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "OpenClaw",
+        "Cowork",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email",
+        "agent-skills",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email",
+        "agents",
+        "campaigns",
+        "automation",
+        "claudeemailmarketing"
+      ],
+      "license": "MIT"
+    },
+    {
+      "name": "emaildeliverabilityskill",
+      "description": "Inbox placement, authentication, sender reputation, complaint control, and remediation workflows.",
+      "path": "skills/emaildeliverabilityskill/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/emaildeliverabilityskill",
+      "sourceRepository": "https://github.com/Sequenzy/emaildeliverabilityskill",
+      "homepage": "https://emaildeliverabilityskill.com",
+      "install": "npx skills add emaildeliverabilityskill",
+      "collectionInstall": "npx skills add Sequenzy/skills --skill emaildeliverabilityskill",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "OpenClaw",
+        "Cowork",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email",
+        "agent-skills",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email",
+        "agents",
+        "campaigns",
+        "automation",
+        "emaildeliverabilityskill"
+      ],
+      "license": "MIT"
+    },
+    {
+      "name": "newsletterskill",
+      "description": "Editorial calendars, issue structure, sponsorship inventory, reader growth, and retention loops.",
+      "path": "skills/newsletterskill/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/newsletterskill",
+      "sourceRepository": "https://github.com/Sequenzy/newsletterskill",
+      "homepage": "https://newsletterskill.com",
+      "install": "npx skills add newsletterskill",
+      "collectionInstall": "npx skills add Sequenzy/skills --skill newsletterskill",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "OpenClaw",
+        "Cowork",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email",
+        "agent-skills",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email",
+        "agents",
+        "campaigns",
+        "automation",
+        "newsletterskill"
+      ],
+      "license": "MIT"
+    },
+    {
+      "name": "dripcampaignskill",
+      "description": "Time-based nurture streams, branching logic, lead scoring hooks, and conversion analysis.",
+      "path": "skills/dripcampaignskill/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/dripcampaignskill",
+      "sourceRepository": "https://github.com/Sequenzy/dripcampaignskill",
+      "homepage": "https://dripcampaignskill.com",
+      "install": "npx skills add dripcampaignskill",
+      "collectionInstall": "npx skills add Sequenzy/skills --skill dripcampaignskill",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "OpenClaw",
+        "Cowork",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email",
+        "agent-skills",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email",
+        "agents",
+        "campaigns",
+        "automation",
+        "dripcampaignskill"
+      ],
+      "license": "MIT"
+    },
+    {
+      "name": "emailautomationskill",
+      "description": "Behavioral triggers, lifecycle journeys, automation governance, and operational safeguards.",
+      "path": "skills/emailautomationskill/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/emailautomationskill",
+      "sourceRepository": "https://github.com/Sequenzy/emailautomationskill",
+      "homepage": "https://emailautomationskill.com",
+      "install": "npx skills add emailautomationskill",
+      "collectionInstall": "npx skills add Sequenzy/skills --skill emailautomationskill",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "OpenClaw",
+        "Cowork",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email",
+        "agent-skills",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email",
+        "agents",
+        "campaigns",
+        "automation",
+        "emailautomationskill"
+      ],
+      "license": "MIT"
+    },
+    {
+      "name": "emailagentskill",
+      "description": "Agentic email planning, tool handoffs, safe execution, review loops, and multi-agent coordination.",
+      "path": "skills/emailagentskill/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/emailagentskill",
+      "sourceRepository": "https://github.com/Sequenzy/emailagentskill",
+      "homepage": "https://emailagentskill.com",
+      "install": "npx skills add emailagentskill",
+      "collectionInstall": "npx skills add Sequenzy/skills --skill emailagentskill",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "OpenClaw",
+        "Cowork",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email",
+        "agent-skills",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email",
+        "agents",
+        "campaigns",
+        "automation",
+        "emailagentskill"
+      ],
+      "license": "MIT"
+    },
+    {
+      "name": "emailcampaignskill",
+      "description": "Campaign briefs, audience logic, creative QA, launch readiness, and post-send analysis.",
+      "path": "skills/emailcampaignskill/SKILL.md",
+      "url": "https://github.com/Sequenzy/skills/tree/main/skills/emailcampaignskill",
+      "sourceRepository": "https://github.com/Sequenzy/emailcampaignskill",
+      "homepage": "https://emailcampaignskill.com",
+      "install": "npx skills add emailcampaignskill",
+      "collectionInstall": "npx skills add Sequenzy/skills --skill emailcampaignskill",
+      "compatibility": [
+        "Claude Code",
+        "OpenAI Codex",
+        "Hermes Agent",
+        "OpenClaw",
+        "Cowork",
+        "SKILL.md-compatible agents"
+      ],
+      "categories": [
+        "email",
+        "agent-skills",
+        "marketing-operations"
+      ],
+      "keywords": [
+        "email",
+        "agents",
+        "campaigns",
+        "automation",
+        "emailcampaignskill"
+      ],
+      "license": "MIT"
     }
   ]
 }

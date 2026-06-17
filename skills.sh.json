@@ -1,0 +1,33 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Sequenzy",
+      "description": "Skills for operating Sequenzy workflows.",
+      "skills": [
+        "sequenzy-email-marketing",
+        "sequenzy"
+      ]
+    },
+    {
+      "title": "Email Agent Skills",
+      "description": "Provider-neutral email operations skills for Codex, Claude Code, Hermes, OpenClaw, Cowork, and compatible agents.",
+      "skills": [
+        "emailworkflowskill",
+        "openclawemailskill",
+        "hermesemailskill",
+        "emaildesignskill",
+        "claudeemailskill",
+        "codexemailskill",
+        "claudeemailmarketing",
+        "emaildeliverabilityskill",
+        "newsletterskill",
+        "dripcampaignskill",
+        "emailautomationskill",
+        "emailagentskill",
+        "emailcampaignskill"
+      ]
+    }
+  ]
+}
