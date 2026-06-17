@@ -101,7 +101,8 @@
         "automation",
         "emailworkflowskill"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "title": "Email Workflow Skill"
     },
     {
       "name": "openclawemailskill",
@@ -132,7 +133,8 @@
         "automation",
         "openclawemailskill"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "title": "OpenClaw Email Skill"
     },
     {
       "name": "hermesemailskill",
@@ -163,7 +165,8 @@
         "automation",
         "hermesemailskill"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "title": "Hermes Email Skill"
     },
     {
       "name": "emaildesignskill",
@@ -194,7 +197,8 @@
         "automation",
         "emaildesignskill"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "title": "Email Design Skill"
     },
     {
       "name": "claudeemailskill",
@@ -225,7 +229,8 @@
         "automation",
         "claudeemailskill"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "title": "Claude Email Skill"
     },
     {
       "name": "codexemailskill",
@@ -256,7 +261,8 @@
         "automation",
         "codexemailskill"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "title": "Codex Email Skill"
     },
     {
       "name": "claudeemailmarketing",
@@ -287,7 +293,8 @@
         "automation",
         "claudeemailmarketing"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "title": "Claude Email Marketing Skill"
     },
     {
       "name": "emaildeliverabilityskill",
@@ -318,7 +325,8 @@
         "automation",
         "emaildeliverabilityskill"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "title": "Email Deliverability Skill"
     },
     {
       "name": "newsletterskill",
@@ -349,7 +357,8 @@
         "automation",
         "newsletterskill"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "title": "Newsletter Skill"
     },
     {
       "name": "dripcampaignskill",
@@ -380,7 +389,8 @@
         "automation",
         "dripcampaignskill"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "title": "Drip Campaign Skill"
     },
     {
       "name": "emailautomationskill",
@@ -411,7 +421,8 @@
         "automation",
         "emailautomationskill"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "title": "Email Automation Skill"
     },
     {
       "name": "emailagentskill",
@@ -442,7 +453,8 @@
         "automation",
         "emailagentskill"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "title": "Email Agent Skill"
     },
     {
       "name": "emailcampaignskill",
@@ -473,7 +485,8 @@
         "automation",
         "emailcampaignskill"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "title": "Email Campaign Skill"
     }
   ]
 }
