@@ -643,7 +643,7 @@ Behavior:
 Caveats:
 
 - valid event types are `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.bounced`, `email.complained`, `email.opened`, `email.clicked`, `email.unsubscribed`, `subscriber.invalid`, `subscriber.updated`, `subscriber.unsubscribed`, `sequence.finished`, and `sequence.failed`; omit `--event` to use the default set
-- `create` prints the signing secret exactly once and it cannot be retrieved later; surface it to the user immediately
+- `create` returns a signing secret exactly once and it cannot be retrieved later; handle it as sensitive output. Do not paste credential material into chat, logs, tickets, or public transcripts. Save it only to a user-approved secure destination such as a password manager, secret store, encrypted file, or local `.env` file outside version control, then report the storage location and a short fingerprint.
 - `--enable` and `--disable` are mutually exclusive; changing the URL or re-enabling resets the failure circuit breaker
 - the webhook must be enabled to receive a test event
 - run `webhooks deliveries <id>` first to find delivery IDs before replaying
@@ -664,7 +664,7 @@ Behavior:
 
 Caveat:
 
-- the plain API key is returned only at creation time; save it immediately
+- newly created API credential material is returned only at creation time; handle it as sensitive output. Do not paste it into chat, logs, tickets, or public transcripts. Save it only to a user-approved secure destination such as a password manager, secret store, encrypted file, or local `.env` file outside version control, then report the storage location and a short fingerprint.
 
 ## Websites
 
@@ -694,5 +694,5 @@ Treat these requested workflows as unsupported in the CLI even though related no
 - use `--json` when another tool or agent needs structured output; dashboard-aware commands add `url`/`appUrls` fields when possible
 - destructive commands (`delete`, `delete-variant`, `cancel-invitation`, and similar) prompt for confirmation; pass `--yes` (or `-y`) to skip, and note that `--yes` is required when stdin is not a TTY, which covers most agent and CI runs
 - `campaigns cancel` deliberately skips the confirmation prompt so a bad send can be stopped fast
-- `webhooks create` returns a one-time signing secret; surface it to the user immediately because it cannot be retrieved later
+- `webhooks create` returns a one-time signing secret; handle it as sensitive output because it cannot be retrieved later. Do not paste credential material into chat, logs, tickets, or public transcripts. Save it only to a user-approved secure destination such as a password manager, secret store, encrypted file, or local `.env` file outside version control, then report the storage location and a short fingerprint.
 - when the user asks for a workflow outside the current CLI surface, say so directly and choose between dashboard or direct API use instead of inventing commands

@@ -551,7 +551,7 @@ sequenzy websites guide --framework nextjs --use-case transactional
 
 Guidance:
 
-- save API keys immediately; the raw key is only returned on creation
+- save newly created API credentials immediately to a user-approved secure destination such as a password manager, secret store, encrypted file, or local `.env` file outside version control. Do not paste credential material into chat, logs, tickets, or public transcripts; report only the storage location and a short fingerprint.
 - use `websites check` when the user needs DNS verification details
 - use `websites guide` for integration code snippets rather than inventing framework examples
 
@@ -639,7 +639,7 @@ sequenzy webhooks delete wh_123 --yes
 
 Guidance:
 
-- `create` prints the signing secret exactly once; surface it to the user immediately and tell them to store it, because it cannot be retrieved later
+- `create` returns one-time signing-secret material; handle it as sensitive output. Save it only to a user-approved secure destination such as a password manager, secret store, encrypted file, or local `.env` file outside version control. Do not paste credential material into chat, logs, tickets, or public transcripts; report only the storage location and a short fingerprint.
 - pick events from the 13 supported `email.*`, `subscriber.*`, and `sequence.*` types, or omit `--event` for the default set
 - debug delivery problems with `test` (fires a test event), `deliveries` (recent attempts with status codes and errors), and `replay` (re-sends one delivery)
 - use `update --disable`/`--enable` to toggle an endpoint; re-enabling or changing the URL resets the failure circuit breaker
