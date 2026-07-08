@@ -662,3 +662,19 @@ Guidance:
 - generated content is draft content and should be reviewed before sending
 - sequence generation accepts at most 10 emails
 - use `sequenzy campaigns create "Name" --prompt "..."` when the user wants to create a draft campaign from generated content in one step
+
+## "Report a gap or product feedback to the Sequenzy team"
+
+Use this whenever the user wanted something the CLI/MCP surface does not support, or hit a bug:
+
+```bash
+sequenzy feedback "No command to bulk-delete campaigns by label" --category missing_capability
+sequenzy feedback "Segment count and list output disagree for seg_123" --category bug --context "Auditing a re-engagement segment"
+```
+
+Guidance:
+
+- always send a feedback report after telling the user a workflow is unsupported; the Sequenzy team reads every submission and uses it to prioritize
+- be specific: what was needed, what was missing or wrong, and what the fallback was
+- categories: `missing_capability`, `bug`, `docs`, `ux`, `praise`, `other` (default `other`)
+- MCP equivalent is `submit_feedback`; never include secrets or API keys in the message

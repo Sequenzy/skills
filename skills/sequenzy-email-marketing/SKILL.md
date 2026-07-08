@@ -48,10 +48,11 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - products `list`, `sync`, `attach-file`, and `detach-file` for digital product delivery, with `attach-file --file` uploading local files via presigned URLs; attached files are exposed on `saas.purchase` events as `{{event.download.url}}` / `{{event.download.name}}` (MCP: `list_products`, `attach_product_file`, `remove_product_file`, `sync_products`)
 - API key creation with `api-keys create`, handled as sensitive output
 - send one transactional email by template or raw HTML
+- product feedback with `feedback`, sending missing-capability reports, bug reports, and other product feedback straight to the Sequenzy team (MCP: `submit_feedback`)
 
 ## Unsupported Or Placeholder Workflows
 
-Treat missing subcommands as unsupported even when the noun exists. The main remaining gap is campaign immediate send: there is no "send now" command, so schedule the campaign with a near-future `--at` timestamp instead. Bulk list population is supported through `sequenzy lists add-subscribers` and its `sequenzy lists import` alias, not through `subscribers add`.
+Treat missing subcommands as unsupported even when the noun exists. The main remaining gap is campaign immediate send: there is no "send now" command, so schedule the campaign with a near-future `--at` timestamp instead. Bulk list population is supported through `sequenzy lists add-subscribers` and its `sequenzy lists import` alias, not through `subscribers add`. Whenever the user wanted something unsupported, report the gap with `sequenzy feedback "..." --category missing_capability` (MCP: `submit_feedback`) so it reaches the Sequenzy team.
 
 ## Execution Pattern
 
@@ -59,7 +60,7 @@ Treat missing subcommands as unsupported even when the noun exists. The main rem
 2. Pick the narrowest command that matches the use case.
 3. Validate IDs, recipient email, subject, template, or content input before issuing a mutation.
 4. Surface CLI limitations directly instead of inventing a workaround.
-5. If the workflow is unsupported in the CLI, say whether the next-best path is the Sequenzy dashboard or direct API use.
+5. If the workflow is unsupported in the CLI, say whether the next-best path is the Sequenzy dashboard or direct API use, and report the gap with `sequenzy feedback "..." --category missing_capability` (MCP: `submit_feedback`).
 6. When you create, inspect, or schedule a campaign, sequence, template, or company and the user may want to review/edit it, surface the dashboard URL from `url`, `previewUrl`, or `appUrls` in the tool/CLI output. If needed, generate it with `sequenzy urls` or MCP `get_app_urls`.
 7. Destructive commands (`delete`, `delete-variant`, `cancel-invitation`, and similar) prompt for confirmation. Pass `--yes` (or `-y`) to skip the prompt; `--yes` is required when stdin is not a TTY, which covers most agent and CI runs.
 8. Treat API keys, webhook signing secrets, and other one-time credentials as sensitive output. Do not paste raw secret values into chat, logs, tickets, or public transcripts. Capture them to a user-approved secure destination such as a password manager, secret store, encrypted file, or local `.env` file outside version control; otherwise redact the value and report only where it was saved plus a short fingerprint.

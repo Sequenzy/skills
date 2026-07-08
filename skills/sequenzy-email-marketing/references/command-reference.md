@@ -682,6 +682,24 @@ Behavior:
 - `websites check`: `GET /api/v1/websites/:domain`
 - `websites guide`: `POST /api/v1/integration-guide`
 
+## Feedback
+
+```bash
+sequenzy feedback "No command to bulk-delete campaigns by label" --category missing_capability
+sequenzy feedback "Segment count and list output disagree for seg_123" --category bug --context "Auditing a re-engagement segment"
+```
+
+Behavior:
+
+- sends `POST /api/v1/feedback`
+- body shape is `{ message, source: "cli", category?, context? }`
+- categories: `missing_capability`, `bug`, `docs`, `ux`, `praise`, `other` (default `other`)
+- MCP equivalent: `submit_feedback` (message, optional category and context; source is set to `mcp` automatically)
+
+Caveat:
+
+- feedback is fire-and-forget: it is delivered straight to the Sequenzy team and there is no way to query it afterwards
+
 ## Commands To Treat As Unsupported
 
 Treat these requested workflows as unsupported in the CLI even though related nouns exist:
@@ -695,4 +713,4 @@ Treat these requested workflows as unsupported in the CLI even though related no
 - destructive commands (`delete`, `delete-variant`, `cancel-invitation`, and similar) prompt for confirmation; pass `--yes` (or `-y`) to skip, and note that `--yes` is required when stdin is not a TTY, which covers most agent and CI runs
 - `campaigns cancel` deliberately skips the confirmation prompt so a bad send can be stopped fast
 - `webhooks create` returns a one-time signing secret; handle it as sensitive output because it cannot be retrieved later. Do not paste credential material into chat, logs, tickets, or public transcripts. Save it only to a user-approved secure destination such as a password manager, secret store, encrypted file, or local `.env` file outside version control, then report the storage location and a short fingerprint.
-- when the user asks for a workflow outside the current CLI surface, say so directly and choose between dashboard or direct API use instead of inventing commands
+- when the user asks for a workflow outside the current CLI surface, say so directly, choose between dashboard or direct API use instead of inventing commands, and report the gap with `sequenzy feedback "..." --category missing_capability` (MCP: `submit_feedback`)
