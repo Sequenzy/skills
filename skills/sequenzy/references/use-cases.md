@@ -301,6 +301,14 @@ sequenzy campaigns get camp_123
 sequenzy campaigns create "April Launch" --prompt "Announce our new dashboard"
 sequenzy campaigns create "April Launch" --subject "We shipped" --label edm --html-file ./campaign.html
 sequenzy campaigns create "April Launch" --subject "We shipped" --blocks-file ./campaign-blocks.json
+
+# Ask for feedback with a poll block inside the campaign blocks JSON:
+# {"type":"poll","variant":"options","question":"What did you think?",
+#  "options":[{"label":"Loved it","value":"loved"},{"label":"Not for me","value":"not_for_me"}],
+#  "attributeKey":"email_feedback"}
+# or an NPS survey: {"type":"poll","variant":"nps","question":"How likely are you to recommend us?","options":[],"attributeKey":"nps_score"}
+# Answers land in the subscriber attribute, fire a poll.answered event, and
+# aggregate into the campaign stats "polls" array.
 sequenzy campaigns update camp_123 --subject "Updated subject" --label edm
 sequenzy campaigns update camp_123 --blocks-file ./campaign-v2-blocks.json
 sequenzy campaigns update camp_123 --reply-to support@example.com

@@ -109,6 +109,8 @@ Output includes:
 - `openRate`
 - `clickRate`
 
+Campaign stats also include a `polls` array when the campaign collected poll / NPS answers: one entry per poll block with `question`, `totalResponses`, per-answer counts and percentages, and an `nps` breakdown (`score`, `average`, promoters / passives / detractors) for NPS surveys.
+
 ## Subscribers
 
 ### List
