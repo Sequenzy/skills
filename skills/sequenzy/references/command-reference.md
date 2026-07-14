@@ -109,6 +109,8 @@ Output includes:
 - `openRate`
 - `clickRate`
 
+Campaign stats also include a `clickedLinks` array when the campaign has tracked link clicks: the top 20 destination URLs, most clicked first, each with `url`, `clicks`, and `percentage` (that link's share of every recorded link click). The CLI prints these as a Clicked Links section; use `--json` for the raw array. The MCP `get_campaign_stats` tool returns the same top-level array.
+
 Campaign stats also include a `polls` array when the campaign collected poll / NPS answers: one entry per poll block with `question`, `totalResponses`, per-answer counts and percentages, and an `nps` breakdown (`score`, `average`, promoters / passives / detractors) for NPS surveys.
 
 ## Subscribers
