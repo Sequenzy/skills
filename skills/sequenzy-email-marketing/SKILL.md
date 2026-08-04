@@ -25,15 +25,18 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - login and logout
 - local auth/session check with `whoami`
 - account inspection with `account`
-- company inspection or creation with `companies list|get|create`
-- stats overview or stats by campaign/sequence ID
-- subscribers `list`, `add`, `get`, and `remove`, with `list` fetching every page by default and supporting tag, segment, and list filters
+- company inspection, creation, or brand/sender-identity updates with `companies list|get|create|update`
+- stats overview or stats by campaign, sequence, or transactional ID, with custom `--start`/`--end` ranges, `--email-type` and `--mailbox-provider` scoping, `--include-bots`, and campaign `clickedLinks` plus poll/NPS `polls` arrays
+- raw delivery/engagement event listing with `events --campaign|--sequence`, and per-delivery inspection with `email-sends list|get` plus bounce-suppression cleanup with `suppressions get|remove`
+- subscribers `list`, `add`, `update`, `get`, and `remove`, with `list` fetching every page by default and supporting tag, segment, and list filters; `add` and `update` set native profile names via `--first-name` / `--last-name` (MCP `add_subscriber` / `update_subscriber`: `firstName` / `lastName`), so never store names in custom attributes; both also handle native phone numbers and SMS consent
+- bulk subscriber imports with `subscribers import` / `import-status`, subscriber notes, custom event triggering with `subscribers event` (live or `--occurred-at` backfill), and bulk tag operations with `subscribers tags add|remove`
 - lists `list`, `create`, `update`, `delete`, `add-subscribers`, `remove-subscribers`, and `import` alias for bulk list population from emails, JSON, CSV, or newline files
 - tags `list`, `create`, `update`, and `delete`, with bare `sequenzy tags` still listing tag definitions for backwards compatibility
 - segments `list`, `create`, `update`, `delete`, and `count`, including `--match any`, nested filter roots, custom event filters, and saved-segment composition filters
 - templates `list`, `get`, `create`, `update`, and `delete`, with `list` supporting label filters and `create`/`update` accepting labels, raw HTML, or Sequenzy block JSON
-- campaigns `list`, `get`, `create`, `update` including label and reply-to updates, `schedule`, and `test`, with `list` supporting label filters, `create` accepting labels plus raw HTML, Sequenzy block JSON, or prompt-generated content, `update` accepting labels plus raw HTML or Sequenzy block JSON, and `schedule` returning a review preview link
-- campaign lifecycle control with `campaigns cancel` (stops scheduled, paused, waiting-approval, or sending campaigns immediately, no confirmation prompt), `campaigns pause` and `campaigns resume` for an active send (resume supports `--spread-over-hours`), `campaigns delete` (blocked while sending, scheduled, or paused - cancel first), and `campaigns duplicate` with `--mode campaign|ab_test|variant`
+- campaigns `list`, `get`, `create`, `update` including label and reply-to updates, `schedule`, and `test`, with `list` supporting label filters, `create` accepting labels plus raw HTML, Sequenzy block JSON, or prompt-generated content, `update` accepting labels plus raw HTML or Sequenzy block JSON, and `schedule` returning a review preview link; `create` and `schedule` both accept the audience via `--segment` or `--target-lists-json`/`--target-lists-file`
+- campaign lifecycle control with `campaigns cancel` (stops scheduled, paused, waiting-approval, or sending campaigns immediately, no confirmation prompt), `campaigns unschedule` (returns a scheduled campaign or recurring series to draft), `campaigns pause` and `campaigns resume` for an active send (resume supports `--spread-over-hours`), `campaigns delete` (blocked while sending, scheduled, or paused - cancel first), and `campaigns duplicate` with `--mode campaign|ab_test|variant`
+- campaign audience inspection with `campaigns audience`, true-to-send HTML previews with `campaigns render` / `templates render` / `sequences render` (subscriber or ad-hoc personalization, locale, tracking, `--out`), recurring sends with `campaigns schedule --repeat weekly|monthly`, and post-send re-engagement with `campaigns resend-to-non-openers`
 - ab-tests `list`, `get`, `stats`, `restart`, `update-variant`, `create`, `add-variant`, `delete-variant`, and `delete`; create/add-variant/delete-variant/delete work on campaign A/B tests in draft status, variant A is the protected control, and `restart` reruns a finished sequence A/B test
 - MCP template and campaign tools support labels on list/create/update; MCP `update_campaign` also supports `replyTo` and `replyProfileId`, and MCP `schedule_campaign` schedules draft or already scheduled campaigns
 - MCP `search_subscribers` supports list filters through `list`, `listId`, or `listName`; MCP `add_subscribers_to_list` accepts up to 500 emails per call
@@ -42,17 +45,27 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - team `list`, `invite` with `--role admin|viewer` and owner-only `--billing-access`, and `cancel-invitation`
 - inbox `list` with status, search, unread, and pagination filters, `get`, `reply` including internal notes with `--note`, `close`, `reopen`, and `mark-read`
 - webhooks `list`, `create`, `update`, `delete`, `test`, `deliveries`, and `replay` for outbound webhook endpoints, with `create` returning a one-time signing secret that must be handled as sensitive
-- AI generation with `generate email`, `generate sequence`, and `generate subjects`
+- AI generation with `generate email`, `generate sequence`, `generate subjects`, and `generate sms`
 - dashboard URL generation with CLI `urls`, MCP `get_app_urls`, and `appUrls`/`url` fields on campaign, sequence, template, and company results
 - websites `list`, `add`, `check`, and `guide`
-- products `list`, `sync`, `attach-file`, and `detach-file` for digital product delivery, with `attach-file --file` uploading local files via presigned URLs; attached files are exposed on `saas.purchase` events as `{{event.download.url}}` / `{{event.download.name}}` (MCP: `list_products`, `attach_product_file`, `remove_product_file`, `sync_products`)
-- API key creation with `api-keys create`, handled as sensitive output
-- send one transactional email by template or raw HTML
+- products `list`, `sync`, `upsert` (API-provider products keyed by your own ID, bulk up to 100), `delete`, `attach-file`, and `detach-file` for digital product delivery, with `attach-file --file` uploading local files via presigned URLs; attached files are exposed on `saas.purchase` events as `{{event.download.url}}` / `{{event.download.name}}` (MCP: `list_products`, `upsert_products`, `delete_product`, `attach_product_file`, `remove_product_file`, `sync_products`)
+- API key management with `api-keys create|list|revoke`, including permission presets and explicit scopes on create; new keys are handled as sensitive output
+- transactional email: one-off sends by template or raw HTML with `send`, plus saved-template management with `transactional list|get|create|update|delete` and preferences-iframe tokens via `transactional widgets preferences-token`
+- forms `list` and `update` (MCP additionally: `create_form`, `get_form_embed`) and full landing-page management with `landing-pages` including publish/unpublish, duplicate, custom domains, and DNS verification
+- sequence operations beyond CRUD: `render`, per-node `test` sends, `duplicate`, `archive`/`unarchive`, enrollment listing with CSV export, `pause-enrollments`/`resume-enrollments`, conversion `goals`, and inbound trigger `webhook get|configure|rotate`
+- template AI/manual localization with `templates localizations set|sync`
+- integrations: `catalog`, `connect` (API-key/webhook-secret providers; OAuth providers connect in the dashboard), `list`, `get`, `activity`, `sync`, `enable-sync`/`disable-sync`, Shopify `pixel`/`enable-pixel`, and `guide`
+- Meta Ads audience syncs with `audience-syncs list|ad-accounts|create|update|delete|sync`
+- deliverability and sending config: `sender-profiles list|update`, `tracking settings|update` (open/click tracking, strict bot filtering, attribution window, double opt-in, auto-UTM), and sequence/step-level sending windows
+- Shopify automation settings with `shopify settings get|update` (browse abandonment, cart abandonment, price drop)
+- SMS operations with `sms settings`, `sms send-test`, SMS sequence steps, and `generate sms`
+- integration event-to-tag sync rules with `sync-rules get|update`
+- personal notification preferences with `account notifications get|set`
 - product feedback with `feedback`, sending missing-capability reports, bug reports, and other product feedback straight to the Sequenzy team (MCP: `submit_feedback`)
 
 ## Unsupported Or Placeholder Workflows
 
-Treat missing subcommands as unsupported even when the noun exists. The main remaining gap is campaign immediate send: there is no "send now" command, so schedule the campaign with a near-future `--at` timestamp instead. Bulk list population is supported through `sequenzy lists add-subscribers` and its `sequenzy lists import` alias, not through `subscribers add`. Whenever the user wanted something unsupported, report the gap with `sequenzy feedback "..." --category missing_capability` (MCP: `submit_feedback`) so it reaches the Sequenzy team.
+Treat missing subcommands as unsupported even when the noun exists. The main remaining gaps: campaign immediate send (no "send now" command - schedule with a near-future `--at` timestamp instead), sending domain add/verify (MCP `add_sending_domain` / `verify_sending_domain` or dashboard only), form creation and embed snippets (MCP `create_form` / `get_form_embed` only), and image asset upload (MCP `upload_image_asset` only). Bulk list population is supported through `sequenzy lists add-subscribers` and its `sequenzy lists import` alias, not through `subscribers add`. Whenever the user wanted something unsupported, report the gap with `sequenzy feedback "..." --category missing_capability` (MCP: `submit_feedback`) so it reaches the Sequenzy team.
 
 ## Execution Pattern
 

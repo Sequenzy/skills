@@ -301,6 +301,14 @@ sequenzy campaigns get camp_123
 sequenzy campaigns create "April Launch" --prompt "Announce our new dashboard"
 sequenzy campaigns create "April Launch" --subject "We shipped" --label edm --html-file ./campaign.html
 sequenzy campaigns create "April Launch" --subject "We shipped" --blocks-file ./campaign-blocks.json
+
+# Ask for feedback with a poll block inside the campaign blocks JSON:
+# {"type":"poll","variant":"options","question":"What did you think?",
+#  "options":[{"label":"Loved it","value":"loved"},{"label":"Not for me","value":"not_for_me"}],
+#  "attributeKey":"email_feedback"}
+# or an NPS survey: {"type":"poll","variant":"nps","question":"How likely are you to recommend us?","options":[],"attributeKey":"nps_score"}
+# Answers land in the subscriber attribute, fire a poll.answered event, and
+# aggregate into the campaign stats "polls" array.
 sequenzy campaigns update camp_123 --subject "Updated subject" --label edm
 sequenzy campaigns update camp_123 --blocks-file ./campaign-v2-blocks.json
 sequenzy campaigns update camp_123 --reply-to support@example.com
@@ -395,7 +403,7 @@ Guidance:
 
 - the campaign must be in draft or rejected status and must not already have an A/B test
 - variant A is created automatically from the campaign email and is the protected control; it cannot be deleted
-- a test holds 2 to 5 variants; structure changes (add, edit, delete variants) are only allowed while the test is in draft status
+- a test holds 2 to 5 variants; structure changes (add, edit, delete variants) are only allowed while the test is in draft status; sequence tests whose parent sequence is active additionally require `--confirm-live-change` (`confirmLiveChange` over MCP) to add or delete variants
 - `--test-percentage` (5-50), `--duration-minutes` (15-1440), and `--winner-criteria open_rate|click_rate` control how the winner is picked once the campaign is scheduled
 - use `ab-tests get` to find variant IDs, `ab-tests stats` to compare results after sending, and `ab-tests delete` (draft or finished tests only) to remove a test
 - `campaigns duplicate camp_123 --mode ab_test` clones a campaign together with its A/B test

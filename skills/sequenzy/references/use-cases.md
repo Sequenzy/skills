@@ -403,7 +403,7 @@ Guidance:
 
 - the campaign must be in draft or rejected status and must not already have an A/B test
 - variant A is created automatically from the campaign email and is the protected control; it cannot be deleted
-- a test holds 2 to 5 variants; structure changes (add, edit, delete variants) are only allowed while the test is in draft status
+- a test holds 2 to 5 variants; structure changes (add, edit, delete variants) are only allowed while the test is in draft status; sequence tests whose parent sequence is active additionally require `--confirm-live-change` (`confirmLiveChange` over MCP) to add or delete variants
 - `--test-percentage` (5-50), `--duration-minutes` (15-1440), and `--winner-criteria open_rate|click_rate` control how the winner is picked once the campaign is scheduled
 - use `ab-tests get` to find variant IDs, `ab-tests stats` to compare results after sending, and `ab-tests delete` (draft or finished tests only) to remove a test
 - `campaigns duplicate camp_123 --mode ab_test` clones a campaign together with its A/B test
