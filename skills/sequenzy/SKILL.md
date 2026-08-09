@@ -47,7 +47,7 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - webhooks `list`, `create`, `update`, `delete`, `test`, `deliveries`, and `replay` for outbound webhook endpoints, with `create` printing the signing secret exactly once
 - AI generation with `generate email`, `generate sequence`, `generate subjects`, and `generate sms`
 - dashboard URL generation with CLI `urls`, MCP `get_app_urls`, and `appUrls`/`url` fields on campaign, sequence, template, and company results
-- websites `list`, `add`, `check`, and `guide`
+- websites `list`, `add`, `check`, `verify`, and `guide`
 - products `list`, `sync`, `upsert` (API-provider products keyed by your own ID, bulk up to 100), `delete`, `attach-file`, and `detach-file` for digital product delivery, with `attach-file --file` uploading local files via presigned URLs; attached files are exposed on `saas.purchase` events as `{{event.download.url}}` / `{{event.download.name}}` (MCP: `list_products`, `upsert_products`, `delete_product`, `attach_product_file`, `remove_product_file`, `sync_products`)
 - API key management with `api-keys create|list|revoke`, including permission presets and explicit scopes on create
 - transactional email: one-off sends by template or raw HTML with `send`, plus saved-template management with `transactional list|get|create|update|delete` and preferences-iframe tokens via `transactional widgets preferences-token`

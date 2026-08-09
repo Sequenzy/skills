@@ -1109,6 +1109,7 @@ Behavior:
 sequenzy websites list --company comp_123
 sequenzy websites add example.com --company comp_123
 sequenzy websites check example.com --company comp_123
+sequenzy websites verify example.com --company comp_123
 sequenzy websites guide --framework nextjs --use-case transactional
 ```
 
@@ -1116,8 +1117,10 @@ Behavior:
 
 - `websites list`: `GET /api/v1/websites`
 - `websites add`: `POST /api/v1/websites`
-- `websites check`: `GET /api/v1/websites/:domain`
+- `websites check`: `GET /api/v1/websites/:domain` - reads the stored status
+- `websites verify`: `POST /api/v1/websites/:domain/verify` - runs a fresh DNS check and updates the stored status
 - `websites guide`: `POST /api/v1/integration-guide`
+- `check` and `verify` print DNS and sending readiness as two separate lines because they are separate questions: `DNS: verified` means the records are correct, `Sending: ready` means the domain can actually send. A domain can sit at `DNS: verified` with `Sending: activating` for a few minutes after records go live - that is normal, needs no DNS changes, and unlocks automatically. When sending is blocked, the reason is printed in parentheses (`activation_pending`, `activation_failed`, `sending_unavailable`, or a `dns_*` reason); trust it over the per-record DKIM/SPF/MAIL FROM statuses, which describe DNS only
 
 ## Feedback
 

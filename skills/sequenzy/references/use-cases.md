@@ -554,13 +554,15 @@ sequenzy api-keys create --name "CI deploy key" --company comp_123
 sequenzy websites list --company comp_123
 sequenzy websites add example.com --company comp_123
 sequenzy websites check example.com --company comp_123
+sequenzy websites verify example.com --company comp_123
 sequenzy websites guide --framework nextjs --use-case transactional
 ```
 
 Guidance:
 
 - save API keys immediately; the raw key is only returned on creation
-- use `websites check` when the user needs DNS verification details
+- use `websites check` when the user needs DNS verification details; use `websites verify` after the user changes DNS records to run a fresh check
+- DNS verified does not mean the domain can send yet: read the `Sending:` line and its reason. `activation_pending` resolves on its own with no DNS changes; `activation_failed` or `sending_unavailable` mean re-verify and contact support if it does not clear
 - use `websites guide` for integration code snippets rather than inventing framework examples
 
 ## "Sell a digital product and deliver the file after purchase"
