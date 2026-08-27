@@ -758,7 +758,7 @@ sequenzy sequences cancel-enrollments seq_123 --field-values price_123 --apply
 Behavior:
 
 - `sequences list`: `GET /api/v1/sequences` with `--status`, `--search`, `--label`, `--limit`, and `--offset` filters
-- `sequences get`: `GET /api/v1/sequences/:id`
+- `sequences get`: `GET /api/v1/sequences/:id`; with `ab_tests:read`, `--json` includes full blocks for every sequence A/B variant at `sequence.emails[].abTest.variants[].blocks`, while the step-level subject, preview text, and blocks remain control variant A only
 - `sequences create`: `POST /api/v1/sequences`
 - `sequences update`: `PUT /api/v1/sequences/:id`
 - `sequences render`: `GET /api/v1/sequences/:sequenceId/nodes/:nodeId/render`; same personalization and output flags as `campaigns render`, plus `--variant` for A/B nodes
@@ -844,10 +844,10 @@ Behavior:
 
 Caveats:
 
-- run `ab-tests get` first to discover variant IDs before targeting a variant
+- for a sequence A/B step, discover variant IDs and audit copy with `sequences get <sequenceId> --json`; use `ab-tests get` when you also need test settings, localization, or stats
 - `stats` uses `--period` (`1h`, `24h`, `7d`, `30d`, `90d`) or both `--start` and `--end`; custom ranges max at 90 days
 - `restart` only applies to sequence A/B tests with a selected winner; options are `--source-variant`, `--test-type subject|content`, `--winner-threshold` (10-1000), and `--variant-count` (2-4 including control)
-- `update-variant` accepts `--subject`, `--preview-text`, and either HTML or blocks flags, not both; only draft A/B tests can be edited
+- `update-variant` accepts `--subject`, `--preview-text`, and either HTML or blocks flags, not both; campaign variants are editable only in draft, while sequence variants remain editable and require `--confirm-live-change` once the parent sequence is active or the test has activity
 - `create` targets a campaign: the campaign must be in draft or rejected status and must not already have an A/B test
 - `create` builds variant A automatically as the control from the campaign's email; extra variants from `--variants-json`/`--variants-file` use `{subject, previewText?, blocks?}` objects
 - `create` accepts `--name`, `--test-percentage` (5-50, default 20), `--duration-minutes` (15-1440, default 240), and `--winner-criteria open_rate|click_rate` (default open_rate)
@@ -855,7 +855,7 @@ Caveats:
 - `delete-variant` cannot remove variant A (the protected control) and must leave at least 2 variants; a test holds at most 5 variants; when a sequence test's parent sequence is active, add `--confirm-live-change`
 - `delete` is blocked for running tests, and the linked campaign must be draft or rejected
 - `create`, `add-variant`, and `delete-variant` support campaign and sequence A/B tests (`create --automation-node` converts a sequence email node and needs `--confirm-live-change` on active sequences); `delete` supports campaign A/B tests only
-- MCP parity: `list_ab_tests`, `get_ab_test`, `get_ab_test_stats`, `restart_ab_test`, `update_ab_test_variant`, `create_ab_test`, `add_ab_test_variant`, `delete_ab_test_variant`, and `delete_ab_test`
+- MCP parity: `list_ab_tests`, `get_ab_test`, `get_ab_test_stats`, `restart_ab_test`, `update_ab_test_variant`, `create_ab_test`, `add_ab_test_variant`, `delete_ab_test_variant`, and `delete_ab_test`. `update_sequence`, `update_sequence_node`, and `update_template` cannot edit sequence variant copy. If `update_ab_test_variant` is missing from the tool list, enable it on the Sequenzy connector instead of writing through another email tool. The **Safer agent access** preset includes the required `ab_tests:read`, `ab_tests:write`, and `sequences:write` scopes
 
 ## AI Generation
 

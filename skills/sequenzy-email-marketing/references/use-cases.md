@@ -403,11 +403,31 @@ Guidance:
 
 - the campaign must be in draft or rejected status and must not already have an A/B test
 - variant A is created automatically from the campaign email and is the protected control; it cannot be deleted
-- a test holds 2 to 5 variants; structure changes (add, edit, delete variants) are only allowed while the test is in draft status; sequence tests whose parent sequence is active additionally require `--confirm-live-change` (`confirmLiveChange` over MCP) to add or delete variants
+- a test holds 2 to 5 variants; campaign variant content and structure changes are allowed only while the campaign test is in draft status. Sequence variant copy remains editable, with `--confirm-live-change` (`confirmLiveChange` over MCP) required once the parent sequence is active or the test has activity; adding or deleting sequence variants still requires a draft test, plus live-change confirmation when the parent sequence is active
 - `--test-percentage` (5-50), `--duration-minutes` (15-1440), and `--winner-criteria open_rate|click_rate` control how the winner is picked once the campaign is scheduled
 - use `ab-tests get` to find variant IDs, `ab-tests stats` to compare results after sending, and `ab-tests delete` (draft or finished tests only) to remove a test
 - `campaigns duplicate camp_123 --mode ab_test` clones a campaign together with its A/B test
 - MCP equivalents are `create_ab_test`, `add_ab_test_variant`, `update_ab_test_variant`, `delete_ab_test_variant`, `delete_ab_test`, `get_ab_test`, and `get_ab_test_stats`
+
+## "Audit or edit a sequence A/B step"
+
+Use:
+
+```bash
+sequenzy sequences get seq_123 --json | jq '.sequence.emails[] | select(.nodeType == "action_ab_test") | .abTest.variants'
+sequenzy ab-tests update-variant ab_123 var_a --blocks-file ./variant-a.json --confirm-live-change
+sequenzy ab-tests update-variant ab_123 var_b --blocks-file ./variant-b.json --confirm-live-change
+```
+
+Guidance:
+
+- with `ab_tests:read`, `sequences get --json` includes every variant's full blocks at `sequence.emails[].abTest.variants[]`; the step-level subject, preview text, and blocks are control variant A only
+- use `ab-tests get` only when you also need the full test record, including settings, localization, or stats
+- edit each variant with `ab-tests update-variant`; a whole-step rewrite must be repeated for every variant
+- do not retry through `templates update`, `sequences update`, or `sequences update-node`, because those paths cannot enforce A/B-test status and live-change rules
+- once the sequence is active or the test has activity, pass `--confirm-live-change` only after the user confirms the live copy change
+- MCP uses `get_sequence.sequence.emails[].abTest.variants[].blocks` and `update_ab_test_variant`. If that write tool is missing, enable it on the Sequenzy connector rather than using another email tool
+- the **Safer agent access** preset includes `ab_tests:read`, `ab_tests:write`, and `sequences:write`, the scopes required for this workflow
 
 ## "Create or manage a sequence"
 
