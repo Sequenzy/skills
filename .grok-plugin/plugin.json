@@ -1,0 +1,12 @@
+{
+  "name": "sequenzy",
+  "description": "Grok Build plugin for operating Sequenzy lifecycle, campaign, and transactional email workflows with agent skills and the hosted MCP server.",
+  "version": "1.8.0",
+  "author": {
+    "name": "Sequenzy",
+    "url": "https://sequenzy.com"
+  },
+  "homepage": "https://sequenzy.com",
+  "repository": "https://github.com/Sequenzy/skills",
+  "license": "MIT"
+}

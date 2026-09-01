@@ -5,8 +5,9 @@
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-ready-111827)](#install)
 [![Codex](https://img.shields.io/badge/Codex-ready-111827)](#install)
 [![Hermes](https://img.shields.io/badge/Hermes-ready-111827)](#install)
+[![Grok Build](https://img.shields.io/badge/Grok%20Build-plugin-111827)](#grok-build-plugin)
 
-Versioned AI-agent skills for operating [Sequenzy](https://sequenzy.com) email marketing workflows from Claude Code, Codex, Hermes, and other SKILL.md-compatible agents.
+Versioned AI-agent skills for operating [Sequenzy](https://sequenzy.com) email marketing workflows from Claude Code, Codex, Hermes, Grok Build, and other SKILL.md-compatible agents.
 
 ## Why this exists
 
@@ -49,6 +50,12 @@ Hermes users can copy or sync the skill into their Hermes skills directory, then
 ```bash
 hermes skills list | grep sequenzy-email-marketing
 ```
+
+## Grok Build plugin
+
+The repository is also an installable Grok Build plugin. It bundles the skills in this repository with Sequenzy's hosted MCP server at `https://api.sequenzy.com/v1/mcp`.
+
+The hosted MCP server uses OAuth. Grok Build opens the Sequenzy authorization flow when the connection is first used; API keys are not stored in this repository. The MCP tools can create or change subscribers, campaigns, sequences, templates, and real email sends. Review mutating actions and recipient scope before approving them.
 
 ## Quick start for agents
 
@@ -102,6 +109,8 @@ This repo includes a machine-readable discovery file at [`.well-known/skills/ind
 ## Repository layout
 
 ```text
+.grok-plugin/plugin.json
+.mcp.json
 .well-known/skills/index.json
 skills/
   sequenzy/
