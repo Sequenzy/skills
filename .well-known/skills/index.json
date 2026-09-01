@@ -4,7 +4,7 @@
   "description": "Agent skills for operating Sequenzy email marketing workflows.",
   "homepage": "https://sequenzy.com",
   "repository": "https://github.com/Sequenzy/skills",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "skills": [
     {
       "name": "sequenzy-email-marketing",
@@ -16,6 +16,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "SKILL.md-compatible agents"
       ],
       "categories": [
@@ -49,6 +50,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "SKILL.md-compatible agents"
       ],
       "categories": [
@@ -85,6 +87,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "OpenClaw",
         "Cowork",
         "SKILL.md-compatible agents"
@@ -117,6 +120,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "OpenClaw",
         "Cowork",
         "SKILL.md-compatible agents"
@@ -149,6 +153,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "OpenClaw",
         "Cowork",
         "SKILL.md-compatible agents"
@@ -181,6 +186,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "OpenClaw",
         "Cowork",
         "SKILL.md-compatible agents"
@@ -213,6 +219,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "OpenClaw",
         "Cowork",
         "SKILL.md-compatible agents"
@@ -245,6 +252,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "OpenClaw",
         "Cowork",
         "SKILL.md-compatible agents"
@@ -277,6 +285,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "OpenClaw",
         "Cowork",
         "SKILL.md-compatible agents"
@@ -309,6 +318,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "OpenClaw",
         "Cowork",
         "SKILL.md-compatible agents"
@@ -341,6 +351,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "OpenClaw",
         "Cowork",
         "SKILL.md-compatible agents"
@@ -373,6 +384,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "OpenClaw",
         "Cowork",
         "SKILL.md-compatible agents"
@@ -405,6 +417,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "OpenClaw",
         "Cowork",
         "SKILL.md-compatible agents"
@@ -437,6 +450,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "OpenClaw",
         "Cowork",
         "SKILL.md-compatible agents"
@@ -469,6 +483,7 @@
         "Claude Code",
         "OpenAI Codex",
         "Hermes Agent",
+        "Grok Build",
         "OpenClaw",
         "Cowork",
         "SKILL.md-compatible agents"
