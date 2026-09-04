@@ -304,6 +304,41 @@ Behavior:
 - use `subscribers add`/`subscribers update` for single-contact tag changes
 - MCP parity: `bulk_add_subscriber_tags` and `bulk_remove_subscriber_tags`
 
+## Accounts
+
+Accounts are the B2B organizations (companies, workspaces, teams) that contacts belong to. Identify them by your own organization id.
+
+```bash
+# List / inspect
+sequenzy accounts list --search acme --sort memberCount --order desc
+sequenzy accounts get org_123
+
+# Create or update by your own organization id; --attr is repeatable and coerces numbers/booleans
+sequenzy accounts upsert org_123 --name Acme --domain acme.com --attr plan=pro --attr seats=5
+sequenzy accounts upsert org_123 --attr legacyPlan=          # clear a key
+sequenzy accounts upsert org_123 --attr plan=team --replace-attributes
+
+# Members (roles: owner, admin, member; re-adding without --role keeps the current role)
+sequenzy accounts members org_123
+sequenzy accounts add-member org_123 --email jane@acme.com --role owner
+sequenzy accounts remove-member org_123 --email bob@acme.com
+
+# Account events: recorded on the account timeline and delivered to members
+sequenzy accounts event org_123 trial_ending --property daysLeft=3 --recipients owners
+sequenzy accounts events org_123 --limit 20
+
+# Delete (contacts are kept; their account.* attributes are cleared)
+sequenzy accounts delete org_123 --yes
+```
+
+Notes:
+
+- Account attributes fan out to every member as `account.<name>` (`account.plan`, `account.seats`, plus built-ins `account.name`, `account.domain`, `account.externalId`, `account.memberCount`, `account.role`). Use them in segment attribute filters and as `{{account.<name>}}` merge tags.
+- `--recipients` defaults to `owners`, which falls back to admins when the account has no owner; `admins` includes owners; `all` reaches every member; `none` records the event without delivering it. Each recipient gets a normal contact event carrying `event.account.*` properties. Pass `--event-id` to make retries idempotent.
+- To run a sequence once per organization instead of once per member, set its enrollment mode to matching field on `account.externalId`.
+- Limits: 100 attributes per account (counted after flattening), 5,000 members per fan-out. `account` is a reserved contact attribute name and is never synced from contact profiles.
+- API: `POST /api/v1/accounts`, `GET|PATCH|DELETE /api/v1/accounts/{externalId}`, `GET|POST|DELETE /api/v1/accounts/{externalId}/members`, `GET|POST /api/v1/accounts/{externalId}/events`; `POST /api/v1/subscribers/events` accepts `account` (external id string or `{externalId, name, domain, role, attributes}`).
+
 ## Transactional Emails
 
 ### Send
