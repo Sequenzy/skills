@@ -1159,7 +1159,7 @@ Treat these requested workflows as unsupported in the CLI even though related no
 ## Saved AI styles
 
 - `sequenzy email-ai-style get [--company ID] [--json]`: inspect `style`, `revisionId`, `canManage`.
-- `sequenzy email-ai-style save EMAIL_ID (--if-unset | --expected-style-id REVISION) [--canvas-file PATH] [--company ID] [--json]`: capture stored email appearance or a complete unsaved canvas.
+- `sequenzy email-ai-style save EMAIL_ID (--if-unset | --expected-style-id REVISION) [--canvas-file PATH] [--layout-rules IDS | --without-layout-rules] [--notes TEXT] [--company ID] [--json]`: capture stored email appearance or a complete unsaved canvas, plus detected layout habits (all kept by default; `--layout-rules` takes comma-separated rule IDs from `style.layout.rules`, `--without-layout-rules` keeps none) and optional design notes (500 characters max).
 - `sequenzy email-ai-style clear --expected-style-id REVISION [--company ID] [--json]`: conditionally clear the current default.
-- MCP equivalents: `get_email_ai_style`, `save_email_ai_style`, `clear_email_ai_style`. Save requires `emailId`, `expectedStyleId`; clear requires a nonempty `expectedStyleId`. Optional `companyId` selects the workspace. Optional save `canvas` matches the API schema.
+- MCP equivalents: `get_email_ai_style`, `save_email_ai_style`, `clear_email_ai_style`. Save requires `emailId`, `expectedStyleId`; clear requires a nonempty `expectedStyleId`. Optional `companyId` selects the workspace. Optional save `canvas`, `layoutRuleIds` (omit for all, `[]` for none) and `notes` match the API schema.
 - GET/PUT/DELETE `/api/v1/email-ai-style`; see the [saved-style workflow](use-cases.md#saved-ai-email-style) for role, validation and conflict recovery rules.
