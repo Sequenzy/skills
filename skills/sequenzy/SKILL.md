@@ -46,6 +46,7 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - inbox `list` with status, search, unread, and pagination filters, `get`, `reply` including internal notes with `--note`, `close`, `reopen`, and `mark-read`
 - webhooks `list`, `create`, `update`, `delete`, `test`, `deliveries`, and `replay` for outbound webhook endpoints, with `create` printing the signing secret exactly once
 - AI generation with `generate email`, `generate sequence`, `generate subjects`, and `generate sms`
+- saved AI email appearance with `email-ai-style get|save|clear` and MCP `get_email_ai_style`, `save_email_ai_style`, `clear_email_ai_style`; read the current revision before writes. See [saved-style workflow](references/use-cases.md#saved-ai-email-style).
 - dashboard URL generation with CLI `urls`, MCP `get_app_urls`, and `appUrls`/`url` fields on campaign, sequence, template, and company results
 - websites `list`, `add`, `check`, and `guide`
 - products `list`, `sync`, `upsert` (API-provider products keyed by your own ID, bulk up to 100), `delete`, `attach-file`, and `detach-file` for digital product delivery, with `attach-file --file` uploading local files via presigned URLs; attached files are exposed on `saas.purchase` events as `{{event.download.url}}` / `{{event.download.name}}` (MCP: `list_products`, `upsert_products`, `delete_product`, `attach_product_file`, `remove_product_file`, `sync_products`)

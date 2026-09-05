@@ -706,3 +706,13 @@ Guidance:
 - be specific: what was needed, what was missing or wrong, and what the fallback was
 - categories: `missing_capability`, `bug`, `docs`, `ux`, `praise`, `other` (default `other`)
 - MCP equivalent is `submit_feedback`; never include secrets or API keys in the message
+
+## Saved AI email style
+
+When asked to reuse an email's look for future AI generation, use `sequenzy email-ai-style get --json` (MCP `get_email_ai_style`) first. Save from the underlying email ID with `sequenzy email-ai-style save EMAIL_ID --if-unset` only when both style and revision are absent. For replacement, pass `--expected-style-id REVISION`; MCP `save_email_ai_style` uses `emailId` and `expectedStyleId` (null only on initial save). Clear with `sequenzy email-ai-style clear --expected-style-id REVISION` or MCP `clear_email_ai_style`.
+
+The API contract is GET/PUT/DELETE `/api/v1/email-ai-style`. Reads require `emails:read`, writes `emails:write`. Marketers can capture marketing sources, while transactional sources stay protected. Personal keys can use `--company` or MCP `companyId`. These commands manage generation defaults; they never edit or send the source email.
+
+By default save snapshots the stored email's appearance, using its theme/font overrides before company defaults. For an unsaved design, pass `--canvas-file ./canvas.json` or MCP `canvas`, containing all of `blocks`, `theme`, `fontFamily`, `emailPreset`. The API uses the editor's validation. Blocks may not exceed 500 or 500,000 serialized characters; provide real content rather than footer/logo scaffolding. The snapshot stores appearance, not source copy or links. Source edits or deletion do not affect it.
+
+After a 409 conflict, report that the saved default changed, fetch the new state and review it before another write. Never automatically replace expectedStyleId with a fresh revision just to force the write. An unsupported snapshot returns style=null with a nonnull revisionId; use that revision for replacement/clear, not an initial-save null. Explicit style requests and plain-text choices still override the default when generating an email.

@@ -1155,3 +1155,11 @@ Treat these requested workflows as unsupported in the CLI even though related no
 - `campaigns cancel` deliberately skips the confirmation prompt so a bad send can be stopped fast
 - `webhooks create` returns a one-time signing secret; surface it to the user immediately because it cannot be retrieved later
 - when the user asks for a workflow outside the current CLI surface, say so directly, choose between dashboard or direct API use instead of inventing commands, and report the gap with `sequenzy feedback "..." --category missing_capability` (MCP: `submit_feedback`)
+
+## Saved AI styles
+
+- `sequenzy email-ai-style get [--company ID] [--json]`: inspect `style`, `revisionId`, `canManage`.
+- `sequenzy email-ai-style save EMAIL_ID (--if-unset | --expected-style-id REVISION) [--canvas-file PATH] [--company ID] [--json]`: capture stored email appearance or a complete unsaved canvas.
+- `sequenzy email-ai-style clear --expected-style-id REVISION [--company ID] [--json]`: conditionally clear the current default.
+- MCP equivalents: `get_email_ai_style`, `save_email_ai_style`, `clear_email_ai_style`. Save requires `emailId`, `expectedStyleId`; clear requires a nonempty `expectedStyleId`. Optional `companyId` selects the workspace. Optional save `canvas` matches the API schema.
+- GET/PUT/DELETE `/api/v1/email-ai-style`; see the [saved-style workflow](use-cases.md#saved-ai-email-style) for role, validation and conflict recovery rules.
