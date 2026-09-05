@@ -887,6 +887,7 @@ Caveats:
 ```bash
 sequenzy team list
 sequenzy team invite teammate@example.com --role admin
+sequenzy team invite marketer@example.com --role marketer
 sequenzy team invite finance@example.com --role viewer --billing-access
 sequenzy team cancel-invitation inv_123 --yes
 ```
@@ -899,7 +900,7 @@ Behavior:
 
 Caveats:
 
-- `--role` must be `admin` or `viewer`
+- `--role` must be `admin`, `marketer`, `viewer`, or `restricted`. `marketer` can edit and send marketing but cannot manage workspace settings, transactional mail, team, or billing; `restricted` is for explicitly shared direct links. Do not combine `marketer` or `restricted` with `--billing-access`
 - inviting and cancelling invitations requires owner or admin access; `--billing-access` can only be granted by the company owner
 - existing Sequenzy users are added to the team immediately; new emails receive an invitation that expires after 14 days
 - run `team list` first to find invitation IDs before cancelling

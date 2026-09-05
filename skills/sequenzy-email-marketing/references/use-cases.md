@@ -624,7 +624,7 @@ sequenzy team cancel-invitation inv_123 --yes
 
 Guidance:
 
-- `--role` is `admin` (can manage the workspace) or `viewer` (read-only); choose `viewer` unless the user explicitly needs management access
+- `--role` is `admin` (workspace management), `marketer` (marketing and subscriber work), `viewer` (read-only), or `restricted` (explicitly shared direct links). Choose the least privileged role that meets the task. Billing access is unavailable to marketers and restricted members
 - `--billing-access` can only be granted by the company owner; expect a permission error otherwise
 - existing Sequenzy users join the team immediately; new emails receive an invitation that expires after 14 days
 - use `team list` to see the owner, members, and pending or expired invitations, and to find invitation IDs before cancelling

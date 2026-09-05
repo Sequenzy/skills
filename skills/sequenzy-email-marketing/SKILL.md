@@ -42,7 +42,7 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - MCP `search_subscribers` supports list filters through `list`, `listId`, or `listName`; MCP `add_subscribers_to_list` accepts up to 500 emails per call
 - sequences `list`, `get`, `create`, `update`, `enable`, `disable`, `delete`, `enroll`, and `cancel-enrollments`, including explicit discount action steps, cancellation by subscriber ID or event-property field values, and `update` branch insertion with tag, list, segment, event, clicked-link, and field conditions; event and clicked-link branch checks can use `activityScope` (`this_sequence`, `previous_email`, `ever`)
 - manual sequence enrollment with `sequences enroll` from emails, JSON, or files, optionally at a specific node with `--target-node-id`, reporting enrolled, skipped, and not-found subscribers
-- team `list`, `invite` with `--role admin|viewer` and owner-only `--billing-access`, and `cancel-invitation`
+- team `list`, `invite` with `--role admin|marketer|viewer|restricted` and owner-only `--billing-access`, and `cancel-invitation`
 - inbox `list` with status, search, unread, and pagination filters, `get`, `reply` including internal notes with `--note`, `close`, `reopen`, and `mark-read`
 - webhooks `list`, `create`, `update`, `delete`, `test`, `deliveries`, and `replay` for outbound webhook endpoints, with `create` returning a one-time signing secret that must be handled as sensitive
 - AI generation with `generate email`, `generate sequence`, `generate subjects`, and `generate sms`
@@ -66,6 +66,12 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 ## Unsupported Or Placeholder Workflows
 
 Treat missing subcommands as unsupported even when the noun exists. The main remaining gaps: campaign immediate send (no "send now" command - schedule with a near-future `--at` timestamp instead), sending domain add/verify (MCP `add_sending_domain` / `verify_sending_domain` or dashboard only), form creation and embed snippets (MCP `create_form` / `get_form_embed` only), and image asset upload (MCP `upload_image_asset` only). Bulk list population is supported through `sequenzy lists add-subscribers` and its `sequenzy lists import` alias, not through `subscribers add`. Whenever the user wanted something unsupported, report the gap with `sequenzy feedback "..." --category missing_capability` (MCP: `submit_feedback`) so it reaches the Sequenzy team.
+
+## Workspace Roles
+
+Inspect `sequenzy account` or MCP `get_account` before choosing a privileged workflow. Account-key permissions combine selected scopes with your current workspace role; `roleRestrictedScopes` identifies scopes blocked by that role. `canSendLive` means at least one delivery workflow is available, not that every send tool is allowed.
+
+Marketers can manage marketing content, subscribers, campaigns and sequences, including marketing test sends and unscheduling. They cannot use transactional sending or manage team, billing, integrations, API keys, sending identities or workspace settings. Choose existing sender/reply profiles; inline creation of a new profile is also restricted. Transactional-backed templates and their campaign, A/B and sequence sources stay protected through copies, previews, share links, analytics and retained send history. Use the narrowest eligible role; billing access cannot be granted to marketers or restricted members.
 
 ## Execution Pattern
 
