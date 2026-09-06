@@ -140,6 +140,18 @@ Guidance:
 - the CLI splits files into API-safe batches of up to 500 emails
 - use this path instead of one API call per subscriber
 
+## "Model the companies or workspaces my contacts belong to"
+
+Use accounts when the product is multi-seat and the user wants plan, seats, or trial dates on the organization rather than on each contact, wants an org-level event to reach the right people, or wants a sequence to run once per company.
+
+1. Upsert the account with the customer's own organization id: `sequenzy accounts upsert org_123 --name Acme --attr plan=pro --attr trialEndsAt=2026-09-20`.
+2. Attach members with roles: `sequenzy accounts add-member org_123 --email jane@acme.com --role owner`. A new email creates the contact.
+3. Send org-level events to the right people: `sequenzy accounts event org_123 trial_ending --property daysLeft=3 --recipients owners`.
+4. Build audiences on `account.plan`, `account.seats`, or `account.role` with segment attribute filters, and personalize with `{{account.name}}`.
+5. For "once per company", set the sequence enrollment mode to matching field on `account.externalId` and use `--recipients owners`.
+
+MCP: `upsert_account`, `add_account_member`, `trigger_account_event`, `list_accounts`, `get_account_by_external_id`. If the workspace already sends events carrying an organization id (for example `workspaceId`), the dashboard offers a one-click backfill that creates accounts and memberships from history; there is no CLI equivalent yet.
+
 ## "Remove a subscriber"
 
 Use:
