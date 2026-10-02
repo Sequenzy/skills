@@ -693,7 +693,7 @@ Guidance:
 
 ## "Report a gap or product feedback to the Sequenzy team"
 
-Use this whenever the user wanted something the CLI/MCP surface does not support, or hit a bug:
+Offer this whenever the user wanted something the CLI/MCP surface does not support, or hit a bug. Before sending feedback, show the user the exact message, category, and context you plan to send, leave out private account, subscriber, contact, and campaign details, and send only after the user approves.
 
 ```bash
 sequenzy feedback "No command to bulk-delete campaigns by label" --category missing_capability
@@ -702,7 +702,7 @@ sequenzy feedback "Segment count and list output disagree for seg_123" --categor
 
 Guidance:
 
-- always send a feedback report after telling the user a workflow is unsupported; the Sequenzy team reads every submission and uses it to prioritize
+- after telling the user a workflow is unsupported, offer to send a feedback report and send it only with their approval; the Sequenzy team reads every submission and uses it to prioritize
 - be specific: what was needed, what was missing or wrong, and what the fallback was
 - categories: `missing_capability`, `bug`, `docs`, `ux`, `praise`, `other` (default `other`)
-- MCP equivalent is `submit_feedback`; never include secrets or API keys in the message
+- MCP equivalent is `submit_feedback`; never include secrets, API keys, subscriber data, or private account or campaign details in the message

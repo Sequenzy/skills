@@ -436,7 +436,7 @@ Behavior:
 - the CLI splits large files into API-safe batches of up to 500 emails for both add and remove
 - files may be newline-separated, CSV with an email column, a JSON email array, or a JSON object with `emails` or `subscribers`
 - CSV headers named `email`, `e-mail`, `email address`, or `mail` are detected; otherwise the first column is used
-- `lists delete` prompts for confirmation; pass `--yes` to skip
+- `lists delete` prompts for confirmation; pass `--yes` only after the user explicitly approves deleting that list
 - MCP parity: `update_list`, `delete_list`, and `remove_subscribers_from_list` (max 500 emails per call)
 
 ### Tags
@@ -459,7 +459,7 @@ Behavior:
 - the color defaults to `gray`; valid colors are `gray`, `red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, and `rose`
 - system tags cannot be updated or deleted
 - tags still referenced by sequences cannot be deleted until those sequences stop using them
-- deleting a tag removes it from every subscriber; the delete prompt warns about this, and `--yes` skips it
+- deleting a tag removes it from every subscriber; the delete prompt warns about this, so pass `--yes` only after the user explicitly approves deleting that tag
 - MCP parity: `list_tags`, `create_tag`, `update_tag`, and `delete_tag`
 
 ### Segments
@@ -483,7 +483,7 @@ Behavior:
 - `segments count`: `GET /api/v1/segments/:id/count`
 - `segments create`: `POST /api/v1/segments`
 - `segments update`: `PATCH /api/v1/segments/:segmentId` with at least one of `--name`, `--filters-json`, `--filters-file`, or `--join-operator and|or`
-- `segments delete`: `DELETE /api/v1/segments/:segmentId`; prompts for confirmation, `--yes` skips
+- `segments delete`: `DELETE /api/v1/segments/:segmentId`; prompts for confirmation; pass `--yes` only after the user explicitly approves deleting that segment
 - update filters replace the existing filter set; `--filters-json`/`--filters-file` accept the same array or `root` object shapes as create, and missing filter IDs are filled in by the CLI
 - `--filter-json` accepts either the legacy raw segment filter array or a nested filter `root` object
 - `--match all|any` controls whether top-level filters are combined with `and` or `or`
@@ -904,7 +904,7 @@ Caveats:
 - inviting and cancelling invitations requires owner or admin access; `--billing-access` can only be granted by the company owner
 - existing Sequenzy users are added to the team immediately; new emails receive an invitation that expires after 14 days
 - run `team list` first to find invitation IDs before cancelling
-- `cancel-invitation` prompts for confirmation; pass `--yes` to skip
+- `cancel-invitation` prompts for confirmation; pass `--yes` only after the user explicitly approves cancelling that invitation
 - MCP parity: `list_team_members`, `invite_team_member`, and `cancel_team_invitation`
 
 ## Inbox
@@ -969,7 +969,7 @@ Caveats:
 - `--enable` and `--disable` are mutually exclusive; changing the URL or re-enabling resets the failure circuit breaker
 - the webhook must be enabled to receive a test event
 - run `webhooks deliveries <id>` first to find delivery IDs before replaying
-- `delete` prompts for confirmation; pass `--yes` to skip
+- `delete` prompts for confirmation; pass `--yes` only after the user explicitly approves deleting that webhook
 - MCP parity: `list_webhooks`, `create_webhook`, `update_webhook`, `delete_webhook`, `test_webhook`, `list_webhook_deliveries`, and `replay_webhook_delivery`
 
 ## API Keys
@@ -1137,6 +1137,7 @@ Behavior:
 Caveat:
 
 - feedback is fire-and-forget: it is delivered straight to the Sequenzy team and there is no way to query it afterwards
+- never send feedback automatically: before sending feedback, show the user the exact message, category, and context you plan to send, leave out private account, subscriber, contact, and campaign details, and send only after the user approves.
 
 ## Commands To Treat As Unsupported
 
@@ -1151,7 +1152,7 @@ Treat these requested workflows as unsupported in the CLI even though related no
 
 - prefer `SEQUENZY_API_KEY` for automation instead of interactive login
 - use `--json` when another tool or agent needs structured output; dashboard-aware commands add `url`/`appUrls` fields when possible
-- destructive commands (`delete`, `delete-variant`, `cancel-invitation`, and similar) prompt for confirmation; pass `--yes` (or `-y`) to skip, and note that `--yes` is required when stdin is not a TTY, which covers most agent and CI runs
+- destructive commands (`delete`, `delete-variant`, `cancel-invitation`, `revoke`, `suppressions remove`, and similar) prompt for confirmation. Before running one, tell the user the exact action and resource (ID and name) and get explicit approval for that specific operation. Only after that approval may you pass `--yes` (or `-y`), which non-TTY agent and CI runs need to skip the prompt. Never use `--yes` to bypass a confirmation the user has not given.
 - `campaigns cancel` deliberately skips the confirmation prompt so a bad send can be stopped fast
 - `webhooks create` returns a one-time signing secret; surface it to the user immediately because it cannot be retrieved later
-- when the user asks for a workflow outside the current CLI surface, say so directly, choose between dashboard or direct API use instead of inventing commands, and report the gap with `sequenzy feedback "..." --category missing_capability` (MCP: `submit_feedback`)
+- when the user asks for a workflow outside the current CLI surface, say so directly, choose between dashboard or direct API use instead of inventing commands, and offer to report the gap with `sequenzy feedback "..." --category missing_capability` (MCP: `submit_feedback`) after the user approves the exact payload
