@@ -10,5 +10,13 @@
   "homepage": "https://docs.sequenzy.com/concepts/mcp",
   "repository": "https://github.com/Sequenzy/skills",
   "license": "MIT",
-  "keywords": ["email", "email-marketing", "newsletter", "lifecycle", "transactional-email", "automation"]
+  "privacyPolicyUrl": "https://sequenzy.com/privacy",
+  "keywords": [
+    "email",
+    "email-marketing",
+    "newsletter",
+    "lifecycle",
+    "transactional-email",
+    "automation"
+  ]
 }

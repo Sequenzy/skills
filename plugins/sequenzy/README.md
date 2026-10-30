@@ -7,7 +7,9 @@
 - **Sequenzy MCP connector** (`.mcp.json`): the remote server at `https://api.sequenzy.com/v1/mcp`. You sign in with your Sequenzy account through OAuth the first time Claude uses it, and pick the permission level Claude gets. Every tool is annotated as read-only or as changing data, so Claude can ask for your approval before anything that writes, sends or deletes.
 - **`sequenzy-email-marketing` skill**: instructions that teach Claude the Sequenzy workflows, which tool to use for each task, and the checks to run before sending or deleting anything.
 
-The plugin has no hooks, scripts or local servers, and it installs no packages.
+The plugin has no hooks, scripts or local servers, and it installs no packages. It never reads credentials from your machine: the connector signs in with OAuth.
+
+The skill's reference files also document the optional [Sequenzy CLI](https://docs.sequenzy.com) for people who run it themselves in a terminal. Those examples mention CLI environment variables such as `SEQUENZY_API_KEY`, which the CLI reads on your machine when you run it. The plugin does not use them.
 
 ## Example requests
 
