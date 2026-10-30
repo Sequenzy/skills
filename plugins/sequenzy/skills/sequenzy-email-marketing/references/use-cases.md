@@ -713,7 +713,7 @@ Guidance:
 
 ## "Recover failed Stripe payments once per invoice"
 
-Native Stripe `saas.payment_failed` events and subscription-invoice `saas.purchase` events carry `invoiceId`, `subscriptionId`, `attemptCount`, `billingReason` and `hostedInvoiceUrl`. `saas.payment_failed` also carries `amountDue` (smallest currency unit), `amountDueFormatted` (such as `$49.00`), `currency`, `nextPaymentAttempt` and `willRetry`.
+Native Stripe `saas.payment_failed` events and subscription-invoice `saas.purchase` events carry `invoiceId`, `subscriptionId`, `attemptCount`, `billingReason` and `hostedInvoiceUrl`. `saas.payment_failed` also carries `amountDue` (smallest currency unit), `amountDueFormatted` (such as `€49.00`), `currency`, `nextPaymentAttempt` and `willRetry`.
 
 Send the per-invoice setup explicitly; nothing is applied automatically:
 

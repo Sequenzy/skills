@@ -1217,7 +1217,7 @@ Caveat:
 ```bash
 sequenzy integrations suggestions
 sequenzy integrations catalog --provider polar
-sequenzy integrations connect polar --api-key $POLAR_KEY --webhook-secret $POLAR_WH_SECRET
+sequenzy integrations connect polar --api-key <polar-api-key> --webhook-secret <polar-webhook-secret>
 sequenzy integrations list
 sequenzy integrations get int_123
 sequenzy integrations activity --status failed
