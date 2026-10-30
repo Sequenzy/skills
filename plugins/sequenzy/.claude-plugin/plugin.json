@@ -12,6 +12,9 @@
   "repository": "https://github.com/Sequenzy/skills",
   "license": "MIT",
   "privacyPolicyUrl": "https://sequenzy.com/privacy",
+  "termsOfServiceUrl": "https://sequenzy.com/terms",
+  "supportUrl": "https://sequenzy.com/contact",
+  "documentationUrl": "https://docs.sequenzy.com/concepts/mcp",
   "keywords": [
     "email",
     "email-marketing",
