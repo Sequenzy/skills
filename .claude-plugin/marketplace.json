@@ -1,0 +1,17 @@
+{
+  "name": "sequenzy-plugins",
+  "owner": {
+    "name": "Sequenzy",
+    "url": "https://www.sequenzy.com"
+  },
+  "plugins": [
+    {
+      "name": "sequenzy",
+      "source": "./plugins/sequenzy",
+      "description": "Operate Sequenzy email marketing with its first-party skill and hosted OAuth MCP server."
+    }
+  ],
+  "metadata": {
+    "description": "First-party Sequenzy email-marketing plugin with agent skills and a hosted OAuth MCP connection."
+  }
+}

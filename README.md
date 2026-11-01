@@ -51,6 +51,17 @@ Hermes users can copy or sync the skill into their Hermes skills directory, then
 hermes skills list | grep sequenzy-email-marketing
 ```
 
+## Claude Code marketplace
+
+Install the Sequenzy plugin, including the email-marketing skill and hosted MCP connection:
+
+```bash
+claude plugin marketplace add Sequenzy/skills
+claude plugin install sequenzy@sequenzy-plugins
+```
+
+Authenticate with your own Sequenzy account when using the hosted MCP server. Its tools can change account data and send real email; review recipients and mutating actions before approving them.
+
 ## Grok Build plugin
 
 The repository is also an installable Grok Build plugin. It bundles the skills in this repository with Sequenzy's hosted MCP server at `https://api.sequenzy.com/v1/mcp`.
