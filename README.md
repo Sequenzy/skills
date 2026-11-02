@@ -115,6 +115,8 @@ Triage unread inbox replies: summarize each open conversation, reply to the simp
 
 ## Discovery
 
+[![Listed on clauderules.net](https://clauderules.net/api/badge/sequenzy-mcp-zjkw)](https://clauderules.net/mcp/sequenzy-mcp-zjkw)
+
 This repo includes a machine-readable discovery file at [`.well-known/skills/index.json`](.well-known/skills/index.json). Catalogs and agents can use it to find the canonical skill path, compatibility notes, and install command.
 
 ## Repository layout
