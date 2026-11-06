@@ -1013,7 +1013,7 @@ sequenzy integrations guide --framework nextjs
 Behavior:
 
 - `catalog`: `GET /api/v1/integrations/catalog`; works whether or not the provider is connected - its `connectFields` list what a provider needs, and its events are the ones sequences can trigger on
-- `connect`: `POST /api/v1/integrations/connect`; covers API-key / webhook-secret providers (Polar, Paddle, Dodo, Whop, Creem, Chargebee, Clerk, PostHog, Affonso). OAuth and app-install providers (Stripe, Shopify, Supabase, GitHub, WooCommerce) connect and disconnect in the dashboard only. Reconnecting replaces stored credentials, and the response includes the webhook URL to configure at the provider
+- `connect`: `POST /api/v1/integrations/connect`; covers API-key / webhook-secret providers (Polar, Paddle, Dodo, Whop, Creem, Chargebee, Clerk, PostHog, Affonso). OAuth and app-install providers (Stripe, Shopify, Supabase, GitHub, WooCommerce) connect and disconnect in the dashboard only. Reconnecting replaces the stored keys and secrets, and the response includes the webhook URL to configure at the provider
 - pass secrets via environment variables instead of flags to keep them out of shell history; credentials, access tokens, and webhook secrets are never returned by read commands
 - `list` / `get`: connected integrations and one integration's detail - `get` lists every event the provider emits, the tags each applies through sync rules, and which sequences trigger on it
 - `activity`: `GET /api/v1/integrations/activity`; retained for 24 hours - use `--status failed` when an integration reports connected but contacts are not appearing

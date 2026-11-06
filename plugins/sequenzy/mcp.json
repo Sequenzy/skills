@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "sequenzy": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@0.15.2",
+        "https://api.sequenzy.com/v1/mcp",
+        "--transport",
+        "http-only",
+        "--auth-timeout",
+        "55",
+        "--static-oauth-client-metadata",
+        "{\"client_name\":\"Hermes Agent (Sequenzy)\"}"
+      ]
+    }
+  }
+}
