@@ -20,6 +20,7 @@
     "mcp"
   ],
   "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Sequenzy",
     "shortDescription": "Email marketing for SaaS",
