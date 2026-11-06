@@ -1,0 +1,20 @@
+{
+  "name": "sequenzy",
+  "interface": {
+    "displayName": "Sequenzy"
+  },
+  "plugins": [
+    {
+      "name": "sequenzy",
+      "source": {
+        "source": "local",
+        "path": "./plugins/sequenzy"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

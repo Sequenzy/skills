@@ -1,0 +1,9 @@
+# Local state and secrets that must never ship with the plugin
+.env
+.env.*
+*.pem
+*.key
+.mcp-auth/
+node_modules/
+.DS_Store
+*.log

@@ -44,6 +44,36 @@ mcp_servers:
 
 Put `SEQUENZY_API_KEY=...` in your Hermes environment file. The key works like a password for your Sequenzy account, so don't paste it into a chat.
 
+## Install in Codex
+
+You need Node.js 20.18.1 or newer with `npx` on your `PATH`. Add this repository as a plugin marketplace, then install the plugin:
+
+```bash
+codex plugin marketplace add Sequenzy/skills
+codex plugin add sequenzy@sequenzy
+```
+
+In the ChatGPT desktop app, the plugin then shows up under the `Sequenzy` source in the Plugins Directory. Start a new session after installing.
+
+Codex reads the same portable package as Hermes Agent: `plugin.json`, `mcp.json` and the skill in `skills/sequenzy-email-marketing/`. `.codex-plugin/plugin.json` only adds the listing details Codex shows (name, description, icon, links and starter prompts). The connector runs the pinned `mcp-remote@0.15.2` sign-in bridge, so the first time Codex uses it your browser opens the Sequenzy sign-in page. The bridge registers itself as "Hermes Agent (Sequenzy)", which is the name you see on the approval page. You can limit or turn off the server's tools in `~/.codex/config.toml` under `[plugins."sequenzy@sequenzy".mcp_servers.sequenzy]`.
+
+Without a browser, connect the server directly with a personal API key (it starts with `seq_user_`) instead of the plugin:
+
+```bash
+export SEQUENZY_API_KEY=seq_user_...
+codex mcp add sequenzy --url https://api.sequenzy.com/v1/mcp --bearer-token-env-var SEQUENZY_API_KEY
+```
+
+## Install in Kiro
+
+This folder is also a Kiro power in the Agent Plugins format. You need Node.js 20.18.1 or newer with `npx` on your `PATH`.
+
+1. Open the **Powers** panel and select **Add Custom Power**.
+2. Select **Import power from GitHub** and enter `https://github.com/Sequenzy/skills/tree/main/plugins/sequenzy`.
+3. Mention Sequenzy or an email-marketing task in chat. Kiro activates the power from the keywords in `plugin.json` and loads the skill and the MCP server.
+
+The first time the server starts, your browser opens the Sequenzy sign-in page through the same `mcp-remote` bridge described above. Kiro names the server `power-sequenzy-sequenzy`.
+
 ## Example requests
 
 - "Show me last week's campaigns and which one had the best click rate."
@@ -64,6 +94,12 @@ A Sequenzy account. You can create one for free at [sequenzy.com](https://sequen
 - MCP setup and tool reference: [docs.sequenzy.com/concepts/mcp](https://docs.sequenzy.com/concepts/mcp)
 - API reference: [docs.sequenzy.com/api-reference](https://docs.sequenzy.com/api-reference)
 - Support: hello@sequenzy.com
+
+## Privacy policy and support
+
+- Privacy policy: [sequenzy.com/privacy](https://sequenzy.com/privacy)
+- Terms of service: [sequenzy.com/terms](https://sequenzy.com/terms)
+- Support: [hello@sequenzy.com](mailto:hello@sequenzy.com) or [sequenzy.com/contact](https://sequenzy.com/contact)
 
 ## License
 

@@ -1,0 +1,49 @@
+{
+  "name": "sequenzy",
+  "version": "1.0.1",
+  "description": "Run Sequenzy email marketing from Codex: subscribers, lists, tags, segments, campaigns, sequences, templates, transactional email and delivery stats.",
+  "author": {
+    "name": "Sequenzy",
+    "email": "hello@sequenzy.com",
+    "url": "https://sequenzy.com"
+  },
+  "homepage": "https://sequenzy.com",
+  "repository": "https://github.com/Sequenzy/skills",
+  "license": "MIT",
+  "keywords": [
+    "email",
+    "email-marketing",
+    "newsletter",
+    "lifecycle",
+    "transactional-email",
+    "automation",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Sequenzy",
+    "shortDescription": "Email marketing for SaaS",
+    "longDescription": "Work in your Sequenzy account from Codex: look up and update subscribers, build lists, tags and segments, draft and schedule campaigns, edit automated sequences and templates, send transactional email, and read delivery and engagement stats. You sign in with your Sequenzy account through OAuth and choose the permission level Codex gets. Tools that write, send or delete are marked as changing data so Codex can ask before running them. Requires a Sequenzy account and Node.js with npx for the sign-in bridge.",
+    "developerName": "Sequenzy",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://sequenzy.com",
+    "supportURL": "https://sequenzy.com/contact",
+    "privacyPolicyURL": "https://sequenzy.com/privacy",
+    "termsOfServiceURL": "https://sequenzy.com/terms",
+    "defaultPrompt": [
+      "Show last week's campaigns and which one had the best click rate.",
+      "Create a segment of subscribers who opened an email in the last 30 days.",
+      "Draft a three-email welcome sequence and leave it inactive for review."
+    ],
+    "brandColor": "#F16366",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png",
+    "screenshots": [
+      "./assets/screenshot-campaign-review.png"
+    ]
+  }
+}

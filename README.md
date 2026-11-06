@@ -68,6 +68,19 @@ The repository is also an installable Grok Build plugin. It bundles the skills i
 
 The hosted MCP server uses OAuth. Grok Build opens the Sequenzy authorization flow when the connection is first used; API keys are not stored in this repository. The MCP tools can create or change subscribers, campaigns, sequences, templates, and real email sends. Review mutating actions and recipient scope before approving them.
 
+## Codex plugin
+
+The [`plugins/sequenzy`](plugins/sequenzy) folder installs in Codex and the ChatGPT desktop app with the email-marketing skill and the hosted MCP server:
+
+```bash
+codex plugin marketplace add Sequenzy/skills
+codex plugin add sequenzy@sequenzy
+```
+
+## Kiro power
+
+The same folder is a Kiro power. In Kiro, open **Powers**, select **Add Custom Power**, then **Import power from GitHub**, and enter `https://github.com/Sequenzy/skills/tree/main/plugins/sequenzy`.
+
 ## Quick start for agents
 
 1. Load [`skills/sequenzy-email-marketing/SKILL.md`](skills/sequenzy-email-marketing/SKILL.md).
@@ -159,3 +172,8 @@ These provider-neutral email skills are also available as separate repos and lan
 - [`emailautomationskill`](skills/emailautomationskill/SKILL.md): Behavioral triggers, lifecycle journeys, automation governance, and operational safeguards. Install: `npx skills add Sequenzy/skills --skill emailautomationskill` or `npx skills add emailautomationskill`.
 - [`emailagentskill`](skills/emailagentskill/SKILL.md): Agentic email planning, tool handoffs, safe execution, review loops, and multi-agent coordination. Install: `npx skills add Sequenzy/skills --skill emailagentskill` or `npx skills add emailagentskill`.
 - [`emailcampaignskill`](skills/emailcampaignskill/SKILL.md): Campaign briefs, audience logic, creative QA, launch readiness, and post-send analysis. Install: `npx skills add Sequenzy/skills --skill emailcampaignskill` or `npx skills add emailcampaignskill`.
+
+## Privacy policy and support
+
+- Privacy policy: [sequenzy.com/privacy](https://sequenzy.com/privacy)
+- Support: [hello@sequenzy.com](mailto:hello@sequenzy.com) or [sequenzy.com/contact](https://sequenzy.com/contact)
