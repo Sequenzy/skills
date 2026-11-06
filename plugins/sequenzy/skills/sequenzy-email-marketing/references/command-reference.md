@@ -106,10 +106,10 @@ Behavior:
 - no ID: `GET /api/v1/metrics?period=7d|30d|90d`, or a custom range with both `--start` and `--end`
 - `--campaign`: `GET /api/v1/metrics/campaigns/:id`
 - `--sequence`: `GET /api/v1/metrics/sequences/:id`
-- `--transactional <id-or-slug>` reports one saved transactional email; its stats are all-time by default, use `--period` for a window
+- `--transactional <id-or-slug>` reports one saved transactional email; its stats are all-time by default, pass `--period` for a window
 - use exactly one of account-level stats, `--campaign`, `--sequence`, or `--transactional`; `--email-type` (e.g. `transactional`) applies only to account-level stats
 - `--mailbox-provider` (e.g. `gmail`, `microsoft`, `yahoo`) scopes account or campaign engagement metrics to one recipient mailbox provider; replies, conversions, and revenue cannot be segmented per provider and report 0 under this filter
-- bot/scanner opens and clicks are excluded by default; use `--include-bots` to inspect raw engagement
+- bot/scanner opens and clicks are excluded by default; pass `--include-bots` to inspect raw engagement
 - sequence stats include a live active/waiting enrollment breakdown by current node plus per-step failures
 
 Output includes:
@@ -126,11 +126,11 @@ Campaign stats also include a `clickedLinks` array when the campaign has tracked
 
 `sequenzy stats --clients` shows which mail clients (Apple Mail, Gmail, Outlook, Yahoo Mail, Thunderbird, Android mail app, web browser, other) and devices (desktop, mobile, tablet, unknown) opened your emails, as shares of unique opens; each send counts once, by the client of its first open. Add `--campaign <id>` for one campaign (whole campaign; no period or email-type filters), or use `--period`, `--start`/`--end`, and `--email-type` for account-level breakdowns (default 90 days). It calls `GET /api/v1/metrics/clients` or `GET /api/v1/metrics/campaigns/:id/clients`; MCP: `get_email_client_stats`. Gmail, Yahoo, and Apple Mail privacy proxies hide the device, reported as `privacyProxyOpens`. Recipients who never open are not represented, so describe results as shares of openers.
 
-`sequenzy stats --by <dimension>` breaks the funnel down by `email` (each campaign, sequence email step and transactional template), `sequence`, `email_type`, `mailbox_provider` or `recipient_domain` (default 30 days, top 25, `--limit` up to 100). Every row includes attributed revenue, credited to the provider and domain of the send each conversion came from. Each row prints the flag that drills into it (`--source sequence:<id>`, `--source sequence_step:<id>`, `--source campaign:<id>`, `--mailbox-provider`, `--recipient-domain` or `--email-type`); add that flag to `sequenzy stats` or another `--by` to narrow every number to that subgroup. MCP: `get_stats_breakdown`, and the same `source`/`recipientDomain` arguments on `get_stats`. API: `GET /api/v1/metrics/breakdown`. Source- or domain-filtered account stats report replies as 0. `--outcome permanent_bounce|temporary_bounce|blocked|complaint` (MCP/API `outcome`) limits account stats or `--by` to sends that bounced that way or drew a spam complaint, so `sequenzy stats --by email --outcome complaint` answers "which emails are my complaints from"; outcome-filtered stats also report replies as 0.
+`sequenzy stats --by <dimension>` breaks the funnel down by `email` (each campaign, sequence email step and transactional template), `sequence`, `email_type`, `mailbox_provider` or `recipient_domain` (default 30 days, top 25, `--limit` up to 100). Every row includes attributed revenue, credited to the provider and domain of the send each conversion came from. Each row prints the flag that drills into it (`--source sequence:<id>`, `--source sequence_step:<id>`, `--source campaign:<id>`, `--mailbox-provider`, `--recipient-domain` or `--email-type`); pass that flag to `sequenzy stats` or another `--by` to narrow every number to that subgroup. MCP: `get_stats_breakdown`, and the same `source`/`recipientDomain` arguments on `get_stats`. API: `GET /api/v1/metrics/breakdown`. Source- or domain-filtered account stats report replies as 0. `--outcome permanent_bounce|temporary_bounce|blocked|complaint` (MCP/API `outcome`) limits account stats or `--by` to sends that bounced that way or drew a spam complaint, so `sequenzy stats --by email --outcome complaint` answers "which emails are my complaints from"; outcome-filtered stats also report replies as 0.
 
 `sequenzy stats --links` ranks link destinations by unique clicks across every email in the account (default 90 days, top 10), with `clicks` (every click, repeats included), `uniqueClicks` (subscribers who clicked the link, each counted once), and `share` of all unique clicks. Query strings, fragments, and trailing slashes are ignored, so UTM-tagged variants of a page count as one link. It accepts `--period`, `--start`/`--end`, `--email-type`, `--mailbox-provider`, and `--limit` (up to 50); `totalClicks`, `totalUniqueClicks` and `totalLinks` cover every link before the limit. It calls `GET /api/v1/metrics/links`; MCP: `get_link_click_stats`. For one campaign's links, use `clickedLinks` from campaign stats instead.
 
-Sequence stats carry the same summaries per email step as `steps[].polls` (lifetime results, omitted for steps without answers); the CLI prints them as a Poll & NPS Results section, and the MCP `get_sequence_stats` tool returns them in `steps`. To list one step's respondents, give the step's `nodeId` as the campaign ID to `poll-responses` / `list_poll_responses`.
+Sequence stats carry the same summaries per email step as `steps[].polls` (lifetime results, omitted for steps without answers); the CLI prints them as a Poll & NPS Results section, and the MCP `get_sequence_stats` tool returns them in `steps`. To list one step's respondents, pass the step's `nodeId` as the campaign ID to `poll-responses` / `list_poll_responses`.
 
 Campaign stats also include a `polls` array when the campaign collected poll / NPS answers: one entry per poll block with `question`, `totalResponses`, per-answer counts and percentages, and an `nps` breakdown (`score`, `average`, promoters / passives / detractors) for NPS surveys.
 
@@ -147,7 +147,7 @@ Behavior:
 - `--campaign`: `GET /api/v1/metrics/campaigns/:id/events`; `--sequence`: `GET /api/v1/metrics/sequences/:id/events`; use exactly one
 - defaults to delivery events; use `--type` for a single event type or `--event-types` for a comma-separated set (delivery, open, click, ...)
 - accepts `--period` (`1h`, `24h`, `7d`, `30d`, `90d`) or `--start`/`--end`, plus `--page` and `--limit` pagination
-- bot/scanner opens and clicks are excluded by default; use `--include-bots` to inspect raw engagement
+- bot/scanner opens and clicks are excluded by default; pass `--include-bots` to inspect raw engagement
 - MCP parity: `list_campaign_events` and `list_sequence_events`
 
 ## Subscribers
@@ -330,7 +330,7 @@ Behavior:
 
 - sends `POST /api/v1/subscribers/bulk/tags/add|remove`; targets come from repeated `--email`, `--emails-json`, `--emails-file`, `--external-id`, or `--subscriber-id`
 - only touches contacts that already exist; unknown identifiers are reported, never created
-- tag automations are skipped by default (what historical backfills want); use `--trigger-automations` to fire `tag_added` sequences
+- tag automations are skipped by default (what historical backfills want); pass `--trigger-automations` to fire `tag_added` sequences
 - requests are chunked at 500 targets each; totals in the output are combined across chunks
 - use `subscribers add`/`subscribers update` for single-contact tag changes
 - MCP parity: `bulk_add_subscriber_tags` and `bulk_remove_subscriber_tags`
@@ -381,7 +381,7 @@ Behavior:
 - `list`: `GET /api/v1/transactional` with `--search`, `--status`, `--sort`, `--order`, and `--include-bots` filters
 - `get <slug>`: `GET /api/v1/transactional/:slug`
 - `create <name>`: `POST /api/v1/transactional`; provide exactly one of `--prompt`, HTML, or blocks; `--slug` sets the API slug used by `sequenzy send --template`
-- `update <slug>` is a partial update: only the fields you send change; replacing the body takes HTML or blocks, not both; `--no-enabled` stops sends while keeping the template and its stats
+- `update <slug>` is a partial update: only the fields you pass change; replacing the body takes HTML or blocks, not both; `--no-enabled` stops sends while keeping the template and its stats
 - `delete <slug>` frees the slug for reuse and stops further sends; past deliveries and stats are kept; requires the `transactional:delete` scope
 - `sequenzy transactional widgets preferences-token <email>` generates a subscription preferences iframe token
 - per-template stats: `sequenzy stats --transactional <id-or-slug>`
@@ -437,15 +437,17 @@ sequenzy companies update comp_123 --primary-color '#0ea5e9' --tone-voice "clear
 sequenzy companies update comp_123 --company-context-file ./product.md
 sequenzy companies update comp_123 --sender-profile-id sender_abc --from-name "Example News"
 sequenzy companies update comp_123 --enable-reply-tracking --reply-tracking-domain-mode sequenzy
+sequenzy companies update comp_123 --category mobile_app
 ```
 
 Behavior:
 
 - `companies list`: `GET /api/v1/companies`
 - `companies get`: `GET /api/v1/companies/:id`
+- `--category <type>` on `companies update` / `companies create` sets `websiteType` (`saas`, `content`, `ecommerce`, `offline`, `mobile_app`, `other`; `none` clears it on update so website detection may classify again). Reads return `websiteType` and `websiteTypeSource` (`user` when chosen, `detected` when set from the website; detection never overwrites `user`). `mobile_app` recommends push-first mobile journeys and app-aware AI copy. After connecting RevenueCat, Superwall or Adapty, `integrations connect` may return `websiteTypeSuggestion`; offer it to the user rather than applying it silently. MCP: `update_company` / `create_company` `websiteType`
 - `darkModeLogoStatus` / `darkModeLogoUrl` (read-only, also in `get_company`): `outlined` means emails show `darkModeLogoUrl`, the logo with a thin white outline so dark transparent logos stay visible in dark-mode inboxes; `not_needed` means the logo already reads on dark; `custom` means the company uploaded its own; `pending` means a new logo is checked automatically within about 10 minutes. `companies update --dark-mode-logo-url <url>` (MCP `darkModeLogoUrl`) replaces the automatic copy in every email, so it must read on light and dark; `--automatic-dark-mode-logo` (MCP `null`) goes back. Changing `--logo-url` drops an uploaded one and triggers a new check
 - `companies create`: `POST /api/v1/companies`; takes a domain plus optional `--name`, or `--without-website --name` for a ready company without a website; `--description`/`--description-file` (up to 500 characters, may be replaced by website processing when a domain is given) and `--with-welcome-sequence` (drafts the four-email sequence, off until turned on) work with either
-- `companies update`: `PATCH /api/v1/companies/:id` covering brand fields (`--description`, `--logo-url`, `--primary-color`, `--brand-colors-json`, `--font-family`, `--email-theme-json` (partial theme patch; `{"layout":{"contentAlign":"left"}}` moves the email's content column flush left instead of centered, with buttons, the logo and footers unless set to right or kept centered with block `styles.keepAlign: true`, `center` restores it), `--email-direction`, `--email-preset branded|minimal` for the default header and footer, `--footer-style auto|classic|mono|band|editorial` for the footer AI-designed emails get), AI context (`--tone-voice`, `--company-context`, `--value-props-json`, `--testimonials-json`, `--pricing-json`, `--email-length-preference`, `--email-style visual|plain|ask` for designed or simple text AI emails; `ask` clears the choice), compliance (`--privacy-policy-url`, `--terms-url`, `--address`, `--language`, `--social-links-json` keyed by platform, including `appstore` and `googleplay` for mobile app store icons in the footer), and sender identity (`--sender-profile-id`, `--from-email`, `--from-name`, `--reply-profile-id`, `--reply-to`, `--reply-to-name`, `--enable/disable-reply-tracking`, `--reply-tracking-domain-mode`, `--enable/disable-reply-forwarding`)
+- `companies update`: `PATCH /api/v1/companies/:id` covering brand fields (`--description`, `--logo-url`, `--primary-color`, `--brand-colors-json`, `--font-family`, `--email-theme-json` (partial theme patch; `{"layout":{"contentAlign":"left"}}` moves the email's content column flush left instead of centered, with buttons, the logo and footers unless set to right or kept centered with block `styles.keepAlign: true`, `center` restores it), `--email-direction`, `--email-preset branded|minimal` for the default header and footer, `--footer-style auto|classic|mono|band|editorial` for the footer AI-designed emails get, `--footer-theme-json` for the auto-added footer's colors and copy as a merge patch where `null` resets a field, and footer font, size and line height through `--email-theme-json` `typography.footerFontFamily`/`footerFontSize`/`footerLineHeight`), AI context (`--tone-voice`, `--company-context`, `--value-props-json`, `--testimonials-json`, `--pricing-json`, `--email-length-preference`, `--email-style visual|plain|ask` for designed or simple text AI emails; `ask` clears the choice), compliance (`--privacy-policy-url`, `--terms-url`, `--address`, `--language`, `--social-links-json` keyed by platform, including `appstore` and `googleplay` for mobile app store icons in the footer), and sender identity (`--sender-profile-id`, `--from-email`, `--from-name`, `--reply-profile-id`, `--reply-to`, `--reply-to-name`, `--enable/disable-reply-tracking`, `--reply-tracking-domain-mode`, `--enable/disable-reply-forwarding`)
 - most JSON-valued flags have `-file` variants to avoid shell escaping
 - MCP parity: `get_company`, `create_company`, and `update_company`
 
@@ -480,7 +482,7 @@ Behavior:
 - the CLI splits large files into API-safe batches of up to 500 emails for both add and remove
 - files may be newline-separated, CSV with an email column, a JSON email array, or a JSON object with `emails` or `subscribers`
 - CSV headers named `email`, `e-mail`, `email address`, or `mail` are detected; otherwise the first column is used
-- `lists delete` prompts for confirmation; use `--yes` to skip
+- `lists delete` prompts for confirmation; pass `--yes` to skip
 - MCP parity: `update_list`, `delete_list`, and `remove_subscribers_from_list` (max 500 emails per call)
 
 ### Tags
@@ -560,7 +562,7 @@ sequenzy products detach-file <product-id>
 
 Behavior:
 
-- `products list`: `GET /api/v1/products`, optionally with `?provider=stripe|shopify|woocommerce|manual&search=...`; returns one page by default (100-per-request cap), use `--all` to page through larger catalogs
+- `products list`: `GET /api/v1/products`, optionally with `?provider=stripe|shopify|woocommerce|manual&search=...`; returns one page by default (100-per-request cap), pass `--all` to page through larger catalogs
 - `products sync`: `POST /api/v1/products/sync`; queues a catalog sync (`--integration` selects one when several are connected) and returns 404 without an active integration
 - `products upsert [productId]`: creates or updates API-provider products keyed by your own `productId`; supports `--title`, `--description`, `--price-cents`, `--currency`, `--image-url`, `--product-url`, `--in-stock`/`--out-of-stock`, `--provider-created-at`, and bulk `--products-json`/`--products-file` for up to 100 products; combine `--file` or `--url` with a single-product upsert to attach the deliverable in the same command
 - `products delete <productId>`: `DELETE /api/v1/products/:id`
@@ -646,7 +648,7 @@ Behavior:
 
 - writes `email_events`, `sms_events`, `custom_events` and a daily `subscribers` snapshot as gzipped JSON lines under `<prefix>/<dataset>/date=YYYY-MM-DD/`; delivery is at least once, so consumers deduplicate on `id`
 - `create` and location/credential updates write a test file first and fail with the provider's reason (missing bucket, access denied, wrong region, unknown key); nothing is saved on failure
-- ask the user for bucket credentials; supply the secret through `SEQUENZY_DATA_EXPORT_SECRET` rather than the command line when possible, and never echo it back; the API only returns a masked access key ID
+- ask the user for bucket credentials; pass the secret through `SEQUENZY_DATA_EXPORT_SECRET` rather than the command line when possible, and never echo it back; the API only returns a masked access key ID
 - `--frequency every_5_minutes|every_15_minutes|hourly|daily` (default every_15_minutes); `--backfill-days 0-30` only on create; datasets added later start from the time they are added
 - failed runs retry automatically with backoff; report `lastError` and `exportedThrough` from `list`/`get` instead of re-running in a loop
 - API keys need `data_exports:read` to view and `data_exports:write` plus `subscribers:read` and `analytics:read` to change; marketers cannot manage exports
@@ -674,6 +676,8 @@ sequenzy templates render tmpl_123 --out preview.html
 sequenzy templates localizations set tmpl_123 es --blocks-file ./welcome-es.json
 sequenzy templates localizations sync tmpl_123 --locale es fr
 sequenzy templates localizations sync tmpl_123 --skip-edited
+sequenzy templates localizations coverage
+sequenzy templates localizations translate-missing --locale fr
 sequenzy templates localizations set tmpl_123 es --blocks-file ./welcome-es.json --keep-edits
 sequenzy templates delete tmpl_123
 ```
@@ -692,16 +696,18 @@ Behavior:
 - `templates render`: `GET /api/v1/templates/:id/render`; same personalization and output flags as `campaigns render` (see Campaigns)
 - `templates check`: `POST /api/v1/templates/:id/check`; same checks and flags as `campaigns check` except `--variant` (see Campaigns). Transactional templates skip the unsubscribe rule
 - `templates localizations set <id> <locale>` stores caller-supplied localized content immediately; the locale must be enabled in the company's localization settings and cannot be the primary locale; provide exactly one HTML or blocks content source. Add `--keep-edits` so automatic on-save translation keeps it (marked `stale` when the original changes) instead of replacing it
-- `templates localizations sync <id>` queues AI translation for selected `--locale` values, or every enabled non-primary locale when omitted. It retranslates edited localizations (losing the edits) unless you use `--skip-edited`; prefer `--skip-edited` when someone may have hand-edited a translation
+- `templates localizations sync <id>` queues AI translation for selected `--locale` values, or every enabled non-primary locale when omitted. It retranslates edited localizations (losing the edits) unless you pass `--skip-edited`; prefer `--skip-edited` when someone may have hand-edited a translation
+- `templates localizations coverage`: `GET /api/v1/templates/localizations/coverage`; per enabled non-primary locale, how many emails that keep sending (every email step and A/B variant in sequences that are not archived, plus enabled transactional emails; marketer keys never see transactional ones) are `upToDate`, `edited`, `outdated` (still sends), `translating`, `failed` or `missing`. Campaigns are not counted. Requires `templates:read`
+- `templates localizations translate-missing [--locale <locales...>]`: `POST /api/v1/templates/localizations/translate-missing`; queues AI translation for every one of those emails with no translation in a locale yet or a failed one, into the given locales or every enabled non-primary locale. Edited, up-to-date and outdated translations are left alone (use `sync` on one template to retranslate it). Repeating while translations are queued queues nothing new. Adding a language in the dashboard already does this for that language. Requires `templates:write`
 - `templates delete`: `DELETE /api/v1/templates/:id`
-- MCP parity: `set_template_localization` (`keepEdits` matches `--keep-edits`) and `sync_template_localizations` (`skipEdited` matches `--skip-edited`)
+- MCP parity: `set_template_localization` (`keepEdits` matches `--keep-edits`), `sync_template_localizations` (`skipEdited` matches `--skip-edited`), `get_template_localization_coverage` and `translate_missing_template_localizations` (`locales` matches `--locale`)
 
 Caveats:
 
 - list accepts `--label <labels...>` to filter by template label name
 - create requires `name`, `subject`, and either `html` or `blocks`; it can also assign labels with `--label <labels...>`
 - update accepts `name`, `subject`, `html`, `blocks`, and replacement labels with `--label <labels...>`
-- `--blocks-json` and `--blocks-file` send Sequenzy block arrays through directly
+- `--blocks-json` and `--blocks-file` pass Sequenzy block arrays through directly
 - conditional email content is only available through block JSON, using a block-level `condition` object
 - raw HTML is still stored as a single text block by the current API path
 - deletion can fail if the template is still referenced by a campaign or sequence
@@ -776,14 +782,14 @@ Caveats:
 - update can replace the saved audience with `--segment` or `--target-lists-json`/`--target-lists-file`, or drop it with `--clear-target-lists` to choose at schedule time
 - update takes `--campaign-data-json/-file` and `--computed-lists-json/-file` to upload personalization data for repeat blocks
 - schedule requires `--at <datetime>` with a future ISO timestamp and a verified sending domain
-- schedule can set targeting with `--segment`, `--target-lists-json`, or `--target-lists-file`; omit them to reuse saved targeting or default to all active subscribers
+- schedule can pass targeting with `--segment`, `--target-lists-json`, or `--target-lists-file`; omit them to reuse saved targeting or default to all active subscribers
 - schedule `--repeat weekly|monthly` makes the campaign a recurring template: each run is duplicated and sent automatically, and audience membership is re-evaluated at every run; use `campaigns unschedule` to stop the series, or re-schedule without `--repeat` for a one-shot send
 - `--spread-over-hours` accepts integers from 1 to 72 and takes precedence over send-time optimization (`--send-time-optimization`)
 - `--max-recipients <count>` (update and schedule) sends to at most that many audience members: the first N matching subscribers by subscriber id after every audience and suppression rule; `--clear-max-recipients` removes a saved cap. Omit both on schedule to keep the draft's saved cap. Recipients already reached count against the cap on resume; duplicates keep it. `campaigns get` and `campaigns list` print `Recipient limit` when one is set
 - `--attach <files...>` (create and update) attaches local files to every recipient's email, uploaded as Base64; `--attachments-json '[{"filename":"terms.pdf","path":"https://..."}]'` adds files by public URL or Base64 `content`; `--clear-attachments` (update) removes them. Up to 10 files, 5MB in total; inline images are not supported. CC/BCC copies, test sends, duplicates and recurring runs carry the same files. If a file cannot be loaded when sending starts, nothing is sent and the campaign returns to draft. `campaigns get` prints `Attachments` when there are any
 - Campaign A/B recipient limits must allow one recipient per variant plus one for the winner. If scheduling rejects a saved or requested limit, raise it or explicitly clear it; the rejected request leaves the campaign and schedule unchanged.
 - `--prompt` generates draft campaign content through `POST /api/v1/generate/email`; do not combine it with HTML or block flags
-- `--blocks-json` and `--blocks-file` send Sequenzy block arrays through directly
+- `--blocks-json` and `--blocks-file` pass Sequenzy block arrays through directly
 - conditional email content is only available through block JSON, using block-level `condition` rules
 - `--reply-to` resolves an existing reply profile by email and `--reply-profile` sets it directly by ID
 - `--reply-to` and `--reply-profile` are mutually exclusive
@@ -808,7 +814,7 @@ MCP parity:
 - `create_campaign` and `update_campaign` accept `attachments`: up to 10 items of `filename` plus Base64 `content` (with optional `contentType`) or a public `path`; `null` or `[]` on update removes them; `get_campaign` reports them as `{ filename, path }`
 - every API, CLI `--json` and MCP response lists request fields the API ignored as `ignoredFields` (`[{ path, reason }]`); a listed field had no effect, so fix its name or drop it. Human CLI output prints them as a warning
 - `cancel_campaign`, `unschedule_campaign`, `pause_campaign`, `resume_campaign` (optional `spreadOverHours`), `delete_campaign`, and `duplicate_campaign` (optional `mode` and `variantId`) mirror the lifecycle commands
-- `get_campaign_audience`, `render_email`, `check_email`, and `resend_campaign_to_non_openers` mirror `audience`, `render`, `check`, and `resend-to-non-openers` (`check_email` also covers sequence steps and templates; use `links: false` for a rules-only check)
+- `get_campaign_audience`, `render_email`, `check_email`, and `resend_campaign_to_non_openers` mirror `audience`, `render`, `check`, and `resend-to-non-openers` (`check_email` also covers sequence steps and templates; pass `links: false` for a rules-only check)
 - `replyTo` and `replyProfileId` are mutually exclusive
 - MCP rejects calls that omit all update fields before hitting the API
 - MCP rejects unsupported extra update fields before hitting the API
@@ -827,7 +833,7 @@ sequenzy forms update form_123 --blocks-file ./form-blocks.json
 Behavior:
 
 - `forms list`: `GET /api/v1/forms`; `forms update`: `PATCH /api/v1/forms/:id`
-- updates are partial: only the options you set change; other flags cover `--name`, `--success-message`, `--redirect-url`, `--theme-json/-file`, and `--clear-tags` to empty the tag targeting
+- updates are partial: only the options you pass change; other flags cover `--name`, `--success-message`, `--redirect-url`, `--theme-json/-file`, and `--clear-tags` to empty the tag targeting
 - run `forms list --json` before replacing blocks and send the complete current block array; the form must retain exactly one email field and one submit button
 - a contact who unsubscribed from all email and submits a saved form or popup again is resubscribed and rejoins its lists, whatever `--duplicate-strategy` says (it only covers profile fields). `--resubscribe-behavior double_opt_in` (also on `popups create/update`, and `resubscribeBehavior` in MCP) sends the double opt-in confirmation email first instead; it returns 400 until the workspace has a confirmation email and default sender. `reactivate` is the default
 - `--bot-protection` / `--no-bot-protection` (also on `popups create/update`, and `botProtection` in MCP `create_form`/`update_form`/`create_popup`/`update_popup`) runs an invisible Cloudflare Turnstile check before each signup from the hosted JavaScript embed or popup. Signups that fail it, or come from the plain HTML snippet, which cannot run it, must confirm by email before they are subscribed; turning it on returns 400 until the workspace has a double opt-in confirmation email and a default sender. Human output prints a `Bot protection:` line. Suggest it when a form receives fake or bot signups
@@ -900,6 +906,8 @@ sequenzy sequences disable seq_123
 sequenzy sequences duplicate seq_123 --name "Onboarding v2"
 sequenzy sequences from-example linear/onboarding --brief "Push people to invite a teammate"
 sequenzy sequences from-example linear/onboarding --steps 1,2,4
+sequenzy sequences templates --category mobile_app
+sequenzy sequences create-from-template mobile-trial-conversion
 sequenzy sequences archive seq_123
 sequenzy sequences unarchive seq_123
 sequenzy sequences enrollments seq_123 --status active waiting
@@ -908,6 +916,7 @@ sequenzy sequences pause-enrollments seq_123
 sequenzy sequences resume-enrollments seq_123
 sequenzy sequences create "Black Friday countdown" --trigger manual --enrollment-mode one_time --key-dates-timezone America/New_York --key-date "Black Friday starts=2026-11-27T00:00:00" --key-date "Black Friday ends=2026-11-29T23:59:00" --steps-file ./countdown-steps.json
 sequenzy sequences update seq_123 --key-dates-timezone America/New_York --key-date "Black Friday starts=2026-11-27T00:00:00"
+sequenzy sequences update seq_123 --send-spread-hours 6
 sequenzy sequences enroll-audience seq_123 --segment-id seg_past_buyers
 sequenzy sequences enroll-audience seq_123 --all --apply --wait
 sequenzy sequences enroll-audience seq_123 --list-ids list_1 --apply --schedule-at 2026-11-15T09:00:00Z --keep-enrolling
@@ -918,6 +927,11 @@ sequenzy sequences update seq_123 --clear-auto-enroll
 sequenzy sequences audience-enrollments seq_123
 sequenzy sequences audience-enrollment seq_123 aer_abc
 sequenzy sequences cancel-audience-enrollment seq_123 aer_abc
+sequenzy sequences schedule seq_123 --monthly 1,last --at 10:00 --timezone Europe/London --segment-id seg_members
+sequenzy sequences schedule seq_123 --daily --at 09:30 --all
+sequenzy sequences schedule seq_123 --monthly last --at 09:00 --all --until 2027-06-30T23:59:00Z --enrollment-mode one_time
+sequenzy sequences schedule seq_123
+sequenzy sequences unschedule seq_123
 sequenzy sequences delete seq_123
 sequenzy sequences enroll seq_123 --email one@example.com two@example.com
 sequenzy sequences enroll seq_123 --emails-file ./vips.csv
@@ -931,7 +945,7 @@ sequenzy sequences resume-subscribers seq_123 --email ada@example.com
 
 Behavior:
 
-- `sequences list`: `GET /api/v1/sequences` with `--status`, `--search`, `--label`, `--limit`, and `--offset` filters
+- `sequences list`: `GET /api/v1/sequences` with `--status`, `--search`, `--label`, `--limit`, and `--offset` filters; each sequence includes `emailCount`, its number of email-sending steps (an A/B test step counts once)
 - `sequences get`: `GET /api/v1/sequences/:id`; with `ab_tests:read`, `--json` includes full blocks for every sequence A/B variant at `sequence.emails[].abTest.variants[].blocks`, while the step-level subject, preview text, and blocks remain control variant A only
 - `sequences create`: `POST /api/v1/sequences`. Trigger settings are top-level fields (`--trigger`, `--list-id`); step delays in `--steps-json/--steps-file` are objects such as `"delay": { "days": 2 }` or `delayMs`. Fields the API ignores (for example a nested `triggerConfig`, `delay: 2` or `delayDays`), a list ID not found in the company, and a `contact_added` trigger with no list or `listScope` still create the draft but come back as `warnings`; fix them before `sequences enable` (MCP: `create_sequence`). `sequences update` reports ignored fields and unknown lists the same way, and `sequences enable` prints readiness warnings such as a list-less `contact_added` trigger that enrolls every new contact
 - `sequences update`: `PUT /api/v1/sequences/:id`
@@ -941,6 +955,9 @@ Behavior:
 - `sequences enable`: `POST /api/v1/sequences/:id/enable`
 - `sequences disable`: `POST /api/v1/sequences/:id/disable`
 - `sequences duplicate`: `POST /api/v1/sequences/:id/duplicate`; email templates, graph topology, and sequence A/B tests are copied independently (MCP: `duplicate_sequence`)
+- `sequences templates [--category company|all|<websiteType>]`: `GET /api/v1/sequences/templates`; the dashboard's ready-made templates, filtered to the company category by default with templates built for it first. Mobile journeys (`mobile-trial-conversion`, `mobile-billing-recovery`, `mobile-cancellation-winback`, `mobile-paywall-abandon`, `mobile-annual-renewal-reminder`, `mobile-expiration-winback`, `mobile-lapsed-reengagement`, `mobile-new-install-onboarding`) trigger on `saas.trial_started`, `saas.payment_failed`, `saas.cancelled`, `saas.purchase.yearly`, `saas.churn`, the app-sent `paywall_viewed`, `app.screen_viewed` inactivity and `contact_added` (MCP: `list_sequence_templates`)
+- `sequences create-from-template <templateId> [--name]`: `POST /api/v1/sequences/from-template`; creates a draft exactly as the dashboard does. Push-first journeys branch on `has_push_device` (an active device on a platform with APNs/FCM/web push set up, not reported as notifications denied or not yet asked): reachable contacts get push and in-app, everyone else email; waits land in 09:00-21:00 in each contact's timezone; email steps respect the frequency cap; the continue condition becomes the stop condition and an attribution goal is created. Emails are AI-written; review push and in-app copy before `sequences enable`. Calendar (key-date) templates return 400. Each success creates another sequence (MCP: `create_sequence_from_template`)
+- Branch condition `has_push_device` (no extra fields) is also available in `create_sequence` / `edit_sequence_graph` branches
 - `sequences from-example <url|brand/sequence>`: `POST /api/v1/sequences/from-example`; clones a public email gallery sequence into a draft with the example's trigger family (signup, `ecommerce.cart_abandoned`, `ecommerce.order_placed`, or the `inactive` tag) and send timing, up to 12 emails. AI writes each email in the company's brand in the background; check `sequences get <id>` until enrichment is complete. Optional `--brief`, `--name`, `--email-style visual|plain` and `--steps 1,2,4` (sent as `stepNumbers`: which of the example's emails to clone, by their 1-based position in the gallery sequence, 1 to 12 distinct positions; each kept email keeps its original timing from the trigger; the response's `example.stepNumbers` lists them; MCP: `stepNumbers`). The draft sends nothing until enabled, and each successful call creates another sequence; if it reports enrichment `not_queued` with a warning, open the sequence in the dashboard instead of running it again (MCP: `create_sequence_from_example`)
 - `sequences preview-example <url|brand/sequence> [--website <site>] [--brief] [--json]`: `POST /api/v1/sequences/from-example/preview`; rewrites the first 3 emails of a gallery sequence for your brand or another `--website` without creating anything. Requires `sequences:write`.
 - `sequences archive` / `unarchive` hide or restore a sequence without deleting it (MCP: `archive_sequence`, `unarchive_sequence`)
@@ -951,9 +968,10 @@ Behavior:
 - `sequences cancel-enrollments`: `POST /api/v1/sequences/:id/enrollments/cancel`
 - `sequences pause-subscribers`: `POST /api/v1/sequences/:id/enrollments/pause`; holds the named contacts (`--subscriber-ids`, `--email`, up to 500) on their current step with optional `--reason`. Paused contacts get no steps, keep their place and entry data, cannot be re-enrolled in the same sequence, and are still ended by unsubscribes, bounces, and `cancel-enrollments`. `in_progress` means a step was running; retry shortly (MCP: `pause_sequence_subscribers`)
 - `sequences resume-subscribers`: `POST /api/v1/sequences/:id/enrollments/resume`; continues paused contacts from the same step with waits kept wall-clock based (MCP: `resume_sequence_subscribers`)
-- `sequences enroll-audience`: `POST /api/v1/sequences/:id/enroll-audience` (estimate only without `--apply`; `--all`, `--list-ids`, `--segment-id`, or `--audience-json/-file`; `--wait` polls until done; `--schedule-at <iso>` starts later, cancellable before then; `--keep-enrolling` also sets `audienceAutoEnroll` so later joiners of the same audience enter until the last key date; `--data-json <json>`/`--data-file <file>` attach run-level data, a JSON object up to 8 KB that every enrolled contact keeps and the sequence's emails and conditions read as `{{enrollment.<field>}}`, returned as `data` on the run; auto-enroll syncs carry no run data). No per-call cap; skips contacts already in the sequence; one run per sequence at a time. For hand-picked contacts beyond the 500 cap of `sequences enroll`, use `--audience-json '{"type":"rules","include":[],"includedSubscriberIds":[...]}'` (the dashboard's Subscribers selection bar starts the same run) (MCP: `enroll_sequence_audience` with `scheduledFor` and `data`)
+- `sequences enroll-audience`: `POST /api/v1/sequences/:id/enroll-audience` (estimate only without `--apply`; `--all`, `--list-ids`, `--segment-id`, or `--audience-json/-file`; `--wait` polls until done; `--schedule-at <iso>` starts later, cancellable before then; `--keep-enrolling` also sets `audienceAutoEnroll` so later joiners of the same audience enter until the last key date; `--data-json <json>`/`--data-file <file>` attach run-level data, a JSON object up to 8 KB that every enrolled contact keeps and the sequence's emails and conditions read as `{{enrollment.<field>}}`, returned as `data` on the run; auto-enroll syncs carry no run data). No per-call cap; skips contacts already in the sequence; one run per sequence at a time. For hand-picked contacts beyond the 500 cap of `sequences enroll`, pass `--audience-json '{"type":"rules","include":[],"includedSubscriberIds":[...]}'` (the dashboard's Subscribers selection bar starts the same run) (MCP: `enroll_sequence_audience` with `scheduledFor` and `data`)
 - `sequences update --auto-enroll-all|--auto-enroll-list-ids|--auto-enroll-segment-id|--auto-enroll-json` (+ `--auto-enroll-starts-at <iso>` to hold the sync until a scheduled initial enrollment) / `--clear-auto-enroll`: `audienceAutoEnroll` on `PUT /api/v1/sequences/:id`; the sequence stays manual, a sync re-checks the audience every few minutes and ends itself after the last key date or when the trigger leaves manual (MCP: `update_sequence` `audienceAutoEnroll` / `clearAudienceAutoEnroll`)
 - `sequences audience-enrollments` / `audience-enrollment <id> <runId>` / `cancel-audience-enrollment <id> <runId>`: `GET /api/v1/sequences/:id/audience-enrollments`, `GET .../audience-enrollments/:runId` and `POST .../audience-enrollments/:runId/cancel` (MCP: `list_sequence_audience_enrollments`, `get_sequence_audience_enrollment`, `cancel_sequence_audience_enrollment`). Runs report `includedSubscriberCount` for hand-picked contacts; the API and CLI JSON return the full `audience.includedSubscriberIds`, while MCP returns only the first 20 with `includedSubscriberIdsTruncated: true`
+- `sequences schedule <id>` / `unschedule <id>`: `GET`, `PUT` and `DELETE /api/v1/sequences/:id/recurring-enrollment` (MCP: `get_sequence_recurring_enrollment`, `set_sequence_recurring_enrollment` with flat `frequency`/`weekdays`/`time`/`timezone` fields, numeric `monthDays` plus `lastDayOfMonth: true` instead of `last`, and `remove: true` to delete). Makes a manual-trigger sequence recurring for sends not tied to an event (end-of-month updates, balance reminders, daily digests): `--daily`, `--weekly mon,fri` (or 0-6, 0 = Sunday), or `--monthly 1,15,last` (`last` is the last day; days past a short month's end run on its last day), with `--at HH:MM`, `--timezone <IANA>` (default: the machine's zone; runs follow daylight saving) and an audience (`--all`, `--list-ids`, `--segment-id`, `--audience-json/-file`), re-evaluated at every run. Without a frequency it shows the schedule, `upcomingRuns` and the last run or skip. Each run is an audience enrollment run with source `recurring`: contacts who finished an earlier run enter again, contacts still in the sequence are skipped, `one_time` sequences never re-enroll anyone. Nothing enrolls until the first scheduled time; occurrences while the sequence is paused, disabled or closed are skipped, and a run that cannot start within 6 hours is skipped. Needs `--trigger manual` and no `audienceAutoEnroll`; changing the trigger away from manual switches it off. `--disable` saves it switched off. `--until <iso>` stops runs after a date (saving replaces the schedule, so omit it for no end date; `nextRunAt` becomes null once nothing is left). `--enrollment-mode unlimited|one_time` sets who enters each run (everyone who matches, or only people who never entered) by changing the sequence's enrollment mode, which also applies to enrollments started by hand (MCP: `endsAt`, `enrollmentMode`). Requires `sequences:write`
 - dashboard-aware responses include `url` on sequence records and `appUrls` on the top-level JSON when the company can be resolved
 
 Goals and inbound webhooks:
@@ -971,6 +989,7 @@ Caveats:
 - trigger-specific options depend on `--trigger`
 - updates accept either step payloads or email payloads via `--steps-*` or `--emails-*`, not both; entries can target a step by `nodeId`, `emailId`, or array order
 - `--insert-steps-json/-file` adds new linear steps (including outbound webhook and SMS steps); `--node-updates-json/-file` and `--graph-edit-json/-file` edit and rewire existing nodes (MCP: `insert_sequence_step`, `update_sequence_node`, `update_sequence_nodes`, `edit_sequence_graph`)
+- Sequences as code: `sequenzy sequences pull <key> --dir sequences` (or `--all`, or `--id seq_123 --key onboarding` to adopt an unkeyed sequence) writes one YAML/JSON definition per sequence in the readable format: `trigger: { event: user.signed_up }` and `steps` in run order (`wait: 2d`, `email: { subject, html | blocks | template: <email id> }`, `branch: [{ if: { tag: trial }, steps: [...] }]` with `else: [...]`, `split` with `percent`, `continueIf`, `tag`, `untag`, `end: true`), where nested paths rejoin at the next step and the end is implicit (`--raw` returns the explicit steps-plus-connections format; a template is copied into the step on every push, so later template edits show in the dry run); `sequenzy sequences new <key>` writes a starter file; `sequenzy sequences push sequences --dry-run` shows the changes and `sequenzy sequences push sequences` applies them (MCP: `get_sequence_definition`, `push_sequence_definition`; API: `GET`/`PUT /api/v1/sequences/definitions/{key}`, `GET /api/v1/sequences/{sequenceId}/definition`). Steps are matched by key; missing steps are removed and their waiting contacts continue to the next step. A push never changes status; active sequences need `--confirm-live-change`. Pushed sequences are `managedBy: code` and read-only in the dashboard except on/off, pause and test sends; A/B test steps pass through unchanged; webhook header values stay `[REDACTED]`.
 - SMS steps use `{"type":"sms","text":"..."}` (optional `label`, `ineligibleAction skip|exit`, `imageUrls`); edit existing ones with `--sms-steps-json/-file`. Update Subscriber steps use `type="update_subscriber"` with attribute updates like `{{event.plan}}`; edit with `--subscriber-update-steps-json/-file`
 - inserting steps or branches into an active sequence requires `--confirm-structural-change`
 - `--stop-condition-json/-file` sets the sequence stop condition (e.g. `{"type":"has_tag","value":"customer"}`; `{"type":"none","value":null}` clears it). Stop conditions are re-evaluated before every step including the first, so `does_not_have_tag` / `removed_from_list` act as an allowlist: guarded-out contacts still enroll and are cancelled at the trigger node. Clearing the guard does not retry contacts it already cancelled - re-enroll them with `sequences enroll`, which skips the `one_time` check
@@ -981,7 +1000,7 @@ Caveats:
 - `--trigger segment_exited --segment-id <id>` enrolls active contacts who stop matching a saved segment from activation onward; unsubscribing or bouncing does not count as leaving, and nobody is enrolled when the sequence is turned on. Add an `entered_segment` stop condition for the same segment to stop the run if they come back
 - `--respect-frequency-cap` (create or update) makes the sequence respect the company frequency cap: an email step is skipped for a contact who already got the cap's number of campaign or marketing sequence emails in its window, and the contact continues to the next step. `--ignore-frequency-cap` turns it off (the default). Earlier emails from the same enrollment count; transactional emails never count, and transactional steps are never skipped. Nothing is skipped until a company cap is set with `sequenzy frequency-cap set`. API/MCP field: `frequencyCapEnabled`. Leave it off for time-sensitive flows such as cart recovery
 - `--active-subscribers-only` (create or update) keeps unsubscribed and bounced contacts out of the sequence. By default they still enter on tag, event, list and contact triggers so non-marketing steps (tags, webhooks, transactional emails) run for them, and only their marketing emails are skipped. `--include-suppressed-subscribers` restores that default. Pending double opt-in contacts still wait at the trigger. API/MCP field: `activeSubscribersOnly`
-- `--trigger manual` never enrolls anyone automatically; use it for one-time countdowns (Black Friday, launches). Set key dates with repeated `--key-date "Label=2026-11-27T00:00:00"` plus `--key-dates-timezone`, or `--key-dates-json/-file` (`{"timezone":"...","dates":[{"label":"...","at":"..."}]}`); keys are slugs of the labels (`black_friday_starts`); zone-less times are read in the key-dates timezone. Steps then wait with `"waitUntilKeyDate":{"key":"black_friday_starts","days":7}` (`direction` before/after, `pastAction` skip/continue/exit, default skip so late enrollees only get what is still ahead). Changing key dates on a live sequence re-times waiting contacts; removing a key date (or `--clear-key-dates`) is rejected while a step still waits for it. After `enable`, run `sequences enroll-audience` (MCP: `keyDates`, `waitUntilKeyDate`, `enroll_sequence_audience`)
+- `--trigger manual` never enrolls anyone automatically; use it for one-time countdowns (Black Friday, launches), or add `sequences schedule` to re-enroll an audience daily, weekly or monthly. Set key dates with repeated `--key-date "Label=2026-11-27T00:00:00"` plus `--key-dates-timezone`, or `--key-dates-json/-file` (`{"timezone":"...","dates":[{"label":"...","at":"..."}]}`); keys are slugs of the labels (`black_friday_starts`); zone-less times are read in the key-dates timezone. Steps then wait with `"waitUntilKeyDate":{"key":"black_friday_starts","days":7}` (`direction` before/after, `pastAction` skip/continue/exit, default skip so late enrollees only get what is still ahead). Changing key dates on a live sequence re-times waiting contacts; removing a key date (or `--clear-key-dates`) is rejected while a step still waits for it. Sends are spread out: each contact gets their own time within 4 hours (after a moment, or leading up to a step timed before one); change it with `--send-spread-hours` (0 is exact) or `keyDates.sendWindow`. Write deadline emails with the end time ("ends tonight at 11:59 PM"), never "1 hour left". After `enable`, run `sequences enroll-audience` (MCP: `keyDates`, `waitUntilKeyDate`, `enroll_sequence_audience`)
 - per-contact date timelines (due dates, renewals, anniversaries): steps wait with `"waitUntil":{"field":"dueDate","source":"attribute","days":140,"direction":"before","pastAction":"skip"}`. `source` is `event` (default, trigger event properties) or `attribute` (the contact's custom attributes, any trigger, read when the step is reached). `pastAction` defaults to `continue` (move on right away when the date already passed); use `skip` on each wait so late joiners only get what is still ahead, and `continue` on a final wait everyone should reach. Store dates as ISO strings (`2027-02-15`) or Unix timestamps
 - contact-local send times (9am for one email, 1pm for the next, each in the contact's own timezone): put a delay step before each email with `"waitUntilWeekday":{"days":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],"startTime":"09:00","endTime":"09:30","timezone":"Europe/Amsterdam","timezoneSource":"subscriber"}`. `timezoneSource` `subscriber` reads the contact's `timezone` field and uses `timezone` as the fallback for contacts without one; the default `fixed` uses `timezone` for everyone. Contacts already inside the window continue immediately. To send N days later at a set local time, add `"minimumWait":{"days":6}` to the same `waitUntilWeekday` instead of a separate fixed delay step: the contact waits at least that long, then continues at the next window. A sequence `--sending-window-*` window is always one fixed timezone
 - `--pause-new-enrollments` / `--resume-new-enrollments` toggle entry from within `update`; `--label`/`--clear-labels` and `--user-cancellable`/`--not-user-cancellable` round out the metadata flags
@@ -1024,7 +1043,7 @@ Behavior:
 - `ab-tests list`: `GET /api/v1/ab-tests`, optionally with `?sequenceId=...` via `--sequence`
 - `ab-tests get`: `GET /api/v1/ab-tests/:id`
 - `ab-tests update`: `PATCH /api/v1/ab-tests/:id` with `--name`, `--test-percentage`, `--duration-minutes`, `--winner-criteria`, `--test-type`, and `--winner-threshold`; campaign tests use percentage/duration, sequence tests use `--test-type` and `--winner-threshold`; add `--confirm-live-change` when the settings affect an active test or a test with recorded activity (MCP: `update_ab_test`)
-- `ab-tests stats`: `GET /api/v1/ab-tests/:id/stats`; bot opens/clicks are excluded by default, use `--include-bots` for raw engagement. The response includes `significance` for the winner metric (`status` `insufficient_data`, `not_significant`, or `significant` at 95% confidence, plus `leaderVariantLabel`, `confidence`, `pValue`, and `relativeLift`), and the human output prints a Significance line. Once a winner is selected, significance compares only the test-phase sends and ignores the period. Report a `not_significant` leader as ahead, not as a proven winner; automatic winner selection does not wait for significance (MCP: `get_ab_test_stats`)
+- `ab-tests stats`: `GET /api/v1/ab-tests/:id/stats`; bot opens/clicks are excluded by default, pass `--include-bots` for raw engagement. The response includes `significance` for the winner metric (`status` `insufficient_data`, `not_significant`, or `significant` at 95% confidence, plus `leaderVariantLabel`, `confidence`, `pValue`, and `relativeLift`), and the human output prints a Significance line. Once a winner is selected, significance compares only the test-phase sends and ignores the period. Report a `not_significant` leader as ahead, not as a proven winner; automatic winner selection does not wait for significance (MCP: `get_ab_test_stats`)
 - `ab-tests restart`: `POST /api/v1/ab-tests/:id/restart`
 - `ab-tests update-variant`: `PATCH /api/v1/ab-tests/:id/variants/:variantId`
 - `ab-tests create`: `POST /api/v1/ab-tests`
@@ -1095,7 +1114,7 @@ Caveats:
 - inviting and cancelling invitations requires owner or admin access; `--billing-access` can only be granted by the company owner
 - existing Sequenzy users are added to the team immediately; new emails receive an invitation that expires after 14 days
 - run `team list` first to find invitation IDs before cancelling
-- `cancel-invitation` prompts for confirmation; use `--yes` to skip
+- `cancel-invitation` prompts for confirmation; pass `--yes` to skip
 - MCP parity: `list_team_members`, `invite_team_member`, and `cancel_team_invitation`
 
 ## Inbox
@@ -1187,8 +1206,38 @@ Caveats:
 - Sequenzy disables an endpoint automatically after every delivery fails for 7 days (`list` shows "Disabled automatically", the API returns `autoDisabledAt`) and emails the workspace owner; once the receiver returns 2xx, re-enable it with `--enable`
 - the webhook must be enabled to receive a test event
 - run `webhooks deliveries <id>` first to find delivery IDs before replaying
-- `delete` prompts for confirmation; use `--yes` to skip
+- `delete` prompts for confirmation; pass `--yes` to skip
 - MCP parity: `list_webhooks`, `create_webhook`, `update_webhook`, `delete_webhook`, `test_webhook`, `list_webhook_deliveries`, and `replay_webhook_delivery`
+
+## Geofences
+
+```bash
+sequenzy geofences list --group stores
+sequenzy geofences create --name "Soho store" --lat 51.5136 --lng -0.1365 --radius 200 --dwell 600 --group stores --external-id store-0042
+sequenzy geofences update geo_123 --radius 300 --clear-dwell
+sequenzy geofences update geo_123 --pause
+sequenzy geofences delete geo_123 --yes
+sequenzy geofences import stores.csv
+```
+
+Behavior:
+
+- `geofences list`: `GET /api/v1/geofences`, with `--group`, `--active true|false`, `--limit` (1-500) and `--cursor` from the previous page
+- `geofences get`: `GET /api/v1/geofences/:id`
+- `geofences create`: `POST /api/v1/geofences`; `--name`, `--lat`, `--lng` and `--radius` are required
+- `geofences update`: `PATCH /api/v1/geofences/:id` with at least one field flag; `--clear-dwell`, `--clear-group` and `--clear-external-id` send `null`; `--pause` and `--resume` set `active`
+- `geofences delete`: `DELETE /api/v1/geofences/:id`; past visits stay in contact history
+- `geofences import`: reads a CSV (headers name, latitude, longitude, radius, dwell, cooldown, group, external_id, active) or a GeoJSON of Point features and sends `POST /api/v1/geofences/import` in batches of 1,000, upserting by external ID
+
+Caveats:
+
+- signed-in app users entering, leaving or staying in a geofence record `app.geofence_entered`, `app.geofence_exited` and `app.geofence_dwelled` with `geofenceId`, `geofenceName`, `geofenceGroup` and `geofenceExternalId`; events carry no coordinates
+- radius 100-10,000 m (200+ recommended), dwell 60-14,400 s (Sequenzy computes dwell, not the phone), cooldown 300-604,800 s (default 3,600), at most 10,000 geofences per workspace and 100 transitions per contact per day
+- trigger a sequence on a visit with an event trigger on a geofence event plus a property filter (`geofenceGroup equals stores` or `geofenceId one_of [...]`)
+- segment with the `geofence` filter field: value `transition:target:timeRange` (or `transition:target:count:timeRange` for at_least/less_than_count), transition `entered|exited|dwelled`, target `any`, `group=<group>` or `id=<id>[,<id>...]`, e.g. `entered:group=stores:30d`
+- every import row needs an external ID; rows without one, or with invalid fields, are skipped and listed with their row number
+- scopes: `geofences:read`, `geofences:write`, `geofences:delete`
+- MCP parity: `list_geofences`, `get_geofence`, `create_geofence`, `update_geofence`, `delete_geofence`, and `import_geofences` (standard MCP only; not on the ChatGPT or Muse connectors)
 
 ## API Keys
 
@@ -1217,7 +1266,7 @@ Caveat:
 ```bash
 sequenzy integrations suggestions
 sequenzy integrations catalog --provider polar
-sequenzy integrations connect polar --api-key <polar-api-key> --webhook-secret <polar-webhook-secret>
+sequenzy integrations connect polar --api-key $POLAR_KEY --webhook-secret $POLAR_WH_SECRET
 sequenzy integrations list
 sequenzy integrations get int_123
 sequenzy integrations activity --status failed
@@ -1234,11 +1283,11 @@ sequenzy integrations set-attio-lists int_123 --from-attio key-accounts=list_abc
 
 Behavior:
 
-- `suggestions`: `GET /api/v1/integrations/suggestions` (`account:read`); what to connect next, from what onboarding found on the company website (Clerk, Supabase, PostHog, Segment, Webflow, Wix, WordPress, WooCommerce, Shopify) minus connected providers. Payment providers are never guessed: when the site lists pricing and nothing handles payments, `paymentProviders` lists every payment provider for the user to pick. `scanComplete: false` means the site is still being read, so an empty list is not "nothing found"
+- `suggestions`: `GET /api/v1/integrations/suggestions` (`account:read`); what to connect next, from what onboarding found on the company website (Clerk, Supabase, PostHog, Segment, Mixpanel, Amplitude, Webflow, Wix, WordPress, WooCommerce, Shopify) minus connected providers. Payment providers are never guessed: when the site lists pricing and nothing handles payments, `paymentProviders` lists every payment provider for the user to pick. `scanComplete: false` means the site is still being read, so an empty list is not "nothing found"
 - `catalog`: `GET /api/v1/integrations/catalog`; works whether or not the provider is connected - its `connectFields` list what a provider needs, and its events are the ones sequences can trigger on
 - `disconnect <id>` / MCP `disconnect_integration`: `POST /api/v1/integrations/{id}/disconnect`; Lemon Squeezy and SparkLoop only. Requires `integrations:manage` and owner/admin access for personal keys. Stops local ingestion before managed webhook cleanup. Manual webhooks and existing subscribers remain. A non-null `cleanupWarning` means locally disconnected; repeat disconnect to retry Lemon Squeezy cleanup, or delete the leftover webhook in SparkLoop. Other providers use the dashboard.
-- `connect`: `POST /api/v1/integrations/connect`; covers API-key / webhook-secret providers (Polar, Paddle, Dodo, Lemon Squeezy, Whop, RevenueCat, Superwall, Adapty, Creem, Chargebee, Clerk, PostHog, Affonso, Attio, SparkLoop). SparkLoop takes `--api-key` (`--webhook-secret` is optional: the webhook authentication token, only to verify SparkLoop's header instead of a secret in the webhook URL), registers its own SparkLoop webhook, and needs `--account-id pub_...` only when the account has several publications (the error lists them); partner referrals for that publication become subscribers and trigger `sparkloop.referral_pending` / `sparkloop.referral_confirmed` / `sparkloop.referral_rejected`. RevenueCat takes a secret API v2 key plus `--webhook-secret` set to the authorization header value configured on the RevenueCat webhook (or its HMAC signing secret); it is webhook-only, so `sync` does not apply, and contacts are matched by `externalId` = RevenueCat app user ID, then by the `$email` attribute (from the event or the RevenueCat API), then by an app user ID that is an email address; unmatched app users show as skipped integration activity. Superwall takes only `--webhook-secret` set to the `whsec_` signing secret of the Superwall webhook pointed at the returned URL; it is webhook-only, so `sync` does not apply, and contacts are matched by `externalId` = the user ID passed to Superwall's `identify()` (or the original app user ID), then by the `email` user attribute, then by a user ID that is an email address; sandbox events and unmatched users show as skipped integration activity. OAuth and app-install providers (Stripe, Shopify, Supabase, GitHub, WooCommerce) connect and disconnect in the dashboard only. Whop also connects through the Sequenzy app in the Whop App Store, linked in the browser by a Whop business admin with no key or webhook; `integrations get` then shows `details.installSource: "whop_app"`, and `sync` / `disconnect` work as usual. Whop webhook secrets are pasted exactly as shown (`ws_...`, or `whsec_...` on older webhooks). Reconnecting replaces the stored keys and secrets, and the response includes the webhook URL to configure at the provider
-- supply secrets via environment variables instead of flags to keep them out of shell history; credentials, access tokens, and webhook secrets are never returned by read commands
+- `connect`: `POST /api/v1/integrations/connect`; covers API-key / webhook-secret providers (Polar, Paddle, Dodo, Lemon Squeezy, Whop, RevenueCat, Superwall, Adapty, Creem, Chargebee, Clerk, PostHog, Segment, Mixpanel, Amplitude, Affonso, Attio, SparkLoop). Mixpanel and Amplitude take only `--webhook-secret`, and the CLI generates and prints one when it is omitted: Mixpanel uses it as the Basic auth password of a Webhook destination and syncs each exported cohort as a `mixpanel-<cohort>` tag (it cannot stream raw events); Amplitude uses it as an `X-Webhook-Secret` header and streams events as `product.<event type>`, profile updates from identify calls and the Users stream, and cohorts as `amplitude-<cohort>` tags (`--event-allowlist` and `--include-internal-events` scope its events at connect; change them later without the secret with `integrations set-amplitude-events <id>`, `PATCH /api/v1/integrations/{id}/amplitude`, or the `update_amplitude_settings` MCP tool, because reconnecting replaces the secret). The first sync of a cohort tags current members without starting automations, and `integrations get` lists synced cohorts with their tags. SparkLoop takes `--api-key` (`--webhook-secret` is optional: the webhook authentication token, only to verify SparkLoop's header instead of a secret in the webhook URL), registers its own SparkLoop webhook, and needs `--account-id pub_...` only when the account has several publications (the error lists them); partner referrals for that publication become subscribers and trigger `sparkloop.referral_pending` / `sparkloop.referral_confirmed` / `sparkloop.referral_rejected`. RevenueCat takes a secret API v2 key plus `--webhook-secret` set to the authorization header value configured on the RevenueCat webhook (or its HMAC signing secret); it is webhook-only, so `sync` does not apply, and contacts are matched by `externalId` = RevenueCat app user ID, then by the `$email` attribute (from the event or the RevenueCat API), then by an app user ID that is an email address; unmatched app users show as skipped integration activity. Superwall takes only `--webhook-secret` set to the `whsec_` signing secret of the Superwall webhook pointed at the returned URL; it is webhook-only, so `sync` does not apply, and contacts are matched by `externalId` = the user ID passed to Superwall's `identify()` (or the original app user ID), then by the `email` user attribute, then by a user ID that is an email address; sandbox events and unmatched users show as skipped integration activity. PostHog events without an email reach the contact whose `externalId` (or stored `posthogDistinctId`) equals the event's `distinct_id` when `--match-by-distinct-id` / `settings.matchByDistinctId` is on; it is the default for new connections, never creates contacts, and `--no-match-by-distinct-id` turns it off (a PostHog reconnect keeps the other event settings). OAuth and app-install providers (Stripe, Shopify, Supabase, GitHub, WooCommerce) connect and disconnect in the dashboard only. Whop also connects through the Sequenzy app in the Whop App Store, linked in the browser by a Whop business admin with no key or webhook; `integrations get` then shows `details.installSource: "whop_app"`, and `sync` / `disconnect` work as usual. Whop webhook secrets are pasted exactly as shown (`ws_...`, or `whsec_...` on older webhooks). Reconnecting replaces stored credentials, and the response includes the webhook URL to configure at the provider
+- pass secrets via environment variables instead of flags to keep them out of shell history; credentials, access tokens, and webhook secrets are never returned by read commands
 - `list` / `get`: connected integrations and one integration's detail - `get` lists every event the provider emits, the tags each applies through sync rules, and which sequences trigger on it
 - `activity`: `GET /api/v1/integrations/activity`; retained for 24 hours - use `--status failed` when an integration reports connected but contacts are not appearing
 - `sync <id>` queues a catalog/backfill re-sync (Stripe, Polar, Paddle, Dodo, Lemon Squeezy, Creem, Chargebee, Whop); returns immediately, poll `integrations get` to watch `syncStatus`; fails with a conflict if a sync is already running
@@ -1330,16 +1379,42 @@ sequenzy push live-activities end --email jane@example.com --activity-id order-1
 
 Behavior:
 
-- `push settings`: `GET /api/v1/push/settings`; shows web push, APNs, and Firebase readiness, last credential errors, and active device counts per platform
+- `push settings`: `GET /api/v1/push/settings`; shows web push, APNs, and Firebase readiness, last credential errors, active device counts per platform, and the app opt-in rate (`devices.permissions`: iOS/Android devices by the notification permission the SDK reported, `unknown` for SDKs that predate reporting)
 - `push web`: `PUT /api/v1/push/settings/web`; the first `--enable` generates VAPID keys; the site must serve `/sequenzy-sw.js` with `importScripts("https://api.sequenzy.com/sequenzy-sw.js")` and call `sequenzy.subscribeToPush()` from a click
 - `push ios set` / `push android set`: `PUT /api/v1/push/settings/ios|android` with the .p8 key or Firebase service account; secrets are encrypted and never returned; `remove` subcommands clear them
-- `push devices`: `GET`/`POST /api/v1/push/devices` and `DELETE /api/v1/push/devices/{id}`; app backends register APNs/FCM tokens with an email or subscriber ID; tokens are never returned in full. Apps using the mobile SDKs register their own tokens (`source: "mobile_sdk"`) with a publishable key whose `--app-ids` lists the app
+- `push devices`: `GET`/`POST /api/v1/push/devices` and `DELETE /api/v1/push/devices/{id}`; app backends register APNs/FCM tokens with an email or subscriber ID; tokens are never returned in full. Apps using the mobile SDKs register their own tokens (`source: "mobile_sdk"`) with a publishable key whose `--app-ids` lists the app. `--permission granted|provisional|ephemeral|denied|not_determined` records the device's notification permission (the SDKs report it themselves); the contact's `pushPermission` attribute holds the best status across their app devices, for push primer segments
 - `push send-test`: `POST /api/v1/push/test`; one device or every device of a contact, 200 per company per rolling 24 hours, excluded from stats
 - `push campaigns`: `/api/v1/push/campaigns` estimate (contacts with an active device), create, update, send (now or `--schedule`), unschedule, cancel, duplicate, stats; only contacts with an active device on a set-up platform receive it; `send` confirms unless `--yes` or `--schedule`
 - add push steps to sequences with `type: "push"` and `title`/`body` in `sequences create --steps-*` or `update --insert-steps-*`; steps skip until push is set up
 - `push live-activities`: iOS Live Activities over APNs (same .p8 key). `list` (`GET /api/v1/push/live-activities`) shows push-to-start tokens per device and activity type, update tokens per running activity, and per-type counts. `start` (`POST .../start`, iOS 17.2+) needs `--email` or `--subscriber-id`, `--activity-type` (the Swift ActivityAttributes name), `--activity-id`, content state JSON, attributes JSON with every field of the app's attributes struct (iOS silently drops a start whose attributes do not decode) and an alert; Sequenzy adds `sequenzy.activityId` to the attributes. Timestamps are Unix seconds or ISO dates; milliseconds are rejected. `update` and `end` target every running copy of that contact's activity, so they also need `--email` or `--subscriber-id` (tokens of other devices under the same id are never sent to); `end` needs the final content state and takes `--dismissal-date` (0 or a past date removes it now). Each returns `tokenCount`; 0 means nothing was sent (no device linked to that contact can start the type, because the app has not called `identify` with an identity token, or no running copy has reported its update token yet, which takes a few seconds after a start), not an error. Updates are safe to repeat; a repeated start starts another copy. Content state dates decode as seconds since 2001-01-01 unless the app's struct says otherwise; the APNs payload must fit 4 KB. The app reports tokens with the iOS SDK's `Sequenzy.observeLiveActivities(of:)` (React Native and Flutter: `registerLiveActivityToken` / `liveActivityEnded`); Android has no Live Activities
 - push campaigns use `campaigns:read|write|send` scopes, devices use `subscribers:read|write`, credentials need `integrations:manage`, Live Activity start/update/end need `transactional:send` and listing needs `subscribers:read`
 - MCP parity: `get_push_settings`, `update_web_push_settings`, `set_apns_credentials`, `set_fcm_credentials`, `list_push_devices`, `register_push_device`, `send_test_push`, `create_push_campaign`, `send_push_campaign`, `get_push_campaign_stats`, `list_live_activities`, `start_live_activity`, `update_live_activity`, `end_live_activity`, and the other push tools
+
+## Push imports
+
+```bash
+sequenzy push imports preflight --source onesignal
+sequenzy push imports start --source onesignal --app-id 1b2c3d4e-0000-4000-8000-00000000abcd --api-key-file onesignal.key --wait
+sequenzy push imports start --source braze --braze-endpoint rest.iad-01.braze.com --segment seg_all_users --api-key-file braze.key
+sequenzy push imports start --source customer_io --region eu --segment 12 --api-key-file cio.key --platforms ios
+sequenzy push imports start --source csv --file devices.csv --yes
+sequenzy push imports list
+sequenzy push imports get pimp_123 --wait
+sequenzy push imports resume pimp_123
+sequenzy push imports cancel pimp_123 --yes
+```
+
+Behavior:
+
+- `/api/v1/push/imports` (preflight, create, rows, start, get, list, cancel); `subscribers:read` for reads, `subscribers:write` for writes, like push devices
+- `start` creates a draft, prints its warnings (APNs or Firebase not set up, APNs on sandbox, credentials must match, web push excluded) and asks before starting unless `--yes`; a declined draft is kept for `resume` or `cancel`
+- sources: OneSignal (App API key + App ID; CSV export, about 2,000 records/s, one export per account at a time), Braze (REST key with `users.export.segment`, REST endpoint, segment; ZIP export, not available when Braze exports to the customer's own bucket), Customer.io (App API key, region, segment; App API at 10 requests/s), CSV (`token` + `platform` columns, `external_id` or `email`, optional `status`, `app_id`, `last_active`, `attribute.<name>`; files up to 256 MB, sent in parts automatically, and the import cannot start until every part arrived; split larger files or use the source's API). Pass the source key with `--api-key-file` or `PUSH_IMPORT_API_KEY` rather than a flag; it is encrypted and deleted once devices are read
+- only iOS (APNs) and Android (FCM) devices are imported; web push subscriptions are tied to the old provider's VAPID keys and are skipped. iOS tokens that are Firebase tokens and Firebase installation IDs are rejected as invalid
+- opted-in devices link to a contact by external ID, then email; otherwise a contact is created (no lists, no sequences), push-only with no email or phone when the device has only an external ID; an email owned by a contact with another external ID is skipped as `identity_conflict`; opted-out devices are stored as unsubscribed; devices already in Sequenzy are left as they are (`matched`); the SDK registering an imported token updates the same device
+- `--no-attributes` stops copying source tags/attributes; otherwise only keys a contact lacks are filled
+- results: `imported`, `matched`, `unsubscribed`, `skipped`, `invalid`, `subscribersCreated`, with reason counts; one import runs per workspace; `resume` continues a failed or stalled import from its last checkpoint without importing anything twice; `cancel` keeps devices already imported; `--wait` exits with status 1 when the import fails or stalls
+- importing never sends anything; the first sends retire tokens Apple or Google reject (uninstalled apps, OneSignal's shared Firebase project)
+- MCP parity: `get_push_import_preflight`, `create_push_import`, `add_push_import_rows`, `start_push_import`, `get_push_import`, `list_push_imports`, `cancel_push_import`
 
 ## In-App Messages
 
@@ -1351,21 +1426,29 @@ sequenzy in-app delete iam_123 --yes
 sequenzy in-app stats node_321
 sequenzy in-app templates --json
 sequenzy in-app write --brief "Trial ends in 3 days; nudge them to upgrade" --format modal
+sequenzy in-app html validate --file survey.html
+sequenzy in-app html set seq_123 node_321 --file survey.html --no-close-button
+sequenzy in-app list --email jane@example.com --formats modal,banner,fullscreen,html
 ```
 
 Behavior:
 
-- add in-app steps to sequences with `type: "in_app"` and `title`/`body` (plus optional `kind` message|card, `format` modal|banner|fullscreen, `position` top|bottom for banners or bottom (sheet, default)|center for modals, `eyebrow` (short line above the title, up to 40 characters), `imageUrl`, `imagePlacement` top|background for modals and full screens, up to 2 `buttons` `{label, action: open_url|dismiss, url}`, string `data`, `expiresAfterDays` 1-365, `pinned` for cards, and `style` `{preset: brand|soft|bold|dark, backgroundColor, textColor, buttonColor, buttonTextColor, cornerRadius 0-32, buttonRadius 0-40}` built from the brand) in `sequences create --steps-*` or `update --insert-steps-*`; each contact gets one item per step, stored in their in-app feed
+- add in-app steps to sequences with `type: "in_app"` and `title`/`body` (plus optional `kind` message|card, `format` modal|banner|fullscreen, `position` top|bottom for banners or bottom (sheet, default)|center for modals, `eyebrow` (short line above the title, up to 40 characters), `imageUrl`, `imagePlacement` top|background for modals and full screens, up to 2 `buttons` `{label, action: open_url|dismiss|request_push_permission, url}` (url only for `open_url`; `request_push_permission` makes a push primer: the app shows the OS notification prompt, or opens its notification settings when the contact turned them off), string `data`, `expiresAfterDays` 1-365, `pinned` for cards, and `style` `{preset: brand|soft|bold|dark, backgroundColor, textColor, buttonColor, buttonTextColor, cornerRadius 0-32, buttonRadius 0-40}` built from the brand) in `sequences create --steps-*` or `update --insert-steps-*`; each contact gets one item per step, stored in their in-app feed
 - nothing is sent by email or push: the customer's app fetches the feed (browser: `POST /api/v1/in-app/feed` with the publishable key and a backend-minted identity token; backend: `GET /api/v1/in-app/messages`), renders it, and reports events; Settings > In-app has a copy-ready prompt for an AI coding tool
-- `in-app list`: `GET /api/v1/in-app/messages`; `--status open` (default) is what the app should show now (messages not yet displayed/clicked/dismissed, cards not dismissed, nothing expired), `--status all` is history; identify the contact with `--email`, `--external-id`, or `--subscriber-id`
-- `in-app event`: `POST /api/v1/in-app/messages/{id}/events` with `displayed`, `clicked`, `dismissed`, or `read`; repeats change nothing except the click count; messages show once, cards stay until dismissed
+- `in-app list`: `GET /api/v1/in-app/messages`; `--status open` (default) is what the app should show now (messages not yet displayed/clicked/dismissed, cards not dismissed, nothing expired), `--status all` is history; identify the contact with `--email`, `--external-id`, or `--subscriber-id`; open items with a `request_push_permission` button are left out unless `--actions request_push_permission` says the app handles it (the mobile SDKs list it themselves)
+- `in-app event`: `POST /api/v1/in-app/messages/{id}/events` with `displayed`, `clicked`, `dismissed`, or `read`; repeats change nothing except the click count; messages show once, cards stay until dismissed; on a push primer click add `--push-permission granted|provisional|ephemeral|denied|not_determined` (the permission the app read after asking): kept once per item and written to the contact's `pushPermission` attribute
 - `in-app delete`: `DELETE /api/v1/in-app/messages/{id}`; confirms unless `--yes`
-- `in-app stats`: `GET /api/v1/in-app/steps/{stepId}/stats`; created, displayed, clicked, dismissed
+- `in-app stats`: `GET /api/v1/in-app/steps/{stepId}/stats`; created, displayed, clicked, dismissed, plus `pushPermissionGranted` / `pushPermissionDenied` for push primers
 - `in-app templates`: `GET /api/v1/in-app/templates`; each template's `config` is a complete `in_app` step without a label, and its link buttons have no `url` until you add one
+- custom HTML messages: an `in_app` step with `format: "html"`, `html` (up to 100 KB of HTML/CSS/JS; Braze Liquid like `{{${email_address}}}` is converted to merge tags, `{{${braze_id}}}` becomes `{{contactId}}`, Liquid without an equivalent is rejected) and `showCloseButton` (default true; turn off when the HTML calls `sequenzy.close()` or `brazeBridge.closeMessage()`); `title` is the accessible name. The document gets a JS bridge (`sequenzy.close/openUrl/logClick/track/setAttributes/setName`, plus Braze's `brazeBridge`/`appboyBridge`) and runs sandboxed (opaque-origin iframe on the web, isolated WebView on mobile). Survicate's Braze In-App Message snippet works pasted as is; its answers reach Sequenzy only with the dashboard's "Forward Survicate answers" snippet (events `survicate_question_answered`/`survicate_survey_completed`) or a Survicate webhook
+- feeds leave `html` messages out unless the caller lists `html` in `formats` (`in-app list --formats`, public feed `formats`), so older SDKs never show them as blank messages; SDKs show them automatically (React Native needs `webView={WebView}` from react-native-webview; web needs `data-sequenzy-in-app` on the snippet)
+- `in-app html validate --file`: `POST /api/v1/in-app/html/validate` (`sequences:read`); returns size, Braze conversions, script hosts a CSP must allow, `closesItself`, warnings and errors; exits 1 when not valid
+- `in-app html set <sequenceId> <stepId> --file`: `PUT /api/v1/sequences/{id}` with a typed `nodeUpdates` change (`format: "html"`, `html`, optional `--title`, `--no-close-button`, `--confirm-live-change` for active sequences)
+- `in-app event --button-id`: which control a click in an HTML message hit (Braze `logClick` id rules)
 - `in-app write`: `POST /api/v1/in-app/copy` with `--brief`, optional `--kind`, `--format`, `--image`; returns `eyebrow`, `title`, `body` and button labels and saves nothing (20 a minute per workspace)
 - scopes: feed and events use `subscribers:read|write`, stats and templates use `sequences:read`, writing copy uses `sequences:write`
 - mobile apps: the iOS, Android, React Native and Flutter SDKs render the feed with the same design as the composer preview, and also record screen views, storefront events, profile updates and form signups; see the Mobile SDKs docs
-- MCP parity: `list_in_app_messages`, `record_in_app_event`, `delete_in_app_message`, `get_in_app_step_stats`, `list_in_app_templates`, `write_in_app_copy`, and `type: "in_app"` in `create_sequence` and `insert_sequence_step`
+- MCP parity: `list_in_app_messages`, `record_in_app_event`, `delete_in_app_message`, `get_in_app_step_stats`, `list_in_app_templates`, `write_in_app_copy`, `validate_in_app_html`, `formats` on `list_in_app_messages`, `buttonId` on `record_in_app_event`, and `type: "in_app"` (including `format: "html"` with `html`/`showCloseButton`) in `create_sequence`, `insert_sequence_step` and `update_sequence_node`
 
 ## Sync Rules
 
@@ -1504,7 +1587,7 @@ Treat these requested workflows as unsupported in the CLI even though related no
 
 - prefer `SEQUENZY_API_KEY` for automation instead of interactive login
 - use `--json` when another tool or agent needs structured output; dashboard-aware commands add `url`/`appUrls` fields when possible
-- destructive commands (`delete`, `delete-variant`, `cancel-invitation`, and similar) prompt for confirmation; use `--yes` (or `-y`) to skip, and note that `--yes` is required when stdin is not a TTY, which covers most agent and CI runs
+- destructive commands (`delete`, `delete-variant`, `cancel-invitation`, and similar) prompt for confirmation; pass `--yes` (or `-y`) to skip, and note that `--yes` is required when stdin is not a TTY, which covers most agent and CI runs
 - `campaigns cancel` deliberately skips the confirmation prompt so a bad send can be stopped fast
 - `webhooks create` returns a one-time signing secret; handle it as sensitive output because it cannot be retrieved later. Do not paste credential material into chat, logs, tickets, or public transcripts. Save it only to a user-approved secure destination such as a password manager, secret store, encrypted file, or local `.env` file outside version control, then report the storage location and a short fingerprint.
 - when the user asks for a workflow outside the current CLI surface, say so directly, choose between dashboard or direct API use instead of inventing commands. Send feedback only when explicitly requested, after telling the user it goes to the Sequenzy team
@@ -1557,7 +1640,7 @@ Behavior:
 
 - `components list|get|create|update|duplicate|delete` call `/api/v1/email-components`; MCP parity: `list_email_components`, `get_email_component`, `create_email_component`, `update_email_component`, `duplicate_email_component`, `delete_email_component`
 - Rename with `update --name` (MCP `update_email_component` with only `name`). Names are unique per company; a taken name returns 409. A rename does not bump `version`.
-- `duplicate` copies description, type and blocks into a new component named "<name> (Copy)", then "(Copy 2)" and so on; use `--name` (MCP `name`) to choose one. The copy is never pinned as a default, so duplicating the default footer gives a regular component and leaves the default unchanged.
+- `duplicate` copies description, type and blocks into a new component named "<name> (Copy)", then "(Copy 2)" and so on; pass `--name` (MCP `name`) to choose one. The copy is never pinned as a default, so duplicating the default footer gives a regular component and leaves the default unchanged.
 - Inserted components are copied into emails, so renaming, duplicating or deleting never changes emails that already use them.
 
 ## Apply a default footer to existing emails
@@ -1598,7 +1681,7 @@ Use `preview_default_email_component` with `slot: "footer"`, `blocks`,
 `application: { scopes: ["sequences", "campaigns", "transactional", "templates"],
 includeCustomized: false }`, and `renderPreview: true`. Inspect
 `renderedPreview.footerHtml` and `renderedPreview.samples[].beforeHtml/afterHtml`.
-Send the identical inputs and `previewToken: application.token` to
+Pass the identical inputs and `previewToken: application.token` to
 `set_default_email_component`. You can also supply `sample: { id, kind }` to
 preview an affected version. Omitting `application` keeps future-only saves.
 
@@ -1614,7 +1697,7 @@ On the OpenAI-reviewed MCP surface, `customVariables` uses the same restricted p
 
 ### Reuse received event data for sequence tests
 
-Use `sequenzy events sample <eventName> --company <companyId> --json`, MCP `get_event_sample`, or `GET /api/v1/events/sample?eventName=<eventName>` to read the latest retained payload in your workspace. Requires `subscribers:read`. This includes older and custom events across all subscribers; `sample: null` means none exists. Copy `sample.properties` into the test run's `customVariables` (CLI `--event-properties`) and edit as needed. The dashboard's **Use latest received event** button replaces the JSON field. Copying data does not change the selected recipient or fire an event. Clear the field, omit the properties, or use `{}` to test without overrides. Lookup errors are safe to retry; starting a real test still has delivery side effects.
+Use `sequenzy events sample <eventName> --company <companyId> --json`, MCP `get_event_sample`, or `GET /api/v1/events/sample?eventName=<eventName>` to read the latest retained payload in your workspace. Requires `subscribers:read`. This includes older and custom events across all subscribers; `sample: null` means none exists. Copy `sample.properties` into the test run's `customVariables` (CLI `--event-properties`) and edit as needed. The dashboard's **Use latest received event** button replaces the JSON field. Copying data does not change the selected recipient or fire an event. Clear the field, omit the properties, or pass `{}` to test without overrides. Lookup errors are safe to retry; starting a real test still has delivery side effects.
 
 ## Renaming your company in footers
 
@@ -1625,7 +1708,7 @@ custom names, body copy, sent or sending campaigns and active A/B tests are pres
 The operation does not send emails. Existing open editor drafts may still contain
 the old name; reload them before continuing to edit.
 
-With the API or MCP `update_company`, send `name`, `renameMatchingFooters: true`
+With the API or MCP `update_company`, pass `name`, `renameMatchingFooters: true`
 and `previousCompanyName` from get company. In the CLI, use
 `sequenzy companies update comp_123 --name Grove --rename-matching-footers --previous-company-name Linear`.
 The option defaults to false. A stale previous name returns 409 with no changes;
@@ -1692,7 +1775,7 @@ request with `--cancel-sample-update` / `cancelSampleUpdate: true`, without a ne
 percentage. To stop a running campaign test early and let its criteria pick the
 winner from the results so far, use `--end-now` / `endTestNow: true` (needs
 `campaigns:send`; it sends the winner to the remaining audience). GET after an uncertain response, since settings may have saved before
-enqueue failed. Capture `updatedAt` when reviewing changes and use
+enqueue failed. Capture `updatedAt` when reviewing changes and pass
 `--expected-updated-at` / `expectedUpdatedAt` for stale-update protection.
 Use `ab-tests select-winner <id> <variantId>` / `select_ab_test_winner`
 only when winner delivery is authorized; it ends the comparison and queues the
@@ -1733,13 +1816,13 @@ on the editor's Canvas tab. They never change what the campaign sends until
 | Discard / restore             | `sequenzy campaigns variations discard <campaign-id> <variation-id>`, then `restore` with the same ids                   | `discard_campaign_variation` / `restore_campaign_variation` | `DELETE .../variations/{variationId}`, `POST .../restore` |
 | Use in the campaign           | `sequenzy campaigns variations use <campaign-id> <variation-id>`                                                         | `use_campaign_variation`                                    | `POST .../variations/{variationId}/use`                   |
 
-- Generation does not wait. Poll `list` (or use `--wait`) until no variation is
+- Generation does not wait. Poll `list` (or pass `--wait`) until no variation is
   `generating`. Each succeeds or fails on its own; one still generating after 10
   minutes is reported as `failed`. Retrying creates new variations.
 - An email can have at most 8 variations generating at once; a request past
   that returns `409`. Wait for the running ones to finish instead of retrying.
 - `--parent` / `parentVariationId` builds on a ready variation; new versions stay
-  close to it unless you use `--style` / `style`. `bold` designs each version
+  close to it unless you pass `--style` / `style`. `bold` designs each version
   anew with its own layout, `emailTheme` and `fontFamily`; use it when the user
   asks for something completely different.
 - `edit` changes one ready variation with AI and saves it (synchronous, up to a
@@ -1783,7 +1866,7 @@ request and save the result (or return it with a dry run).
   with `update_ab_test_variant`.
 - Needs `sequences:write`. Synchronous; up to 12 emails per request (batch
   longer sequences with `--emails`). A `503` means the AI couldn't tell which
-  emails the prompt means: retry or use `--emails`. After a timeout, read the
+  emails the prompt means: retry or pass `--emails`. After a timeout, read the
   sequence before retrying, since changes may already be saved.
 - For exact values (one background color, a preset) use `update_sequence_nodes`
   instead of the AI.
@@ -1804,7 +1887,7 @@ goals, including inactive records, with their original scope, triggers and windo
 Human CLI output labels them separately; JSON and MCP retain both arrays. Custom
 company-wide goals require an open or click; campaign-specific goals can count
 a conversion after a send alone. Manage company-wide goals in Settings, and do
-not use their IDs to campaign goal update/delete. Restricted members cannot read
+not pass their IDs to campaign goal update/delete. Restricted members cannot read
 these Settings definitions. A failed list request can be retried without side effects.
 
 For a paid-member list, use `sequenzy lists update list_123 --allow-member-unsubscribe` to allow existing members to opt out without making the list public. Use `--no-allow-member-unsubscribe` to disable. Create supports the same flags. API and MCP use boolean `allowMemberUnsubscribe`: default false on create, omission preserves on update, false clears, null rejected. Public lists retain their normal behavior. Read the stored setting with `sequenzy lists --json` or MCP `list_lists`; after an uncertain create, inspect before retrying.
@@ -1813,7 +1896,7 @@ For a paid-member list, use `sequenzy lists update list_123 --allow-member-unsub
 
 In clients that support MCP Apps, including compatible ChatGPT and Claude connections, you can review your saved emails and sequences directly in the conversation.
 
-- `render_email` opens the rendered email with **Desktop** (640px) and **Mobile** (375px) views, its subject, preview text and personalization warnings. Give a campaign ID, template ID, or sequence ID plus node ID using the existing tool inputs. It renders your saved content through Sequenzy's email renderer. Personalization and locale options remain available through the same tool.
+- `render_email` opens the rendered email with **Desktop** (640px) and **Mobile** (375px) views, its subject, preview text and personalization warnings. Pass a campaign ID, template ID, or sequence ID plus node ID using the existing tool inputs. It renders your saved content through Sequenzy's email renderer. Personalization and locale options remain available through the same tool.
 - `preview_sequence({ companyId, sequenceId })` opens the saved sequence as a connected diagram with triggers, delays, branches and actions. Select an email to render it, switch between available A/B variants, or use the **Emails** tab to browse the sequence's emails. Random splits show their configured allocation. **Refresh** reloads saved content, and failed requests offer an explicit retry.
 
 Supporting workflows use compact cards in the same Sequenzy style:
@@ -1831,7 +1914,7 @@ Clients without MCP Apps still receive the existing rendered HTML or sequence da
 
 ## B2B accounts
 
-Use `sequenzy accounts list`, `get`, `upsert`, `members`, `add-member`, `remove-member`, `event`, `events`, and `delete` to manage customer-owned organizations and their contacts. The dashboard calls accounts Organizations, and `sequenzy organizations` is the same command. Organization attributes are available as `organization.<name>` segment fields and sequence conditions and as `{{organization.<name>}}` merge tags (`account.*` is an older alias). Account events are recorded on the account timeline and delivered to `owners` (falling back to admins), `admins`, or `all`; use `none` to record without delivery. Use `--event-id` when retries must resume only failed recipients. Account writes require the subscriber scopes, and account events also require `events:write`. Accounts here are your customers' organizations, not your Sequenzy account (`sequenzy account`). The workspace turns Accounts on with its first account; if contacts already use an `account` or `account.*` custom attribute, that first upsert fails with 409 until the attribute is renamed. Until Accounts is on, `subscribers event --account` is ignored (the CLI prints a warning and JSON output includes `accountIgnored`). Bulk-created accounts start with every contact as a member, so account events sent to owners or admins reach nobody; find them with `sequenzy accounts list --without-event-recipients` (MCP `list_accounts` with `withoutEventRecipients: true`) and set roles with `accounts add-member <externalId> --email <email> --role owner|admin`. In sequences started by account events, use `{{event.organization.*}}` merge tags (the organization the event was sent for; `{{organization.*}}` is the contact's primary organization; the `account` spellings still work). Matching-field enrollment on `organization.externalId` (or `account.externalId`) means one run per organization at a time: only the first member the event reaches enrolls, so do not use it for alerts every admin should get.
+Use `sequenzy accounts list`, `get`, `upsert`, `members`, `add-member`, `remove-member`, `event`, `events`, and `delete` to manage customer-owned organizations and their contacts. The dashboard calls accounts Organizations, and `sequenzy organizations` is the same command. Organization attributes are available as `organization.<name>` segment fields and sequence conditions and as `{{organization.<name>}}` merge tags (`account.*` is an older alias). Account events are recorded on the account timeline and delivered to `owners` (falling back to admins), `admins`, or `all`; use `none` to record without delivery. Pass `--event-id` when retries must resume only failed recipients. Account writes require the subscriber scopes, and account events also require `events:write`. Accounts here are your customers' organizations, not your Sequenzy account (`sequenzy account`). The workspace turns Accounts on with its first account; if contacts already use an `account` or `account.*` custom attribute, that first upsert fails with 409 until the attribute is renamed. Until Accounts is on, `subscribers event --account` is ignored (the CLI prints a warning and JSON output includes `accountIgnored`). Bulk-created accounts start with every contact as a member, so account events sent to owners or admins reach nobody; find them with `sequenzy accounts list --without-event-recipients` (MCP `list_accounts` with `withoutEventRecipients: true`) and set roles with `accounts add-member <externalId> --email <email> --role owner|admin`. In sequences started by account events, use `{{event.organization.*}}` merge tags (the organization the event was sent for; `{{organization.*}}` is the contact's primary organization; the `account` spellings still work). Matching-field enrollment on `organization.externalId` (or `account.externalId`) means one run per organization at a time: only the first member the event reaches enrolls, so do not use it for alerts every admin should get.
 
 `sequenzy accounts suggestions [--min-contacts <n>] [--limit <n>]` lists work email domains that several contacts share (default 3 contacts, 25 suggestions), with a few sample emails each, skipping personal and disposable providers, the workspace's sending domains, domains where a contact already belongs to an account and domains an account already uses. It is read-only (`subscribers:read`). `sequenzy accounts accept-suggestions <domain...>` (up to 25, `subscribers:write`) creates one account per domain (external ID and domain set to the domain) with the domain's unassigned contacts as members, or adds them to the one existing account that uses the domain. Results report `created`, `updated` or `skipped` (`no_contacts`, `multiple_accounts`, `already_in_account`); retries are safe, and no sync rules or segment-entered sequences run. MCP parity: `list_account_suggestions` and `accept_account_suggestions`.
 

@@ -340,7 +340,7 @@ Guidance:
 - use block JSON when the user needs conditional content or an exact editor-compatible structure
 - use `--reply-to` when the user knows the reply profile email and it already exists for the company
 - use `--reply-profile` when the user already has the reply profile ID
-- do not use `--reply-to` and `--reply-profile` together
+- do not pass `--reply-to` and `--reply-profile` together
 - use `campaigns get` after an update when you want to confirm the saved reply-to details
 - use `campaigns schedule --at <future ISO datetime>` when the user asks to schedule a campaign; it requires a verified sending domain
 - use `--target-lists-json` or `--target-lists-file` only when the user explicitly needs new targeting at schedule time
@@ -414,7 +414,7 @@ Guidance:
 - Campaign A/B recipient limits must allow one recipient per variant plus one for the winner. If scheduling rejects a saved or requested limit, raise it or explicitly clear it; the rejected request leaves the campaign and schedule unchanged.
 - `--max-recipients` keeps the first N matching subscribers (by subscriber id) after every audience and suppression rule; the schedule response's `estimatedRecipientCount` reflects the cap
 - for a daily ramp, keep one audience such as "in list X and email sent was not sent ever": contacts who already received the campaign drop out of the audience, so each duplicate sends to the next batch
-- omit the flag on `schedule` to keep the cap saved on the draft, or use `--clear-max-recipients` to send to everyone
+- omit the flag on `schedule` to keep the cap saved on the draft, or pass `--clear-max-recipients` to send to everyone
 - recipients already reached count against the cap when a paused campaign resumes, so a capped campaign never exceeds N in total
 - warming is not required on Sequenzy's shared infrastructure; the cap is for domain reputation ramps, soft launches, batched imports, and spend control
 
@@ -424,7 +424,7 @@ MCP equivalents are `update_campaign` and `schedule_campaign` with `maxRecipient
 
 1. Preview first when the change is broad: `sequenzy sequences edit-emails <sequence-id> --prompt "<change>" --dry-run --json` (MCP `edit_sequence_emails` with `dryRun: true`). Tell the user what each email's `summary` says, and which steps were `skipped`.
    To make emails look like one of them, say so in the prompt ("make them all look like email 1"): its style is copied exactly, without AI. To try a few designs of one email first, use `sequences variations generate <id> --email <emailId> --prompt "..." --wait` / `generate_sequence_email_variations`, preview one with `sequences render <id> --node <nodeId> --variation <variationId>` / `render_email` with `variationId`, then `sequences variations use <id> <variationId> --email <emailId> --all` / `use_sequence_email_variation` with `scope: "all"` to give every email its style (`--dry-run` / `dryRun` first). `edit-emails` answers 400 to a variations prompt.
-2. Apply it: run the same command without `--dry-run`. To change only some emails, name them in the prompt ("give email 2 a new structure") or use `--emails`; for part of one email add `--sections`.
+2. Apply it: run the same command without `--dry-run`. To change only some emails, name them in the prompt ("give email 2 a new structure") or pass `--emails`; for part of one email add `--sections`.
 3. Report per email: `changed` (saved), `unchanged` (why) and `failed` (send again with `--emails` for those). On an active sequence, say the changes go out with the next sends.
 
 For an exact value rather than an AI edit (for example one hex background on every email), use `update_sequence_nodes` with `emailTheme` instead.
@@ -478,7 +478,7 @@ Guidance:
 - use `ab-tests get` only when you also need the full test record, including settings, localization, or stats
 - edit each variant with `ab-tests update-variant`; a whole-step rewrite must be repeated for every variant
 - do not retry through `templates update`, `sequences update`, or `sequences update-node`, because those paths cannot enforce A/B-test status and live-change rules
-- once the sequence is active or the test has activity, use `--confirm-live-change` only after the user confirms the live copy change
+- once the sequence is active or the test has activity, pass `--confirm-live-change` only after the user confirms the live copy change
 - MCP uses `get_sequence.sequence.emails[].abTest.variants[].blocks` and `update_ab_test_variant`. If that write tool is missing, enable it on the Sequenzy connector rather than using another email tool
 - the **Safer agent access** preset includes `ab_tests:read`, `ab_tests:write`, and `sequences:write`, the scopes required for this workflow
 
@@ -497,6 +497,7 @@ sequenzy sequences update seq_123 --steps-file ./sequence-updates.json
 sequenzy sequences enable seq_123
 sequenzy sequences enroll-audience seq_123 --segment-id seg_past_buyers --apply --wait
 sequenzy sequences enroll-audience seq_123 --segment-id seg_past_buyers --apply --data-json '{"sale_ends_at":"2026-11-29T23:59:00Z","discount_percent":20}'
+sequenzy sequences schedule seq_123 --monthly 1,last --at 10:00 --timezone Europe/London --segment-id seg_members
 sequenzy sequences disable seq_123
 sequenzy sequences cancel-enrollments seq_123 --subscriber-id sub_123
 sequenzy sequences cancel-enrollments seq_123 --field-path order.id --field-values ord_123,ord_456
@@ -598,7 +599,7 @@ Guidance:
 - use `--subscriber-id` when the caller knows the exact subscriber enrollment to stop
 - use `--field-values` when the caller wants to stop all active, waiting, or paused enrollments whose stored entry event property matches specific IDs
 - include `--field-path` unless the sequence already has the correct `enrollmentFieldPath`
-- omit `--apply` for a dry run; use `--apply` only after reviewing the matched count
+- omit `--apply` for a dry run; pass `--apply` only after reviewing the matched count
 - MCP equivalent is `cancel_sequence_enrollments` with exactly one of `subscriberId` or `fieldValues`; set `dryRun: false` to apply a field-value cancellation
 
 ## "Pause one contact in a sequence and continue later"
@@ -713,7 +714,7 @@ Guidance:
 
 ## "Recover failed Stripe payments once per invoice"
 
-Native Stripe `saas.payment_failed` events and subscription-invoice `saas.purchase` events carry `invoiceId`, `subscriptionId`, `attemptCount`, `billingReason` and `hostedInvoiceUrl`. `saas.payment_failed` also carries `amountDue` (smallest currency unit), `amountDueFormatted` (such as `€49.00`), `currency`, `nextPaymentAttempt` and `willRetry`.
+Native Stripe `saas.payment_failed` events and subscription-invoice `saas.purchase` events carry `invoiceId`, `subscriptionId`, `attemptCount`, `billingReason` and `hostedInvoiceUrl`. `saas.payment_failed` also carries `amountDue` (smallest currency unit), `amountDueFormatted` (such as `$49.00`), `currency`, `nextPaymentAttempt` and `willRetry`.
 
 Send the per-invoice setup explicitly; nothing is applied automatically:
 
@@ -782,7 +783,7 @@ Guidance:
 - use `--note` to record internal context (decisions, escalations) without emailing the subscriber
 - outbound replies are sent asynchronously by a worker, so report the message as queued rather than delivered; replies also reopen closed conversations
 - use `--search` to find conversations by subscriber email, name, or subject, and `--status open|closed|all` plus `--page`/`--limit` for larger inboxes
-- to close or reopen many conversations, send up to 100 IDs to one `inbox close`/`inbox reopen` call (for example every ID from one `inbox list --status open --limit 100` page) and report the updated, already-closed and not-found counts it prints; confirm with the user before closing conversations they did not name
+- to close or reopen many conversations, pass up to 100 IDs to one `inbox close`/`inbox reopen` call (for example every ID from one `inbox list --status open --limit 100` page) and report the updated, already-closed and not-found counts it prints; confirm with the user before closing conversations they did not name
 - flagged mail sent to inbox addresses lands in the Spam folder, which `inbox list` leaves out; check `inbox list --spam` when an expected email (a signup code, an invoice) is missing, and move real mail back with `inbox not-spam <id>`. Use `--sent-to <address>` to see one address, such as `admin@acme.com`
 - when a conversation has a `recipientAddress` ("Sent to"), reply from the sender profile whose email equals that address if one exists (`sender-profiles list`, then `--sender-profile-id`)
 - MCP equivalents are `list_conversations`, `get_conversation`, `reply_to_conversation`, `update_conversation_status`, `bulk_update_conversation_status` (up to 100 `conversationIds`), `bulk_update_conversation_spam`, `list_conversation_recipients`, and `mark_conversation_read`
@@ -808,6 +809,27 @@ Guidance:
 - `remove` stops all mail to the domain, including replies to emails already sent, and clears a branded inbox address on it; confirm with the user first
 - subscribe a webhook to the opt-in `email.received` event to hear about new mail to inbox addresses and receiving domains (not replies, not spam)
 - MCP equivalents are `list_receiving_domains`, `add_receiving_domain`, `get_receiving_domain`, `verify_receiving_domain`, and `remove_receiving_domain`
+
+## "Trigger emails from store visits (geofences)"
+
+Use:
+
+```bash
+sequenzy geofences import stores.csv
+sequenzy geofences create --name "Soho store" --lat 51.5136 --lng -0.1365 --radius 200 --dwell 600 --group stores --external-id store-0042
+sequenzy geofences list --group stores
+sequenzy geofences update geo_123 --pause
+```
+
+Guidance:
+
+- geofences only produce events once the app uses a Sequenzy mobile SDK with geofencing enabled, the user is signed in (identified) and has granted location access; confirm that before promising results
+- the app adds the geofencing add-on of its SDK (`SequenzyGeofences` on iOS, `com.sequenzy:sequenzy-android-geofences`, `@sequenzy/react-native-geofences` Expo module, `sequenzy_flutter_geofences`), calls `start()` after configure, then `requestAuthorization()` and `enable()` once the user agreed; it needs "Always" location access with precise location
+- import a CSV or GeoJSON of locations with an external ID per row so re-imports update instead of duplicating; keep radii at 200 m or more
+- to start a sequence on a visit, use an event trigger on `app.geofence_entered` (or `app.geofence_dwelled` for "stayed 10 minutes", which needs `--dwell`) with a property filter `geofenceGroup equals stores` or `geofenceId one_of [...]`
+- to target or exclude visitors, add a `geofence` segment filter such as `entered:group=stores:30d` (is) or `entered:any:30d` with `is_not` for "has not visited in 30 days"
+- events carry `geofenceId`, `geofenceName`, `geofenceGroup` and `geofenceExternalId`, never coordinates; repeats inside the geofence cooldown (default 1 hour) are ignored
+- MCP equivalents are `list_geofences`, `get_geofence`, `create_geofence`, `update_geofence`, `delete_geofence`, and `import_geofences` (standard MCP only)
 
 ## "Manage outbound webhooks"
 
@@ -868,7 +890,7 @@ Guidance:
 
 ## Manage B2B accounts
 
-For organizations or workspaces that group contacts, use the `accounts` commands. Start with `sequenzy accounts list --search <text>` or `sequenzy accounts get <externalId>`, then use `upsert` and the member commands to maintain roles. Use `accounts event` for account timeline events; choose `--recipients owners|admins|all|none` and use a stable `--event-id` for safe retries. The dashboard calls accounts Organizations, and `sequenzy organizations` is the same command. Organization attributes are exposed to segments, sequence conditions and email templates under `organization.*` (`account.*` is an older alias). These are customer organizations, unrelated to `sequenzy account`. Create the first account with `accounts upsert` before relying on `subscribers event --account` (or `--organization`), which is ignored until the workspace has Accounts on. When the app already sends an organization ID, run `sequenzy accounts detect-org-ids` (MCP `detect_account_organization_ids`), show the user `sequenzy accounts preview-org-id <key>` (MCP `preview_accounts_from_organization_id`), and only after they confirm run `sequenzy accounts create-from-org-id <key>` (MCP `create_accounts_from_organization_id`), then check it with `org-id-job` (MCP `get_account_organization_id_job`). When the workspace has no organization IDs to sync, run `sequenzy accounts suggestions` (MCP `list_account_suggestions`) to find work email domains that several contacts share, show the list to the user, and accept only the domains they confirm with `sequenzy accounts accept-suggestions <domain...>` (MCP `accept_account_suggestions`). Personal and disposable providers, the workspace's own domains and domains already partly grouped under an account are never suggested; contacts already in an account stay where they are. Bulk-created accounts start with every contact as a member, so account events sent to owners or admins reach nobody; find them with `sequenzy accounts list --without-event-recipients` (MCP `list_accounts` with `withoutEventRecipients: true`) and set roles with `accounts add-member <externalId> --email <email> --role owner|admin`. In sequences started by account events, use `{{event.organization.*}}` merge tags (the organization the event was sent for; `{{organization.*}}` is the contact's primary organization; the `account` spellings still work). Matching-field enrollment on `organization.externalId` (or `account.externalId`) means one run per organization at a time: only the first member the event reaches enrolls, so do not use it for alerts every admin should get.
+For organizations or workspaces that group contacts, use the `accounts` commands. Start with `sequenzy accounts list --search <text>` or `sequenzy accounts get <externalId>`, then use `upsert` and the member commands to maintain roles. Use `accounts event` for account timeline events; choose `--recipients owners|admins|all|none` and pass a stable `--event-id` for safe retries. The dashboard calls accounts Organizations, and `sequenzy organizations` is the same command. Organization attributes are exposed to segments, sequence conditions and email templates under `organization.*` (`account.*` is an older alias). These are customer organizations, unrelated to `sequenzy account`. Create the first account with `accounts upsert` before relying on `subscribers event --account` (or `--organization`), which is ignored until the workspace has Accounts on. When the app already sends an organization ID, run `sequenzy accounts detect-org-ids` (MCP `detect_account_organization_ids`), show the user `sequenzy accounts preview-org-id <key>` (MCP `preview_accounts_from_organization_id`), and only after they confirm run `sequenzy accounts create-from-org-id <key>` (MCP `create_accounts_from_organization_id`), then check it with `org-id-job` (MCP `get_account_organization_id_job`). When the workspace has no organization IDs to sync, run `sequenzy accounts suggestions` (MCP `list_account_suggestions`) to find work email domains that several contacts share, show the list to the user, and accept only the domains they confirm with `sequenzy accounts accept-suggestions <domain...>` (MCP `accept_account_suggestions`). Personal and disposable providers, the workspace's own domains and domains already partly grouped under an account are never suggested; contacts already in an account stay where they are. Bulk-created accounts start with every contact as a member, so account events sent to owners or admins reach nobody; find them with `sequenzy accounts list --without-event-recipients` (MCP `list_accounts` with `withoutEventRecipients: true`) and set roles with `accounts add-member <externalId> --email <email> --role owner|admin`. In sequences started by account events, use `{{event.organization.*}}` merge tags (the organization the event was sent for; `{{organization.*}}` is the contact's primary organization; the `account` spellings still work). Matching-field enrollment on `organization.externalId` (or `account.externalId`) means one run per organization at a time: only the first member the event reaches enrolls, so do not use it for alerts every admin should get.
 
 ## design.md
 
@@ -880,19 +902,19 @@ The API contract is GET/PUT `/api/v1/design-md`. Reads need `account:read`; save
 
 ## Saved AI email style
 
-When asked to reuse an email's look for future AI generation, use `sequenzy email-ai-style get --json` (MCP `get_email_ai_style`) first. Save from the underlying email ID with `sequenzy email-ai-style save EMAIL_ID --if-unset` only when both style and revision are absent. For replacement, use `--expected-style-id REVISION`; MCP `save_email_ai_style` uses `emailId` and `expectedStyleId` (null only on initial save). Clear with `sequenzy email-ai-style clear --expected-style-id REVISION` or MCP `clear_email_ai_style`.
+When asked to reuse an email's look for future AI generation, use `sequenzy email-ai-style get --json` (MCP `get_email_ai_style`) first. Save from the underlying email ID with `sequenzy email-ai-style save EMAIL_ID --if-unset` only when both style and revision are absent. For replacement, pass `--expected-style-id REVISION`; MCP `save_email_ai_style` uses `emailId` and `expectedStyleId` (null only on initial save). Clear with `sequenzy email-ai-style clear --expected-style-id REVISION` or MCP `clear_email_ai_style`.
 
 The API contract is GET/PUT/DELETE `/api/v1/email-ai-style`. Reads require `emails:read`, writes `emails:write`. Marketers can capture marketing sources, while transactional sources stay protected. Personal keys can use `--company` or MCP `companyId`. These commands manage generation defaults; they never edit or send the source email.
 
-By default save snapshots the stored email's appearance, using its theme/font overrides before company defaults. For an unsaved design, use `--canvas-file ./canvas.json` or MCP `canvas`, containing all of `blocks`, `theme`, `fontFamily`, `emailPreset`. The API uses the editor's validation. Blocks may not exceed 500 or 500,000 serialized characters; provide real content rather than footer/logo scaffolding. The snapshot stores appearance, not source copy or links. Source edits or deletion do not affect it.
+By default save snapshots the stored email's appearance, using its theme/font overrides before company defaults. For an unsaved design, pass `--canvas-file ./canvas.json` or MCP `canvas`, containing all of `blocks`, `theme`, `fontFamily`, `emailPreset`. The API uses the editor's validation. Blocks may not exceed 500 or 500,000 serialized characters; provide real content rather than footer/logo scaffolding. The snapshot stores appearance, not source copy or links. Source edits or deletion do not affect it.
 
-Saving also detects layout habits in the source, such as "Dotted divider above and below every button" or "Open with a video", and keeps all of them by default. Review `style.layout.rules` in the save or get response; each rule has a stable `id` such as `around|button|divider:dots`. To keep a subset, save again with `--layout-rules "id1,id2"` (MCP `layoutRuleIds`) and the new revision; `--without-layout-rules` (MCP `layoutRuleIds: []`) keeps appearance only. Send the user's design guidance with `--notes` (MCP `notes`, 500 characters max); notes are design guidance, never email content. Generation follows kept habits and inserts the captured dividers or spacers around matching blocks; habits that need content, such as an opening video, are guidance only.
+Saving also detects layout habits in the source, such as "Dotted divider above and below every button" or "Open with a video", and keeps all of them by default. Review `style.layout.rules` in the save or get response; each rule has a stable `id` such as `around|button|divider:dots`. To keep a subset, save again with `--layout-rules "id1,id2"` (MCP `layoutRuleIds`) and the new revision; `--without-layout-rules` (MCP `layoutRuleIds: []`) keeps appearance only. Pass the user's design guidance with `--notes` (MCP `notes`, 500 characters max); notes are design guidance, never email content. Generation follows kept habits and inserts the captured dividers or spacers around matching blocks; habits that need content, such as an opening video, are guidance only.
 
 After a 409 conflict, report that the saved default changed, fetch the new state and review it before another write. Never automatically replace expectedStyleId with a fresh revision just to force the write. An unsupported snapshot returns style=null with a nonnull revisionId; use that revision for replacement/clear, not an initial-save null. Explicit style requests and plain-text choices still override the default when generating an email.
 
 ## MCP effect disclosures
 
-The OpenAI directory uses `https://api.sequenzy.com/v1/mcp/openai`. Tool hints cover every supported mode: irreversible messages and automation-triggering operations are destructive and open-world; replacement setters are destructive even when a user can restore an old value. Edits to email content that can be live in a sequence, A/B test or transactional send, or shown on a public share link, are destructive and open-world. Public forms, popups, share links, hosted uploads, provider changes and tools that fetch URLs or call outside services (link checks, AI drafts that can read URLs in a prompt or goal, gallery ranking) are open-world, as are changes that decide which contacts running sequences reach (applying or removing tags on contacts, list membership, segment rules, accounts, sync rules, integration list targeting, frequency caps), and changes to live email content, sender identity or public pages. A newly created private draft or additive internal note remains non-destructive. These annotations describe effects; they do not expand the authenticated user's permissions.
+The OpenAI directory uses `https://api.sequenzy.com/v1/mcp/openai`. Meta's Muse uses `https://api.sequenzy.com/v1/mcp/muse`, a smaller subset of about 70 everyday tools with the same names and inputs; for A/B tests, sequence graph edits, integrations, landing pages and other work outside that list, point the user to `https://api.sequenzy.com/v1/mcp` or the dashboard. Tool hints cover every supported mode: irreversible messages and automation-triggering operations are destructive and open-world; replacement setters are destructive even when a user can restore an old value. Edits to email content that can be live in a sequence, A/B test or transactional send, or shown on a public share link, are destructive and open-world. Public forms, popups, share links, hosted uploads, provider changes and tools that fetch URLs or call outside services (link checks, AI drafts that can read URLs in a prompt or goal, gallery ranking) are open-world, as are changes that decide which contacts running sequences reach (applying or removing tags on contacts, list membership, segment rules, accounts, sync rules, integration list targeting, frequency caps), and changes to live email content, sender identity or public pages. A newly created private draft or additive internal note remains non-destructive. These annotations describe effects; they do not expand the authenticated user's permissions.
 
 Send `submit_feedback` only when the user explicitly asks. Tell them the message reaches the Sequenzy team through Telegram and automatically includes their company name/ID and account email for attribution. Keep the supplied feedback generalized and exclude subscriber/account data, credentials and raw diagnostic payloads. `submit_feedback` is not available on the OpenAI surface.
 
@@ -968,3 +990,14 @@ permissions can read (`conversations:read` for replies, `analytics:read` for
 bounces, complaints and polls, `subscribers:read`, `campaigns:read` or
 `sequences:read` for the rest). The CLI and the local stdio MCP server do not
 offer events; for a permanent integration, use outbound webhooks instead.
+
+## Set Up A Mobile App
+
+For an iOS or Android app (usually with RevenueCat, Superwall or Adapty):
+
+1. `sequenzy companies get <id>`: check `websiteType`. If it is not `mobile_app`, ask the user, then `sequenzy companies update <id> --category mobile_app` (MCP `update_company` `websiteType`).
+2. Push first: `sequenzy push` settings for APNs (iOS) and FCM (Android), and install the mobile SDK so devices register. Without push, journeys still reach users by email and in-app.
+3. Connect the subscription platform: `sequenzy integrations connect revenuecat|superwall|adapty`.
+4. `sequenzy sequences templates --category mobile_app`, then `sequenzy sequences create-from-template mobile-trial-conversion` (and billing recovery, cancellation save, win-back as needed). Review the push and in-app copy with `sequenzy sequences get <id>`, then enable.
+5. For the paywall journey, the app must send `paywall_viewed` (with Superwall, forward `paywallOpen`); for the lapsed-user journey, the SDK must track screens (`app.screen_viewed`).
+
