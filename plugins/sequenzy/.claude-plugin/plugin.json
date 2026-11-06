@@ -2,7 +2,7 @@
   "name": "sequenzy",
   "displayName": "Sequenzy",
   "description": "Run Sequenzy email marketing from Claude: subscribers, segments, campaigns, sequences, templates, transactional email and delivery stats.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": {
     "name": "Sequenzy",
     "email": "hello@sequenzy.com",
@@ -11,6 +11,7 @@
   "homepage": "https://sequenzy.com",
   "repository": "https://github.com/Sequenzy/skills",
   "license": "MIT",
+  "icon": "./assets/icon.png",
   "privacyPolicyUrl": "https://sequenzy.com/privacy",
   "termsOfServiceUrl": "https://sequenzy.com/terms",
   "supportUrl": "https://sequenzy.com/contact",
