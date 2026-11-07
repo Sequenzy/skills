@@ -903,7 +903,8 @@ sequenzy sequences create lapsed --trigger segment_exited --segment-id seg_activ
 sequenzy sequences update seq_123 --steps-file ./sequence-updates.json
 sequenzy sequences update seq_123 --branch-file ./branch.json
 sequenzy sequences render seq_123 --out preview.html
-sequenzy sequences test seq_123 --node-id node_email_2 --to you@example.com
+sequenzy sequences test seq_123 --node node_email_2 --to you@example.com
+sequenzy sequences test seq_123 --node node_email_2 --to you@example.com --attrs-json '{"plan":"pro"}'
 sequenzy sequences enable seq_123
 sequenzy sequences disable seq_123
 sequenzy sequences duplicate seq_123 --name "Onboarding v2"
@@ -954,7 +955,7 @@ Behavior:
 - `sequences update`: `PUT /api/v1/sequences/:id`
 - `sequences check <id> --node <nodeId>`: `POST /api/v1/sequences/:sequenceId/nodes/:nodeId/check`; same checks and flags as `campaigns check`, plus `--variant` for A/B nodes. Run it for each email step before activating
 - `sequences render`: `GET /api/v1/sequences/:sequenceId/nodes/:nodeId/render`; same personalization and output flags as `campaigns render`, plus `--variant` for A/B nodes
-- `sequences test --node-id <id> --to <email>` sends only the selected saved email step; it does not enable the sequence or enroll subscribers - use `sequences get` first to find the email step nodeId (MCP: `send_sequence_test_email`)
+- `sequences test --node <id> --to <email>` sends only the selected saved email step; it does not enable the sequence or enroll subscribers - use `sequences get` first to find the email step nodeId. `--attrs-json '{...}'` / repeatable `--attr key=value` render the test as a contact with those custom attributes (merge tags and block conditions) without changing any contact, so reviewers see each version (MCP: `send_sequence_test_email` with `customAttributes`)
 - `sequences enable`: `POST /api/v1/sequences/:id/enable`
 - `sequences disable`: `POST /api/v1/sequences/:id/disable`
 - `sequences duplicate`: `POST /api/v1/sequences/:id/duplicate`; email templates, graph topology, and sequence A/B tests are copied independently (MCP: `duplicate_sequence`)

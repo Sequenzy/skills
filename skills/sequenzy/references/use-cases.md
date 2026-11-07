@@ -712,11 +712,39 @@ Guidance:
 - rewards cannot be combined with a success redirect or a floating bar; a cover image needs an https URL on a host that allows CORS
 - MCP flows use `create_popup` with `template: "scratch-to-reveal"` and `reward`, then `update_popup` and `get_popup_embed`
 
+## "Build lifecycle flows on tags, not events"
+
+For customer lifecycle state, trigger on the tag rather than the `saas.*` event that sets it:
+
+| Moment | Tag trigger | Event it replaces |
+| --- | --- | --- |
+| Became a paying customer | `customer` | `saas.purchase` |
+| Started a trial | `trial` | `saas.trial_started` |
+| Payment failed | `past-due` | `saas.payment_failed` |
+| Cancelled (paid until period end) | `cancelled` | `saas.cancelled` |
+| Churned (subscription ended) | `churned` | `saas.churn` |
+| Refunded | `refunded` | `saas.refund` |
+| Left checkout without paying | `visited-payment-page` | `saas.checkout_expired` |
+
+```bash
+sequenzy sync-rules get
+sequenzy sequences create dunning --trigger tag_added --tag-name past-due --enrollment-mode unlimited --steps-file ./steps.json
+```
+
+Guidance:
+
+- the tag is the contact's current state: the flow also reaches contacts imported or tagged by hand, and removing the tag (they paid, they came back) ends the run, which is the default stop for a `tag_added` trigger
+- these tags start sequences only when the company's sync rules add them. Check `sequenzy sync-rules get` (MCP `get_sync_rules`) first; if the company has no rules, ask the user before opting into the preset with `sequenzy sync-rules update --reset` (MCP `update_sync_rules` with `null`), since it changes tagging, or use the event
+- tag-triggered emails have no `{{event.*}}` data; use contact attributes such as `{{billingPlanName}}` or `{{mrr}}`, and link to the product's billing page rather than an invoice
+- keep `event_received` when an email needs that occurrence's data (the failed invoice's `{{event.hostedInvoiceUrl}}`, the order's line items) or must run once per occurrence, as in the next recipe
+- `unlimited` enrollment re-enrolls a contact whose tag returns later (a second failed payment months on); `one_time` suits flows that should only ever run once, like customer onboarding
+- MCP flows use `create_sequence` with `trigger: "tag_added"` and `tagName`
+
 ## "Recover failed Stripe payments once per invoice"
 
 Native Stripe `saas.payment_failed` events and subscription-invoice `saas.purchase` events carry `invoiceId`, `subscriptionId`, `attemptCount`, `billingReason` and `hostedInvoiceUrl`. `saas.payment_failed` also carries `amountDue` (smallest currency unit), `amountDueFormatted` (such as `$49.00`), `currency`, `nextPaymentAttempt` and `willRetry`.
 
-Send the per-invoice setup explicitly; nothing is applied automatically:
+Use this event-based setup only when each email needs the failed invoice itself; for one recovery flow per contact, trigger on the `past-due` tag (previous recipe). Send the per-invoice setup explicitly; nothing is applied automatically:
 
 ```bash
 sequenzy sequences create invoice-recovery \
