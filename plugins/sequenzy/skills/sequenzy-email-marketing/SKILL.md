@@ -15,7 +15,7 @@ Use this as the default skill for Sequenzy email-marketing/product operations: s
 2. Treat the MCP server's tool list (tool names, descriptions and input schemas) as the source of truth for MCP tool names, arguments, and validation.
 3. Treat the [API reference](https://docs.sequenzy.com/api-reference) as the source of truth for request and response shapes.
 4. Do not promise support for commands or tools that appear only in docs. Confirm them in `--help` or the MCP tool list, and report runtime "not implemented" or "unsupported" errors as limitations.
-5. Prefer `sequenzy login` for interactive auth and `SEQUENZY_API_KEY` for automation.
+5. Prefer `sequenzy login` for interactive auth.
 6. Prefer inspection before mutation whenever the workflow allows it.
 
 Create a draft directly from a complete selected group with `campaigns from-audience --selection-json` or `--selection-file` (MCP `create_campaign_for_audience`). Preserve every filter and all selected IDs; membership is frozen, while send eligibility stays live. Review selectedCount and eligibleCount before editing and scheduling.
@@ -78,7 +78,7 @@ Read [references/use-cases.md](references/use-cases.md) before executing anythin
 - Shopify automation settings with `shopify settings get|update` (browse abandonment, cart abandonment, price drop)
 - SMS operations with `sms settings`, `sms update` (label, brand prefix, link shortening), `sms send-test`, SMS sequence steps, and `generate sms`
 - push notifications with `push settings`, `push web`, `push ios set` / `push android set`, `push devices`, `push send-test`, `push campaigns`, and `type: "push"` sequence steps for web, iOS, and Android
-- moving a push audience from OneSignal, Braze, Customer.io or a CSV with `push imports preflight|start|get|list|resume|cancel` (MCP `get_push_import_preflight`, `create_push_import`, `add_push_import_rows`, `start_push_import`, `get_push_import`, `list_push_imports`, `cancel_push_import`): show the preflight warnings before starting, because imported APNs/FCM tokens only work with the same bundle ID, Apple team and Firebase project; web push is never imported; opted-out devices stay unsubscribed; contacts are matched by external ID then email and created quietly for opted-in devices (push-only, with no email or phone, when the device has only an external ID). See [push imports](references/command-reference.md#push-imports)
+- moving a push audience from OneSignal, Braze, Customer.io or a CSV with `push imports preflight|start|get|list|resume|cancel` (MCP `get_push_import_preflight`, `create_push_import`, `add_push_import_rows`, `start_push_import`, `get_push_import`, `list_push_imports`, `cancel_push_import`): show the preflight warnings before starting, because imported APNs/FCM tokens only work with the same bundle ID, Apple team and Firebase project; web push is never imported; opted-out devices stay unsubscribed; contacts are matched by external ID then email and created quietly for opted-in devices (push-only, with no email or phone, when the device has only an external ID). See [push imports](https://github.com/Sequenzy/skills/blob/main/skills/sequenzy-email-marketing/references/command-reference.md#push-imports)
 - iOS Live Activities with `push live-activities list|start|update|end` (MCP `list_live_activities`, `start_live_activity`, `update_live_activity`, `end_live_activity`): start remotely on one contact's iPhones (iOS 17.2+, alert required, attributes must include every field of the app's struct), then update or end every running copy by the same contact and your `activityId` (end needs the final content state); `tokenCount: 0` means nothing was sent. Confirm with the user before starting one, since a repeated start shows a second activity
 - in-app messages and content cards with `type: "in_app"` sequence steps (modal, banner, fullscreen, card, or `html`: custom HTML/CSS/JS such as a Survicate survey or Braze custom HTML, shown sandboxed by the SDKs with a JS bridge, Braze Liquid converted) that the customer's app (or the Sequenzy SDKs) fetches and renders, plus `in-app list`, `in-app event`, `in-app delete`, `in-app stats`, `in-app templates` (ready-made step configs), `in-app write` (AI copy from a brief), and `in-app html validate|set` (check a custom HTML document, put it on a step); a button with `action: "request_push_permission"` (template `push-primer`) is a push primer that asks for notification permission, with results in `in-app stats`, the app opt-in rate in `push settings`, and the contact's `pushPermission` attribute for segments
 - mobile apps: the iOS, Android, React Native and Flutter SDKs identify contacts, `track` custom events, register push tokens and show in-app messages and cards with a publishable key restricted by `web-tracking create|update --app-ids com.example.app` (MCP `allowedAppIds` on `create_web_tracking_key` / `update_web_tracking_key`) plus an identity token the app's backend mints with `POST /api/v1/web-tracking-identities`; never put a secret key in an app. App events cannot use built-in names such as `saas.purchase`
@@ -192,21 +192,21 @@ Marketers can manage marketing content, subscribers, campaigns and sequences, in
 
 ## Execution Pattern
 
-1. Check auth first with `sequenzy whoami` or by verifying `SEQUENZY_API_KEY` is set. If MCP tools return `MCP_AUTH_REQUIRED`, the server has no key: relay the signup link and setup steps from `howToFix` to the user instead of retrying.
+1. Check auth first with `sequenzy whoami`. If MCP tools return `MCP_AUTH_REQUIRED`, the server has no key: relay the signup link and setup steps from `howToFix` to the user instead of retrying.
 2. Pick the narrowest command that matches the use case.
 3. Validate IDs, recipient email, subject, template, or content input before issuing a mutation.
 4. Surface CLI limitations directly instead of inventing a workaround.
 5. If the workflow is unsupported in the CLI, say whether the next-best path is the Sequenzy dashboard or direct API use. Submit feedback only if the user explicitly requests it, after explaining that it goes to the Sequenzy team.
 6. When you create, inspect, or schedule a campaign, sequence, template, or company and the user may want to review/edit it, surface the dashboard URL from `url`, `previewUrl`, or `appUrls` in the tool/CLI output. If needed, generate it with `sequenzy urls` or MCP `get_app_urls`.
 7. Destructive commands (`delete`, `delete-variant`, `cancel-invitation`, and similar) prompt for confirmation. Pass `--yes` (or `-y`) to skip the prompt; `--yes` is required when stdin is not a TTY, which covers most agent and CI runs.
-8. Treat API keys, webhook signing secrets, and other one-time credentials as sensitive output. Do not paste raw secret values into chat, logs, tickets, or public transcripts. Capture them to a user-approved secure destination such as a password manager, secret store, encrypted file, or local `.env` file outside version control; otherwise redact the value and report only where it was saved plus a short fingerprint.
+8. Treat API keys, webhook signing secrets, and other one-time credentials as sensitive output. Do not paste raw secret values into chat, logs, tickets, or public transcripts. Capture them to a user-approved secure destination such as a password manager, secret store, encrypted file; otherwise redact the value and report only where it was saved plus a short fingerprint.
 9. Call out implementation caveats that matter operationally, such as `whoami` using cached local auth state, sequence creation supporting both `--goal` and explicit step modes, explicit discount steps requiring Stripe before activation, generated sequences being capped at 10 emails, `campaigns test` queuing a real email rather than confirming delivery, and conditional email content requiring block JSON rather than raw HTML.
 
 `campaigns test` requires a verified sending domain and returns `emailSendId` and `jobId`. Inspect delivery with `sequenzy email-sends get EMAIL_SEND_ID`. Use `websites check` to read stored status and `websites verify` to run a fresh DNS check; DNS verification and readiness to send are separate outcomes.
 
 ## Dashboard URLs
 
-Use `SEQUENZY_APP_URL` as the dashboard base when it is set; otherwise default to `https://sequenzy.com`.
+Use `https://sequenzy.com` as the dashboard base.
 
 Prefer actual URLs returned by the CLI/MCP result:
 
@@ -223,14 +223,14 @@ Useful settings tabs include `domain`, `tracking`, `localization`, `integrations
 
 ## References
 
-- [references/command-reference.md](references/command-reference.md): exact command shapes, env vars, behavior, and caveats.
+- [references/command-reference.md](https://github.com/Sequenzy/skills/blob/main/skills/sequenzy-email-marketing/references/command-reference.md): exact command shapes, env vars, behavior, and caveats.
 - [references/use-cases.md](references/use-cases.md): decision trees and examples for the most common agent tasks.
 
 For default footer changes, preserve the requested scope and use the preview/token
-workflow in [the command reference](references/command-reference.md#apply-a-default-footer-to-existing-emails).
+workflow in [the command reference](https://github.com/Sequenzy/skills/blob/main/skills/sequenzy-email-marketing/references/command-reference.md#apply-a-default-footer-to-existing-emails).
 Render before/after HTML when a visual check would help.
 
-For event-driven sequence testing, use the live sequence test workflow in `references/command-reference.md`. Supply cart IDs and arrays as event properties, inspect the returned run before retrying, and account for real action side effects.
+For event-driven sequence testing, use the live sequence test workflow in [references/command-reference.md](https://github.com/Sequenzy/skills/blob/main/skills/sequenzy-email-marketing/references/command-reference.md). Supply cart IDs and arrays as event properties, inspect the returned run before retrying, and account for real action side effects.
 
 ### Reuse received event data for sequence tests
 
@@ -260,7 +260,7 @@ error; writes are never retried automatically.
 
 For sequence review, keep the same sample contact across email steps and A/B variants. Use simulation to check readiness and the existing activation and enrollment commands when requested. See [use cases](references/use-cases.md).
 
-Campaign A/B progress, live audience/time changes, early finish and recovery are described in [the command reference](references/command-reference.md#running-campaign-ab-controls).
+Campaign A/B progress, live audience/time changes, early finish and recovery are described in [the command reference](https://github.com/Sequenzy/skills/blob/main/skills/sequenzy-email-marketing/references/command-reference.md#running-campaign-ab-controls).
 
 ## Transactional labels
 
