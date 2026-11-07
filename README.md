@@ -77,6 +77,27 @@ codex plugin marketplace add Sequenzy/skills
 codex plugin add sequenzy@sequenzy
 ```
 
+Without a browser, connect the server directly with a personal API key (it starts with `seq_user_`, from **Account Settings → API Keys** in Sequenzy) instead of the plugin:
+
+```bash
+export SEQUENZY_API_KEY=seq_user_...
+codex mcp add sequenzy --url https://api.sequenzy.com/v1/mcp --bearer-token-env-var SEQUENZY_API_KEY
+```
+
+## Hermes Agent plugin
+
+The same folder is in the Hermes Agent plugin catalog: `hermes plugins install sequenzy`, then `hermes plugins enable sequenzy`. On a server or another machine without a browser, skip the plugin and add the server to `~/.hermes/config.yaml` with a personal API key:
+
+```yaml
+mcp_servers:
+  sequenzy:
+    url: "https://api.sequenzy.com/v1/mcp"
+    headers:
+      Authorization: "Bearer ${SEQUENZY_API_KEY}"
+```
+
+Put `SEQUENZY_API_KEY=...` in your Hermes environment file. The key works like a password for your Sequenzy account, so don't paste it into a chat.
+
 ## Kiro power
 
 The same folder is a Kiro power. In Kiro, open **Powers**, select **Add Custom Power**, then **Import power from GitHub**, and enter `https://github.com/Sequenzy/skills/tree/main/plugins/sequenzy`.

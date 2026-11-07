@@ -9,7 +9,7 @@
 
 The plugin has no hooks or scripts. In Claude it installs nothing and runs no local server; in Hermes Agent it runs the `mcp-remote` sign-in bridge described below. Apart from its own sign-in token, it reads no credentials from your machine: the connector signs in with OAuth.
 
-The skill's reference files also document the optional [Sequenzy CLI](https://docs.sequenzy.com) for people who run it themselves in a terminal. Those examples mention CLI environment variables such as `SEQUENZY_API_KEY`, which the CLI reads on your machine when you run it. The plugin does not use them.
+The skill's reference files also document the optional [Sequenzy CLI](https://docs.sequenzy.com) for people who run it themselves in a terminal. The plugin does not run the CLI and does not ask for an API key.
 
 ## Install in Hermes Agent
 
@@ -32,17 +32,7 @@ The Hermes package is `plugin.json`, `mcp.json` and the skill in `skills/sequenz
 - Emails you send or schedule go to real recipients and count toward your Sequenzy plan. AI email generation uses your plan's AI allowance.
 - The package sends no telemetry.
 
-On a server or another machine without a browser, skip the plugin and add the server to `~/.hermes/config.yaml` with a personal API key (it starts with `seq_user_`) from **Account Settings → API Keys** in Sequenzy:
-
-```yaml
-mcp_servers:
-  sequenzy:
-    url: "https://api.sequenzy.com/v1/mcp"
-    headers:
-      Authorization: "Bearer ${SEQUENZY_API_KEY}"
-```
-
-Put `SEQUENZY_API_KEY=...` in your Hermes environment file. The key works like a password for your Sequenzy account, so don't paste it into a chat.
+On a server or another machine without a browser, connect the server with a personal API key instead of the plugin; see [MCP setup](https://docs.sequenzy.com/concepts/mcp).
 
 ## Install in Codex
 
@@ -57,12 +47,7 @@ In the ChatGPT desktop app, the plugin then shows up under the `Sequenzy` source
 
 Codex reads the same portable package as Hermes Agent: `plugin.json`, `mcp.json` and the skill in `skills/sequenzy-email-marketing/`. `.codex-plugin/plugin.json` only adds the listing details Codex shows (name, description, icon, links and starter prompts). The connector runs the pinned `mcp-remote@0.15.2` sign-in bridge, so the first time Codex uses it your browser opens the Sequenzy sign-in page. The bridge registers itself as "Hermes Agent (Sequenzy)", which is the name you see on the approval page. Catalogs that copy only `.codex-plugin/plugin.json` and the files it names (`.mcp.json`, `skills/`, `assets/`) get Codex's built-in connection to the same server instead of the bridge; sign in when Codex asks, or run `codex mcp login sequenzy`. You can limit or turn off the server's tools in `~/.codex/config.toml` under `[plugins."sequenzy@sequenzy".mcp_servers.sequenzy]`.
 
-Without a browser, connect the server directly with a personal API key (it starts with `seq_user_`) instead of the plugin:
-
-```bash
-export SEQUENZY_API_KEY=seq_user_...
-codex mcp add sequenzy --url https://api.sequenzy.com/v1/mcp --bearer-token-env-var SEQUENZY_API_KEY
-```
+Without a browser, connect the server with a personal API key instead of the plugin; see [MCP setup](https://docs.sequenzy.com/concepts/mcp).
 
 ## Install in Kiro
 
