@@ -16,8 +16,6 @@ Then verify:
 sequenzy whoami
 ```
 
-Prefer `SEQUENZY_API_KEY` instead when the task is fully non-interactive or running in CI.
-
 ## "Check whether I am authenticated"
 
 Use:
@@ -29,7 +27,7 @@ sequenzy whoami
 Interpretation:
 
 - success means a local API key is available
-- failure means the agent should ask for login or a `SEQUENZY_API_KEY`
+- failure means the agent should ask for login
 
 Remember that this is local-state validation, not a fresh server-side account lookup.
 
@@ -659,7 +657,7 @@ sequenzy websites guide --framework nextjs --use-case transactional
 
 Guidance:
 
-- save newly created API credentials immediately to a user-approved secure destination such as a password manager, secret store, encrypted file, or local `.env` file outside version control. Do not paste credential material into chat, logs, tickets, or public transcripts; report only the storage location and a short fingerprint.
+- save newly created API credentials immediately to a user-approved secure destination such as a password manager, secret store, encrypted file. Do not paste credential material into chat, logs, tickets, or public transcripts; report only the storage location and a short fingerprint.
 - use `websites check` for stored verification/readiness details and `websites verify` to run a fresh DNS check; DNS verification and readiness to send are separate outcomes
 - when `websites check` shows `DNS upgrade: available`, `websites upgrade-dns` moves the domain onto the current records in place (MCP `upgrade_sending_domain_dns`): the user adds the printed CNAMEs next to the current records, the domain keeps sending on its current records and switches by itself about an hour after the required ones are visible on public DNS (sending is normally not interrupted; if that isn't possible for a domain, Amazon SES sends can be held a few minutes), and the old records are deleted 8 days after the switch; an older SES-only domain needs a working DMARC record before it can start
 - use `websites guide` for integration code snippets rather than inventing framework examples
@@ -875,7 +873,7 @@ sequenzy webhooks delete wh_123 --yes
 
 Guidance:
 
-- `create` returns one-time signing-secret material; handle it as sensitive output. Save it only to a user-approved secure destination such as a password manager, secret store, encrypted file, or local `.env` file outside version control. Do not paste credential material into chat, logs, tickets, or public transcripts; report only the storage location and a short fingerprint.
+- `create` returns one-time signing-secret material; handle it as sensitive output. Save it only to a user-approved secure destination such as a password manager, secret store, encrypted file. Do not paste credential material into chat, logs, tickets, or public transcripts; report only the storage location and a short fingerprint.
 - pick events from the supported `email.*`, `campaign.*`, `sms.*`, `subscriber.*`, `subscriber_import.*`, `sequence.*`, and `poll.*` types (the full list is in the command reference), or omit `--event` for the default set; `email.received` (new mail to inbox addresses and receiving domains) is opt-in
 - debug delivery problems with `test` (fires a test event), `deliveries` (recent attempts with status codes and errors), and `replay` (re-sends one delivery)
 - use `update --disable`/`--enable` to toggle an endpoint; re-enabling or changing the URL resets the failure circuit breaker
@@ -968,7 +966,7 @@ processing deadline; terminal records last seven days.
 
 ## Refresh existing email footers
 
-Read the current default, edit its blocks, then follow the [footer preview workflow](command-reference.md#apply-a-default-footer-to-existing-emails). Select only the requested categories, inspect skips and rendered samples, and apply the returned token. On a stale preview, review a new preview before retrying.
+Read the current default, edit its blocks, then follow the [footer preview workflow](https://github.com/Sequenzy/skills/blob/main/skills/sequenzy-email-marketing/references/command-reference.md#apply-a-default-footer-to-existing-emails). Select only the requested categories, inspect skips and rendered samples, and apply the returned token. On a stale preview, review a new preview before retrying.
 
 ## Email a group you have already found
 
