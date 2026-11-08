@@ -5,11 +5,11 @@
 ## What the plugin contains
 
 - **Sequenzy MCP connector** (`.mcp.json` for Claude, `mcp.json` for Hermes Agent): the remote server at `https://api.sequenzy.com/v1/mcp`. You sign in with your Sequenzy account through OAuth the first time the agent uses it, and pick the permission level it gets. Every tool is annotated as read-only or as changing data, so the agent can ask for your approval before anything that writes, sends or deletes.
-- **`sequenzy-email-marketing` skill**: instructions that teach the agent the Sequenzy workflows, which tool to use for each task, and the checks to run before sending or deleting anything.
+- **`sequenzy-email-marketing` skill**: instructions that teach the agent the Sequenzy workflows, which connector tool to use for each task, and the checks to run before sending or deleting anything. It works only through the connector.
 
 The plugin has no hooks or scripts. In Claude it installs nothing and runs no local server; in Hermes Agent it runs the `mcp-remote` sign-in bridge described below. Apart from its own sign-in token, it reads no credentials from your machine: the connector signs in with OAuth.
 
-The skill also mentions the optional [Sequenzy CLI](https://docs.sequenzy.com) for people who run it themselves in a terminal; its full command reference is in the [standalone skill](https://github.com/Sequenzy/skills/tree/main/skills/sequenzy-email-marketing), not in this plugin. The plugin does not run the CLI, does not ask for an API key, and reads no environment variables or stored CLI login.
+People who prefer the Sequenzy command-line tool can use the [standalone skill](https://github.com/Sequenzy/skills/tree/main/skills/sequenzy-email-marketing) instead; this plugin doesn't include it. The plugin asks for no key or password and reads nothing from your machine: no environment variables, files or saved logins.
 
 ## Install in Hermes Agent
 
