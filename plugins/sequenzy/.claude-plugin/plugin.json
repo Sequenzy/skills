@@ -2,7 +2,7 @@
   "name": "sequenzy",
   "displayName": "Sequenzy",
   "description": "Run Sequenzy email marketing from Claude: subscribers, segments, campaigns, sequences, templates, transactional email and delivery stats.",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "author": {
     "name": "Sequenzy",
     "email": "hello@sequenzy.com",

@@ -15,7 +15,7 @@ Use this as the default skill for Sequenzy email-marketing/product operations: s
 2. Treat the MCP server's tool list (tool names, descriptions and input schemas) as the source of truth for MCP tool names, arguments, and validation.
 3. Treat the [API reference](https://docs.sequenzy.com/api-reference) as the source of truth for request and response shapes.
 4. Do not promise support for commands or tools that appear only in docs. Confirm them in `--help` or the MCP tool list, and report runtime "not implemented" or "unsupported" errors as limitations.
-5. Prefer `sequenzy login` for interactive auth.
+5. Let the Sequenzy MCP connector sign in through its own OAuth prompt.
 6. Prefer inspection before mutation whenever the workflow allows it.
 
 Create a draft directly from a complete selected group with `campaigns from-audience --selection-json` or `--selection-file` (MCP `create_campaign_for_audience`). Preserve every filter and all selected IDs; membership is frozen, while send eligibility stays live. Review selectedCount and eligibleCount before editing and scheduling.
@@ -26,8 +26,6 @@ For MCP tool effect annotations and feedback attribution, read [MCP effect discl
 
 Read [references/use-cases.md](references/use-cases.md) before executing anything non-trivial. The currently implemented CLI flows are:
 
-- login and logout
-- local auth/session check with `whoami`
 - account inspection with `account`
 - company inspection, creation, or brand/sender-identity updates with `companies list|get|create|update`
 - stats overview or stats by campaign, sequence, or transactional ID, with custom `--start`/`--end` ranges, `--email-type` and `--mailbox-provider` scoping, `--include-bots`, and campaign `clickedLinks` plus poll/NPS `polls` arrays (sequence stats carry the same summaries per email step in `steps[].polls`)
@@ -192,7 +190,7 @@ Marketers can manage marketing content, subscribers, campaigns and sequences, in
 
 ## Execution Pattern
 
-1. Check auth first with `sequenzy whoami`. If MCP tools return `MCP_AUTH_REQUIRED`, the server has no key: relay the signup link and setup steps from `howToFix` to the user instead of retrying.
+1. If MCP tools return `MCP_AUTH_REQUIRED`, the server has no key: relay the signup link and setup steps from `howToFix` to the user instead of retrying.
 2. Pick the narrowest command that matches the use case.
 3. Validate IDs, recipient email, subject, template, or content input before issuing a mutation.
 4. Surface CLI limitations directly instead of inventing a workaround.
@@ -200,7 +198,7 @@ Marketers can manage marketing content, subscribers, campaigns and sequences, in
 6. When you create, inspect, or schedule a campaign, sequence, template, or company and the user may want to review/edit it, surface the dashboard URL from `url`, `previewUrl`, or `appUrls` in the tool/CLI output. If needed, generate it with `sequenzy urls` or MCP `get_app_urls`.
 7. Destructive commands (`delete`, `delete-variant`, `cancel-invitation`, and similar) prompt for confirmation. Pass `--yes` (or `-y`) to skip the prompt; `--yes` is required when stdin is not a TTY, which covers most agent and CI runs.
 8. Treat API keys, webhook signing secrets, and other one-time credentials as sensitive output. Do not paste raw secret values into chat, logs, tickets, or public transcripts. Capture them to a user-approved secure destination such as a password manager, secret store, encrypted file; otherwise redact the value and report only where it was saved plus a short fingerprint.
-9. Call out implementation caveats that matter operationally, such as `whoami` using cached local auth state, sequence creation supporting both `--goal` and explicit step modes, explicit discount steps requiring Stripe before activation, generated sequences being capped at 10 emails, `campaigns test` queuing a real email rather than confirming delivery, and conditional email content requiring block JSON rather than raw HTML.
+9. Call out implementation caveats that matter operationally, such as sequence creation supporting both `--goal` and explicit step modes, explicit discount steps requiring Stripe before activation, generated sequences being capped at 10 emails, `campaigns test` queuing a real email rather than confirming delivery, and conditional email content requiring block JSON rather than raw HTML.
 
 `campaigns test` requires a verified sending domain and returns `emailSendId` and `jobId`. Inspect delivery with `sequenzy email-sends get EMAIL_SEND_ID`. Use `websites check` to read stored status and `websites verify` to run a fresh DNS check; DNS verification and readiness to send are separate outcomes.
 

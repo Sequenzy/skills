@@ -2,35 +2,6 @@
 
 ## Pick The Right Flow
 
-### "Log into Sequenzy on this machine"
-
-Use:
-
-```bash
-sequenzy login
-```
-
-Then verify:
-
-```bash
-sequenzy whoami
-```
-
-## "Check whether I am authenticated"
-
-Use:
-
-```bash
-sequenzy whoami
-```
-
-Interpretation:
-
-- success means a local API key is available
-- failure means the agent should ask for login
-
-Remember that this is local-state validation, not a fresh server-side account lookup.
-
 ## "Show me account or company info"
 
 Use:
