@@ -1029,3 +1029,9 @@ For an iOS or Android app (usually with RevenueCat, Superwall or Adapty):
 4. `sequenzy sequences templates --category mobile_app`, then `sequenzy sequences create-from-template mobile-trial-conversion` (and billing recovery, cancellation save, win-back as needed). Review the push and in-app copy with `sequenzy sequences get <id>`, then enable.
 5. For the paywall journey, the app must send `paywall_viewed` (with Superwall, forward `paywallOpen`); for the lapsed-user journey, the SDK must track screens (`app.screen_viewed`).
 
+## Show in-app content inline in an app (placements)
+
+1. `sequenzy in-app placements create --key home_hero --name "Home hero"` for each slot in the app (home screen hero, checkout upsell).
+2. Add the SDK placement view where the slot belongs: `SequenzyPlacement("home_hero")` (SwiftUI), `SequenzyPlacementView` (UIKit, Android), `<SequenzyPlacement placementId="home_hero" />` (React Native), `SequenzyPlacement(placementId: 'home_hero')` (Flutter), or `<sequenzy-placement placement="home_hero">` with `data-sequenzy-placements` on the web snippet.
+3. Insert an in-app step with `kind: "placement"`, `placement: "home_hero"`, a `priority` (`high`, `medium` or `low`; higher wins when several items target the slot), a `layout` (`card`, `banner` or `hero`) and card content (`title`, `body`, `imageUrl`, a link button and a dismiss button).
+4. Check what a contact sees with `sequenzy in-app placements content --email <email> --placements home_hero`, and results with `sequenzy in-app placements list` (live, shown, clicked).
