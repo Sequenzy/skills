@@ -983,7 +983,7 @@ Behavior:
 Goals and inbound webhooks:
 
 - `sequences goals list|create|update|delete` manage conversion goals on `/api/v1/sequences/:id/goals[/:goalId]`; `create <sequenceId> <name>` and `update` accept `--active`/`--inactive` (MCP: `list_sequence_goals`, `create_sequence_goal`, `update_sequence_goal`, `delete_sequence_goal`)
-- `sequences webhook get|configure|rotate <sequenceId>` manage the sequence's inbound trigger webhook; `configure` accepts `--field-mapping-json/-file` and `--sample-payload-json/-file` (with `--clear-*` variants), and `rotate` replaces the signing secret (MCP: `get_sequence_inbound_webhook`, `configure_sequence_inbound_webhook`, `rotate_sequence_inbound_webhook_secret`)
+- `sequences webhook get|configure|rotate <sequenceId>` manage the sequence's inbound trigger webhook; `configure` accepts `--field-mapping-json/-file` and `--sample-payload-json/-file` (with `--clear-*` variants), and `rotate` replaces the signing secret (MCP: `get_sequence_inbound_webhook`, `configure_sequence_inbound_webhook`, `rotate_sequence_inbound_webhook_secret`). Map paths from the payload the endpoint actually receives (relays such as LiveWire wrap and flatten the source app's format). `mappingCheck` in the output reports `email_not_found` when the mapping finds no email in the last payload: those webhooks are answered 200 but create no subscriber
 
 Caveats:
 
