@@ -212,6 +212,8 @@ sequenzy segments count seg_123
 sequenzy segments create --name "Bought Pro" --stripe-product prod_pro
 sequenzy segments create --name "VIP or Churn Risk" --match any --filter-json '[{"field":"tag","operator":"contains","value":"vip"},{"field":"emailOpened","operator":"is_not","value":"30d"}]'
 sequenzy segments create --name "Active non-paying" --filter-json '{"kind":"group","id":"root","joinOperator":"and","children":[{"kind":"filter","id":"f1","field":"attribute","operator":"gte","value":"last_login_days_ago:0"},{"kind":"group","id":"g1","joinOperator":"or","children":[{"kind":"filter","id":"f2","field":"attribute","operator":"is_empty","value":"plan_end"},{"kind":"filter","id":"f3","field":"attribute","operator":"lt","value":"plan_end:2026-04-21"}]}]}'
+sequenzy segments create --name "UK or Irish SMS" --filter-json '[{"field":"phoneCountry","operator":"is","value":"GB,IE"},{"field":"smsStatus","operator":"is","value":"subscribed"}]'
+sequenzy segments create --name "Bay Area numbers" --filter-json '[{"field":"phone","operator":"starts_with","value":"+1 415"}]'
 sequenzy segments update seg_123 --name "Churn Risk" --join-operator or
 sequenzy segments delete seg_123 --yes
 ```
@@ -232,6 +234,7 @@ Guidance:
 - use Stripe product IDs, not product names
 - use `--filter-json` when the user needs a non-Stripe, mixed, nested, custom event, or saved-segment payload
 - use `--match any` when the segment should match any top-level filter instead of all filters
+- phone filters: `phoneCountry` takes `is`/`is_not` with ISO codes (`GB`, or `US,CA` for any of several); `phone` takes `starts_with`/`not_starts_with` with a country code or longer prefix (`+44`, `+1 415`) and `contains`/`not_contains` with digits, besides `is_not_empty`/`is_empty`; all of them only match contacts that have a phone
 - `segments count` is the quickest way to preview impact before using a segment in a campaign
 
 For MCP-driven workflows, `create_segment` supports the same legacy filter array with `filterJoinOperator: "or"` for match-any segments:

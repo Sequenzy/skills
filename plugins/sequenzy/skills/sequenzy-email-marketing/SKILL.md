@@ -28,6 +28,7 @@ Marketers can manage marketing content, subscribers, campaigns and sequences, in
 - Find people with `search_subscribers` and `get_subscriber`; `get_subscriber_activity` shows what they received and did.
 - Add or update one contact with `add_subscriber` / `update_subscriber`. These fire the automations the user has set up (welcome sequences, tag triggers), so mention that before adding real contacts.
 - For bulk work, use `create_subscriber_import`, `add_subscribers_to_list`, `bulk_add_subscriber_tags` or `start_subscriber_operation`, and report counts and failures from the result.
+- If `get_subscriber_import` returns `listQuality` (`needs_cleaning`), the list has too many addresses that don't exist or look risky and nothing was imported: relay its message and suggest cleaning the list (`listQuality.cleaningUrl`) and importing it again.
 - Build segments with `create_segment`; check the size with `get_segment_count` before using one as an audience.
 - "Why did this person stop getting email?": check `get_subscriber` (status, unsubscribes), `list_recipient_suppressions` (bounces and complaints) and `get_subscriber_activity`. Remove a suppression only when the user confirms the address is valid again.
 

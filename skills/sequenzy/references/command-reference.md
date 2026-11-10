@@ -289,6 +289,7 @@ Behavior:
 - `--enroll-sequences` enrolls matching subscribers (requires the `automations:trigger` scope); `--default-phone-country` and `--sms-consent` handle imported phone numbers
 - `--opt-in-mode default|confirmed|double_opt_in` sets email consent; use `confirmed` only when the contacts already gave verified consent. A repeat double opt-in request for an unconfirmed contact sends a new confirmation only when the last one went out at least 24 hours ago, up to three per address, and never after it unsubscribed or complained; otherwise it returns `optIn.emailQueued: false`, so do not retry to "resend" it sooner
 - imports run asynchronously; poll the returned ID with `subscribers import-status` (`GET /api/v1/subscribers/imports/:importId`). A completed import can still contain failed rows - inspect failed counts and the `--json` reason maps
+- an import whose list has too many addresses that don't exist or look risky gets `listQuality` (`status: needs_cleaning`, `issues`, `message`, `cleaningUrl`). Rows are imported only after the list check (usually under a minute); a list that needs cleaning imports nothing (rows skipped as `list_needs_cleaning`): relay the message and suggest cleaning the list (Bouncer) and importing it again. `listQuality` is null otherwise
 - MCP parity: `create_subscriber_import` and `get_subscriber_import`
 
 ### Notes
