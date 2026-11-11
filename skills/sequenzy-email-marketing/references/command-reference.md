@@ -195,6 +195,7 @@ Behavior:
 - `--external-id <id>` stores a customer-owned subscriber ID that other subscriber commands can address with `--external-id`
 - `--list <ids...>` adds the subscriber to specific lists with `subscribers:write`; `--no-lists` targets none. When both are omitted, a new contact follows workspace default lists and an existing contact keeps its memberships
 - `--skip-sequences` suppresses sequence enrollment for this add
+- the response reports `sequenceTriggersRan`; with a key that lacks `automations:trigger` the contact is still added but no sequence starts, `sequenceTriggersSkippedReason` is `missing_scope`, and human output prints a `Warning:` line on stderr (`subscribers update --tag` reports the same)
 - `--attr key=value` always sends strings; `--attrs-json '{"zip":"02134","seats":5}'` keeps JSON types (numbers, booleans, lists, and strings with leading zeros). When both set a key, `--attr` wins. Check existing names and types first with `subscribers attributes`
 - `--created-at` preserves a contact's real signup date (for migrations) so date-relative segments stay correct; it never moves an existing contact's date later and suppresses sequence enrollment by default. Single-contact creation with a signup date at most one hour old remains eligible for account notifications; older dates and bulk imports do not notify on creation, but double opt-in confirmation can still notify. Preferences, double opt-in and daily caps still apply
 - supports repeated `--tag` values
@@ -319,23 +320,24 @@ Behavior:
 - without `--occurred-at` the event is live and runs the full chain: sync rules, sequence enrollment, waiting steps, and goal conversions
 - with an `--occurred-at` more than an hour in the past the event is recorded as history: stored with its real timestamp and counted by segments, but no sequences enroll and no webhooks fire; the contact's signup date also moves back to when the event occurred (never later). Use it for backfills, never to fake a live event
 - `--event-id` provides an idempotency key
+- a live event from a key without the `automations:trigger` scope is still recorded but starts no sequence and resumes no waiting step; human output prints a `Warning:` line on stderr, and `--json` includes `sequenceTriggersRan: false`, `sequenceTriggersSkippedReason: "missing_scope"` and `warnings`. Successful responses always carry `sequenceTriggersRan`; `historical` is the reason for backfilled events
 - MCP parity: `trigger_subscriber_event` and `trigger_subscriber_events` (bulk)
 
 ### Bulk Tags
 
 ```bash
-sequenzy subscribers tags add vip --email one@example.com two@example.com
-sequenzy subscribers tags add imported-2026 --emails-file ./batch.csv
-sequenzy subscribers tags remove trial --emails-json '["one@example.com"]'
+sequenzy subscribers tags add --tag vip --email one@example.com two@example.com
+sequenzy subscribers tags add --tag imported-2026 --emails-file ./batch.csv
+sequenzy subscribers tags remove --tag trial --emails-json '["one@example.com"]'
 ```
 
 Behavior:
 
-- sends `POST /api/v1/subscribers/bulk/tags/add|remove`; targets come from repeated `--email`, `--emails-json`, `--emails-file`, `--external-id`, or `--subscriber-id`
+- many contacts, one or more tags: sends `POST /api/v1/subscribers/bulk/tags/add|remove`; targets come from repeated `--email`, `--emails-json`, `--emails-file`, `--external-id`, or `--subscriber-id`
 - only touches contacts that already exist; unknown identifiers are reported, never created
 - tag automations are skipped by default (what historical backfills want); pass `--trigger-automations` to fire `tag_added` sequences
 - requests are chunked at 500 targets each; totals in the output are combined across chunks
-- use `subscribers add`/`subscribers update` for single-contact tag changes
+- use `subscribers add`/`subscribers update` for single-contact tag changes. The API's `POST /api/v1/subscribers/tags/bulk` is the opposite shape (one contact, several tags, creates the contact), and `POST /api/v1/subscribers/tags/remove` removes one tag from one contact and never creates it (`subscriberFound: false` when unknown)
 - MCP parity: `bulk_add_subscriber_tags` and `bulk_remove_subscriber_tags`
 
 ## Transactional Emails
@@ -532,7 +534,7 @@ Behavior:
 - `segments count`: `GET /api/v1/segments/:id/count`
 - `segments create`: `POST /api/v1/segments`
 - `segments update`: `PATCH /api/v1/segments/:segmentId` with at least one of `--name`, `--filters-json`, `--filters-file`, or `--join-operator and|or`
-- `segments delete`: `DELETE /api/v1/segments/:segmentId`; prompts for confirmation, `--yes` skips
+- `segments delete`: `DELETE /api/v1/segments/:segmentId`; prompts for confirmation, `--yes` skips. Deleting is never blocked when the segment is in use: the response (and `--json`) lists `affectedSequences` (with `usages`: trigger, condition, filter, stop_condition, audience), `affectedCampaigns` (unsent, plus live in-app; each has `type`), `affectedSegments` and `affectedAudienceSyncs`, and human output prints them as warnings (campaigns as "N campaign(s) targeted or excluded this segment"). Draft campaigns and conditions inside email content are not checked; if the usage check fails the segment is still deleted and the `affected*` fields are omitted, meaning usage is unknown. Those now treat every contact as not in the segment, so tell the user which sequences to repoint
 - update filters replace the existing filter set; `--filters-json`/`--filters-file` accept the same array or `root` object shapes as create, and missing filter IDs are filled in by the CLI
 - `--filter-json` accepts either the legacy raw segment filter array or a nested filter `root` object
 - `--match all|any` controls whether top-level filters are combined with `and` or `or`
@@ -967,7 +969,7 @@ Behavior:
 - `sequences archive` / `unarchive` hide or restore a sequence without deleting it (MCP: `archive_sequence`, `unarchive_sequence`)
 - `sequences enrollments`: `GET /api/v1/sequences/:id/enrollments`; defaults to active, waiting, and paused enrollments, filters by `--status`, `--node-id`, `--subscriber-id`, and `--email`, and exports with `--all --csv <file>`. `waitUntil` is when a waiting enrollment resumes. Get node IDs from `sequences get` or `stats --sequence` (MCP: `list_sequence_enrollments`)
 - `sequences pause-enrollments` stops new entrants while existing active and waiting recipients keep moving (the sequence must be active; use `disable` to freeze current recipients too); `resume-enrollments` reopens entry (MCP: `pause_sequence_enrollments`, `resume_sequence_enrollments`)
-- `sequences delete`: `DELETE /api/v1/sequences/:id`
+- `sequences delete`: `DELETE /api/v1/sequences/:id`; the response (and `--json`) has `contactsInSequence`, the number of contacts still in the sequence when it was deleted, who get none of its remaining steps; human output prints the count when it is above zero. To let current contacts finish, use `sequences pause-enrollments` instead (MCP: `delete_sequence`)
 - `sequences enroll`: `POST /api/v1/sequences/:id/enroll`
 - `sequences cancel-enrollments`: `POST /api/v1/sequences/:id/enrollments/cancel`
 - `sequences pause-subscribers`: `POST /api/v1/sequences/:id/enrollments/pause`; holds the named contacts (`--subscriber-ids`, `--email`, up to 500) on their current step with optional `--reason`. Paused contacts get no steps, keep their place and entry data, cannot be re-enrolled in the same sequence, and are still ended by unsubscribes, bounces, and `cancel-enrollments`. `in_progress` means a step was running; retry shortly (MCP: `pause_sequence_subscribers`)
@@ -1469,6 +1471,7 @@ Behavior:
 - mobile apps: the iOS, Android, React Native and Flutter SDKs render the feed with the same design as the composer preview, and also record screen views, storefront events, profile updates and form signups; see the Mobile SDKs docs
 - `in-app campaigns`: `/api/v1/in-app/campaigns` list, create, get, update, estimate, send (now or `--schedule`), unschedule, stop, duplicate, stats; one in-app message or card for an audience (`--all-contacts`, `--segment`, `--lists` or `--target-lists-*`). The message takes the in-app step fields: flags for the common ones, `--message-json|--message-file` for the full config, and updates merge over the stored message. `--priority high|medium|low` orders messages waiting in the app (sequence steps are medium); `--ends-at` (empty clears) stops new deliveries and removes it from every feed that still has it at that time
 - launching writes nothing per contact: while the campaign is live, each contact in the audience gets the message the first time their app fetches its feed (SDK feed, browser feed or `GET /in-app/messages?status=open`), including people who join the audience later or open the app days later; an app that can't draw the format or a button action doesn't use it up; each contact gets it at most once
+- `estimate` returns `audienceCount` (contacts who match now) and `appUserCount` (those known to have your app connected: an active iOS or Android device, or an in-app message their app displayed; a lower bound). When `appUserCount` is 0, nobody in the audience is known to use the app yet: set up in-app messages (Settings > In-app) before launching
 - live campaigns can't be edited (409): stop and duplicate; `stop` is final, ends every item still in a feed and can be repeated; `POST /campaigns/{id}/cancel` stops an in-app campaign too, and `DELETE /campaigns/{id}` refuses live ones and deletes delivered items with the campaign
 - stats: `delivered` (their app received it), `displayed`, `clicked`, `totalClicks`, `dismissed`, push primer results and `buttons` (first click per custom HTML `buttonId`); `audienceAtLaunch` is the audience size at launch. Campaign scopes `campaigns:read|write|send`
 - `in-app list` and MCP `list_in_app_messages` look at a feed without delivering campaigns (`deliver=false`); an app backend serving the feed leaves `deliver` out. Removing a campaign item ends it instead of deleting it, so the campaign doesn't deliver it again
@@ -1630,7 +1633,7 @@ Treat these requested workflows as unsupported in the CLI even though related no
 
 - campaign immediate send; there is no "send now" command, so schedule with a near-future `--at` timestamp instead
 - form creation and embed snippets: CLI covers `forms list` and `forms update` only; use MCP `create_form` / `get_form_embed` or the dashboard
-- image asset upload: MCP `upload_image_asset` only, PNG/JPEG/GIF/WebP up to 10MB
+- image asset upload: MCP `upload_image_asset` only, PNG/JPEG/GIF/WebP up to 10MB (cropping a hosted image is supported: `sequenzy images crop`)
 
 ## Operational Caveats
 
@@ -1640,6 +1643,14 @@ Treat these requested workflows as unsupported in the CLI even though related no
 - `campaigns cancel` deliberately skips the confirmation prompt so a bad send can be stopped fast
 - `webhooks create` returns a one-time signing secret; handle it as sensitive output because it cannot be retrieved later. Do not paste credential material into chat, logs, tickets, or public transcripts. Save it only to a user-approved secure destination such as a password manager, secret store, encrypted file, or local `.env` file outside version control, then report the storage location and a short fingerprint.
 - when the user asks for a workflow outside the current CLI surface, say so directly, choose between dashboard or direct API use instead of inventing commands. Send feedback only when explicitly requested, after telling the user it goes to the Sequenzy team
+
+## Images
+
+- `sequenzy images crop <url> (--aspect RATIO [--focus-x F] [--focus-y F] | --x F --y F --width F --height F) [--alt TEXT] [--company ID] [--json]`: crop a media-library image, or a Pexels/Unsplash photo, into a new hosted image. Fractions are 0-1 of the upright image; `--aspect` takes `16:9`, `1:1`, `4:5`, `1.91:1` or a number. Prints the new URL, the original, and the `{ src, crop }` pair to put on an image block; `--json` adds `asset`, `sourceWidth` and `sourceHeight`.
+- The crop is saved as a new image (the original stays), so Gmail and Outlook show the same area as other clients, unlike a fixed `height` with `objectFit: "cover"`. Store the returned `crop` on the block (`crop` on image blocks and gallery images, `imageCrop` on image cards) so the editor can re-open or undo it. To change a crop, crop `crop.sourceSrc` again. Retrying the same crop returns the same asset.
+- Other external images must be uploaded first (MCP `upload_image_asset`), then cropped by their hosted URL. Merge-tag image sources can't be cropped.
+- MCP equivalent: `crop_image_asset` (`sourceUrl` required; `crop` object or `aspectRatio` string, optional `focusX`, `focusY`, `altText`, `displayWidthPercent`, `align`; returns `asset`, `crop` and a ready `imageBlock`).
+- POST `/api/v1/media/crop` (`emails:write`); errors: 400 invalid input or disallowed source, 404 missing source, 413 too large, 422 unreadable image, 503 retryable.
 
 ## design.md
 
@@ -1775,7 +1786,7 @@ For a recipient's progress toward a goal (trial days, onboarding steps, installm
 
 Responses include suggestions (field/path/example), priceCandidates (path/example/unknown units), previewItems, scenario, isSample and Compact/Classic/Showcase presets. Apply suggestions explicitly and preserve existing mappings. For numeric prices select `priceUnit: "minor"` for cents or `"major"` for major-unit amounts. The separate total remains in cents. Validation errors return 400; auth returns 401/403. Transport retries are safe because assistance has no side effects.
 
-Read current blocks using existing campaign/sequence/template/transactional detail commands, then save chosen `itemFields`, `priceUnit`, `imageSize` (32–120), `rowSpacing` (0–32), `fontSize` (12–24), `imageFit` (cover/contain), `showPrices` and `showCompareAtPrice` (default false; strikes through each item's catalog compare-at price when higher) using existing block replacement workflows. Preserve unrelated fields. Remove optional properties to reset, never use null. Existing render commands/tools accept scenario items under `variables` at the block's source; view resulting HTML at desktop/mobile widths. Rendered rows still respect maxItems. Previewing never updates recipients or event samples.
+Read current blocks using existing campaign/sequence/template/transactional detail commands, then save chosen `itemFields`, `priceUnit`, `imageSize` (32–120), `rowSpacing` (0–32), `fontSize` (12–24), `imageFit` (cover/contain), `showPrices`, `showCompareAtPrice` (default false; strikes through each item's catalog compare-at price when higher) and `priceLocale` (BCP 47 locale such as `de-DE` or `es-ES` for prices and the total, e.g. `49,95 €`; omit to follow the email's language) using existing block replacement workflows. Preserve unrelated fields. Remove optional properties to reset, never use null. Existing render commands/tools accept scenario items under `variables` at the block's source; view resulting HTML at desktop/mobile widths. Rendered rows still respect maxItems. Previewing never updates recipients or event samples.
 
 ## Script input and structured recovery
 
@@ -1947,7 +1958,14 @@ For a paid-member list, use `sequenzy lists update list_123 --allow-member-unsub
 In clients that support MCP Apps, including compatible ChatGPT and Claude connections, you can review your saved emails and sequences directly in the conversation.
 
 - `render_email` opens the rendered email with **Desktop** (640px) and **Mobile** (375px) views, its subject, preview text and personalization warnings. Pass a campaign ID, template ID, or sequence ID plus node ID using the existing tool inputs. It renders your saved content through Sequenzy's email renderer. Personalization and locale options remain available through the same tool.
+- `open_sequenzy({ companyId? })` opens a workspace view with the company's sequences (up to 50) and recent campaigns (up to 25). Without `companyId` it uses the selected company and offers a company switcher. A list the key cannot read is shown as unavailable while the other still loads. Selecting an item opens the flow or the rendered email. Claude lists this tool on its Artifacts page so users can open and pin it without asking.
 - `preview_sequence({ companyId, sequenceId })` opens the saved sequence as a connected diagram with triggers, delays, branches and actions. Select an email to render it, switch between available A/B variants, or use the **Emails** tab to browse the sequence's emails. Random splits show their configured allocation. **Refresh** reloads saved content, and failed requests offer an explicit retry.
+
+In Claude, previews can also open in the side panel or full screen with the expand button in the view's header, and `open_sequenzy` is listed on Claude's Artifacts page so you can open (and pin) your workspace without asking. These parts of Claude are rolling out gradually; where they are unavailable the previews work as before.
+
+- `open_sequenzy({ companyId? })` opens your workspace: the company's sequences (up to 50) and recent campaigns (up to 25), with a company switcher when your connection reaches more than one. Select a sequence to open its flow or a campaign to render its email; the back link returns to the list. Every input is optional. A list your key cannot read shows as unavailable while the other still loads.
+- While a preview is open, your assistant can change what it shows through tools the view itself offers: `get_view_state` (what you have open), `open_sequence_step`, `open_sequence`, `open_campaign_email`, `show_sequence_overview`, `set_preview_width` and `reload_view`. After it edits the sequence or email you are looking at, `reload_view` shows the saved change in place. These tools only change the view; edits go through the usual write tools and permissions. Your client may ask you to approve them.
+- **Ask for changes**, on an open email, sends your assistant a message naming that email so it can suggest improvements. Nothing changes until you agree to an edit.
 
 Supporting workflows use compact cards in the same Sequenzy style:
 

@@ -26,7 +26,7 @@ Marketers can manage marketing content, subscribers, campaigns and sequences, in
 ### Subscribers, lists, tags and segments
 
 - Find people with `search_subscribers` and `get_subscriber`; `get_subscriber_activity` shows what they received and did.
-- Add or update one contact with `add_subscriber` / `update_subscriber`. These fire the automations the user has set up (welcome sequences, tag triggers), so mention that before adding real contacts.
+- Add or update one contact with `add_subscriber` / `update_subscriber`. These fire the automations the user has set up (welcome sequences, tag triggers), so mention that before adding real contacts. If the result has `sequenceTriggersRan: false` with `sequenceTriggersSkippedReason: "missing_scope"`, the key lacks `automations:trigger`: the contact was saved but no sequence started, so tell the user. The same fields appear on `trigger_subscriber_event`, `trigger_subscriber_events` and `import_subscriber_events`.
 - For bulk work, use `create_subscriber_import`, `add_subscribers_to_list`, `bulk_add_subscriber_tags` or `start_subscriber_operation`, and report counts and failures from the result.
 - If `get_subscriber_import` returns `listQuality` (`needs_cleaning`), the list has too many addresses that don't exist or look risky and nothing was imported: relay its message and suggest cleaning the list (`listQuality.cleaningUrl`) and importing it again.
 - Build segments with `create_segment`; check the size with `get_segment_count` before using one as an audience.
@@ -45,7 +45,7 @@ Campaign A/B tests use the `*_ab_test*` tools. Select a winner or change a runni
 ### Sequences (automations)
 
 - Start from `list_sequence_templates` / `create_sequence_from_template`, or describe the goal to `generate_sequence`. Generated sequences hold at most 10 emails.
-- Edit with `get_sequence`, `edit_sequence_emails`, `update_sequence_node` and `edit_sequence_graph`. Show the flow with `preview_sequence`.
+- Edit with `get_sequence`, `edit_sequence_emails`, `update_sequence_node` and `edit_sequence_graph`. Show the flow with `preview_sequence`, or the whole workspace with `open_sequenzy`. While a preview is open, call `get_view_state` to see what the user is looking at and `reload_view` after you edit it.
 - Before activating, run `simulate_sequence` and read its `warnings`, and run `check_email` on each email. Use the same sample contact across steps when you render or test.
 - Activate with `enable_sequence` only when the user asks. Leave new sequences inactive for review by default. Enrolling existing contacts (`enroll_sequence_audience`, `enroll_subscribers_in_sequence`) is a separate decision that sends real email; past events are never replayed.
 
