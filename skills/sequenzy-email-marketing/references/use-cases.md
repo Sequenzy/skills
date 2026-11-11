@@ -321,6 +321,9 @@ sequenzy campaigns create "April Launch" --subject "We shipped" --blocks-file ./
 #  "options":[{"label":"Loved it","value":"loved"},{"label":"Not for me","value":"not_for_me"}],
 #  "attributeKey":"email_feedback"}
 # or an NPS survey: {"type":"poll","variant":"nps","question":"How likely are you to recommend us?","options":[],"attributeKey":"nps_score"}
+# Add "optionLayout":"row" to put short text answers side by side instead of stacked.
+# Add "commentEnabled":true (and optionally "commentPrompt") for a comment box on the thank-you page; comments fire poll.commented.
+# Set "redirectUrl" to send respondents to your own page; the chosen value arrives as ?answer=<value>.
 # Answers land in the subscriber attribute, fire a poll.answered event, and
 # aggregate into the campaign stats "polls" array (for a sequence email,
 # into that step's steps[].polls in `sequenzy stats --sequence <id> --json`).
