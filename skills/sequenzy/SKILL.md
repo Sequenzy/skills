@@ -134,12 +134,14 @@ without removing it: a recommended, optional one-time upgrade to our new DNS
 structure for better deliverability and security. Confirm with the user first,
 since they must edit DNS.
 Relay `dnsUpgrade.records` (four CNAMEs) to add next to the current records,
-removing nothing; the domain keeps sending on its current records and switches
+removing nothing, plus `dnsUpgrade.trackingRecord` while the tracking domain is not
+verified (a workspace without one gets `links.<domain>`; optional, never holds
+up the switch); the domain keeps sending on its current records and switches
 by itself about an hour after the required ones are visible on public DNS
 (`websites verify` checks now but does not skip the wait). Sending is normally
 not interrupted at the switch; if that isn't possible for a domain, emails sent
 through Amazon SES can be held for a few minutes. The domain also gets a new
-2048-bit DKIM key; the four CNAMEs stay the same. When `status` is
+2048-bit DKIM key; it adds no records of its own. When `status` is
 `completed`, tell them they may delete `oldRecords` (optional; each is marked `removed` once
 gone from public DNS; `replacedRecords` lists them before the switch) after `deleteOldRecordsAfter` (8
 days after the switch; for an older SES-only domain that includes the old

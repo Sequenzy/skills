@@ -667,7 +667,7 @@ Guidance:
 
 - save API keys immediately; the raw key is only returned on creation
 - use `websites check` for stored verification/readiness details and `websites verify` to run a fresh DNS check; DNS verification and readiness to send are separate outcomes
-- when `websites check` shows `DNS upgrade: available`, `websites upgrade-dns` moves the domain onto the current records in place (MCP `upgrade_sending_domain_dns`): the user adds the printed CNAMEs next to the current records, the domain keeps sending on its current records and switches by itself about an hour after the required ones are visible on public DNS (sending is normally not interrupted; if that isn't possible for a domain, Amazon SES sends can be held a few minutes), and the old records are deleted 8 days after the switch; an older SES-only domain needs a working DMARC record before it can start
+- when `websites check` shows `DNS upgrade: available`, `websites upgrade-dns` moves the domain onto the current records in place (MCP `upgrade_sending_domain_dns`): the user adds the printed CNAMEs (including the link tracking CNAME, when printed) next to the current records, the domain keeps sending on its current records and switches by itself about an hour after the required ones are visible on public DNS (sending is normally not interrupted; if that isn't possible for a domain, Amazon SES sends can be held a few minutes), and the old records are deleted 8 days after the switch; an older SES-only domain needs a working DMARC record before it can start
 - use `websites guide` for integration code snippets rather than inventing framework examples
 
 ## "Sell a digital product and deliver the file after purchase"
@@ -741,7 +741,7 @@ Guidance:
 
 - the tag is the contact's current state: the flow also reaches contacts imported or tagged by hand, and removing the tag (they paid, they came back) ends the run, which is the default stop for a `tag_added` trigger
 - these tags start sequences only when the company's sync rules add them. Check `sequenzy sync-rules get` (MCP `get_sync_rules`) first; if the company has no rules, ask the user before opting into the preset with `sequenzy sync-rules update --reset` (MCP `update_sync_rules` with `null`), since it changes tagging, or use the event
-- tag-triggered emails have no `{{event.*}}` data; use contact attributes such as `{{billingPlanName}}` or `{{mrr}}`, and link to the product's billing page rather than an invoice
+- tag-triggered emails have no `{{event.*}}` data; use contact attributes such as `{{billingPlanName}}` or `{{mrr}}`. For `past-due` emails, a failed renewal also sets `{{billingPaymentUrl}}`: Stripe's hosted invoice or Paddle's checkout for the failed transaction (no login), or the App Store / Google Play subscriptions page for RevenueCat, Superwall and Adapty. Stripe adds `{{billingAmountDue}}` and `{{billingNextPaymentAttempt}}`, Paddle adds `{{billingAmountDue}}`. Link the button to `{{billingPaymentUrl}}` with the product's billing page as fallback. They are removed on the next purchase or when the subscription ends
 - keep `event_received` when an email needs that occurrence's data (the failed invoice's `{{event.hostedInvoiceUrl}}`, the order's line items) or must run once per occurrence, as in the next recipe
 - `unlimited` enrollment re-enrolls a contact whose tag returns later (a second failed payment months on); `one_time` suits flows that should only ever run once, like customer onboarding
 - MCP flows use `create_sequence` with `trigger: "tag_added"` and `tagName`
