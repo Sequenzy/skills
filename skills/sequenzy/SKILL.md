@@ -106,6 +106,8 @@ after the user confirms: links and images in emails already sent through it
 stop working.
 Changing it keeps those links working while the old CNAME stays.
 `websites configure` and `configure_sending_domain` are deprecated.
+If your custom domain is verified and `active` is false, links use shared
+routing. You do not need to change the CNAME.
 
 New sending domains publish their bounce subdomain as one CNAME
 (`website.bounceRecords.cnameRecord`, the `Bounce:` line in the CLI), which
