@@ -100,7 +100,7 @@ Put `SEQUENZY_API_KEY=...` in your Hermes environment file. The key works like a
 
 ## Kiro power
 
-The same folder is a Kiro power. In Kiro, open **Powers**, select **Add Custom Power**, then **Import power from GitHub**, and enter `https://github.com/Sequenzy/skills/tree/main/plugins/sequenzy`.
+The [`powers/sequenzy`](powers/sequenzy) folder is a Kiro power with the email-marketing skill and the hosted MCP server. In Kiro, open **Powers**, select **Add Custom Power**, then **Import power from GitHub**, and enter `https://github.com/Sequenzy/skills/tree/main/powers/sequenzy`. Kiro signs you in to Sequenzy through OAuth the first time it calls a tool; you need no API key and no Node.js.
 
 ## Quick start for agents
 
@@ -157,6 +157,11 @@ This repo includes a machine-readable discovery file at [`.well-known/skills/ind
 .grok-plugin/plugin.json
 .mcp.json
 .well-known/skills/index.json
+plugins/sequenzy/      Claude, Codex and Hermes Agent plugin
+powers/sequenzy/       Kiro power
+  plugin.json
+  mcp.json
+  skills/sequenzy-email-marketing/SKILL.md
 skills/
   sequenzy/
     SKILL.md

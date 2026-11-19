@@ -1,4 +1,4 @@
-# Sequenzy for Claude and Hermes Agent
+# Sequenzy for Claude, Codex and Hermes Agent
 
 [Sequenzy](https://sequenzy.com) is an email marketing platform for SaaS and ecommerce teams. This plugin lets Claude or Hermes Agent work in your Sequenzy account: look up and update subscribers, build segments, draft and schedule campaigns, edit automated sequences and templates, send transactional email, and read delivery and engagement stats.
 
@@ -51,13 +51,7 @@ Without a browser, connect the server with a personal API key instead of the plu
 
 ## Install in Kiro
 
-This folder is also a Kiro power in the Agent Plugins format. You need Node.js 20.18.1 or newer with `npx` on your `PATH`.
-
-1. Open the **Powers** panel and select **Add Custom Power**.
-2. Select **Import power from GitHub** and enter `https://github.com/Sequenzy/skills/tree/main/plugins/sequenzy`.
-3. Mention Sequenzy or an email-marketing task in chat. Kiro activates the power from the keywords in `plugin.json` and loads the skill and the MCP server.
-
-The first time the server starts, your browser opens the Sequenzy sign-in page through the same `mcp-remote` bridge described above. Kiro names the server `power-sequenzy-sequenzy`.
+Use the Kiro power in [`powers/sequenzy`](../../powers/sequenzy) instead of this folder. It connects to the same server with Kiro's own sign-in, so it needs no Node.js.
 
 ## Example requests
 
