@@ -504,14 +504,16 @@ Behavior:
 
 - `tags list`: `GET /api/v1/tags`; bare `sequenzy tags` without a subcommand still lists tag definitions for backwards compatibility
 - `tags create`: `POST /api/v1/tags` with `{ name, color? }`
-- `tags update`: `PATCH /api/v1/tags/:tagId` with `{ color }` (`--color` is required)
+- `tags update`: `PATCH /api/v1/tags/:tagId` with `{ name?, color? }` (`--name`, `--color` or both); `--name` renames the tag on every subscriber and is refused with a usage list while a sequence, segment, campaign, email, sync rule, goal or integration still uses it
+- `tags merge <tagId> --into <targetTagId>`: `POST /api/v1/tags/:tagId/merge` with `{ targetTagId }`; subscribers with the merged tag get the kept tag and the merged tag is deleted (needs `tags:write` and `tags:delete`)
+- a rename or merge of a tag on more than 20,000 subscribers answers `202` with `status: "processing"`: the subscribers move in the background, `tags list` shows the change in progress (`changeInProgress` in JSON), and other renames, merges and deletes answer `409 tag_in_progress` until it finishes
 - `tags delete`: `DELETE /api/v1/tags/:tagId`
 - tag names are normalized to lowercase with dashes, so `VIP Customer` becomes `vip-customer`
 - the color defaults to `gray`; valid colors are `gray`, `red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, and `rose`
 - system tags cannot be updated or deleted
 - tags still referenced by sequences cannot be deleted until those sequences stop using them
 - deleting a tag removes it from every subscriber; the delete prompt warns about this, and `--yes` skips it
-- MCP parity: `list_tags`, `create_tag`, `update_tag`, and `delete_tag`
+- MCP parity: `list_tags`, `create_tag`, `update_tag`, `merge_tags`, and `delete_tag`
 
 ### Segments
 
@@ -728,6 +730,7 @@ sequenzy campaigns get camp_123
 sequenzy campaigns create "April Launch" --prompt "Announce our new dashboard"
 sequenzy campaigns create "April Launch" --subject "We shipped" --label edm --html-file ./campaign.html
 sequenzy campaigns create "April Launch" --subject "We shipped" --blocks-file ./campaign-blocks.json
+sequenzy campaigns create "Black Friday" --subject "Ready?" --template-id email_123
 sequenzy campaigns create "Partner Update" --subject "We shipped" --html-file ./campaign.html --segment seg_123
 sequenzy campaigns create "Partner Update" --subject "We shipped" --html-file ./campaign.html --target-lists-json '{"type":"lists","listIds":["list_123"]}'
 sequenzy campaigns update camp_123 --subject "Updated subject" --label edm
@@ -1508,6 +1511,7 @@ Behavior:
 ```bash
 sequenzy sync-rules get
 sequenzy sync-rules update --rules-file ./rules.json
+sequenzy sync-rules update --rules-json '[{"triggerEvent":"saas.purchase","actions":{"addTags":["lifetime-buyer"],"removeTags":[]},"conditions":{"purchasedProduct":{"names":["Captioneer - Lifetime"]}}}]'
 sequenzy sync-rules update --reset
 ```
 
@@ -1515,6 +1519,7 @@ Behavior:
 
 - `GET`/`PUT /api/v1/sync-rules`; sync rules map integration events to tags applied on subscribers
 - `--rules-json`/`--rules-file` replace the rule set; `--reset` restores defaults
+- a rule can run for one product only: `conditions.purchasedProduct.names` (case-insensitive) or `productIds` match the product a payment event carries (Polar carries both), and `tags`/`collectionIds`/`productTypes`/`vendors` match commerce catalog products
 - MCP parity: `get_sync_rules` and `update_sync_rules`
 
 ## Notification Preferences

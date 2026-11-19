@@ -195,6 +195,14 @@ Inspect `sequenzy account` or MCP `get_account` before choosing a privileged wor
 
 Marketers can manage marketing content, subscribers, campaigns and sequences, including marketing test sends and unscheduling. They cannot use transactional sending or manage team, billing, integrations, API keys, sending identities or workspace settings. Choose existing sender/reply profiles; inline creation of a new profile is also restricted. Transactional-backed templates and their campaign, A/B and sequence sources stay protected through copies, previews, share links, analytics and retained send history. Use the narrowest eligible role; billing access cannot be granted to marketers or restricted members.
 
+## On-brand emails
+
+- Before writing campaign, template or sequence content yourself, read the design brief (`design-md get`, MCP `get_design_md`). Its Reference email section lists the colors, fonts and format of the saved AI style; those win over the frontmatter values.
+- Content you write as `blocks` (and empty drafts) starts on the brand automatically: the saved style's theme and font, the logo when the format is branded, and the default footer (templates get no footer). Do not add your own logo or footer blocks, and do not pass `emailPreset` unless the user asks for a format.
+- To make an email look exactly like a past one, create it from that email: `campaigns create --template-id <emailId>` (MCP `create_campaign` with `templateId`) or `campaigns duplicate`, then replace the content with `campaigns update`.
+- Write lists as a `list` block (`bullet`, `numbered` or `checklist`), never as `<ul>`/`<ol>` inside a text block. The API answers that with a warning.
+- Before reporting an email as ready, render it (`campaigns render`, MCP `render_email`) and compare it with a recent sent email.
+
 ## Execution Pattern
 
 1. Check auth first with `sequenzy whoami` or by verifying `SEQUENZY_API_KEY` is set. If MCP tools return `MCP_AUTH_REQUIRED`, the server has no key: relay the signup link and setup steps from `howToFix` to the user instead of retrying.

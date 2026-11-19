@@ -226,7 +226,8 @@ sequenzy segments create --name "3+ Pro Payments" --stripe-product prod_pro --pu
 
 Guidance:
 
-- bare `sequenzy tags` still lists tag definitions; `tags create`, `tags update`, and `tags delete` mutate them
+- bare `sequenzy tags` still lists tag definitions; `tags create`, `tags update`, `tags merge`, and `tags delete` mutate them
+- `tags update <tagId> --name <name>` renames the tag on every subscriber that carries it, and `tags merge <tagId> --into <targetTagId>` moves a tag's subscribers to another tag and deletes it; neither starts sequences, and both are refused with a usage list while the tag is still used elsewhere
 - tag names are normalized to lowercase with dashes, system tags cannot be changed or deleted, and tags used by sequences cannot be deleted
 - deleting a tag removes it from every subscriber, so confirm intent before running `tags delete`
 - `lists update` changes name, description, or visibility; `lists remove-subscribers` only removes memberships, while `lists delete` removes the whole list and all of its memberships (subscribers themselves are kept)
