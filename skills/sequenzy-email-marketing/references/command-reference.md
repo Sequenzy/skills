@@ -1077,6 +1077,7 @@ Caveats:
 - `delete-variant` cannot remove variant A (the protected control) and must leave at least 2 variants; a test holds at most 5 variants; when a sequence test's parent sequence is active, add `--confirm-live-change`
 - `delete` is blocked for running tests, and the linked campaign must be draft or rejected
 - `create`, `add-variant`, and `delete-variant` support campaign and sequence A/B tests (`create --automation-node` converts a sequence email node and needs `--confirm-live-change` on active sequences); `delete` supports campaign A/B tests only
+- `ab-tests delete` / `delete_ab_test` deletes campaign tests only. A sequence A/B test is a step: remove it with a `delete_node` graph edit (`edit_sequence_graph`), which deletes the step and its test, then insert a plain email step if you want one there. Rendering an A/B step without `variantId` shows control variant A when the key has `ab_tests:read`; checking one still needs `variantId`
 - MCP parity: `list_ab_tests`, `get_ab_test`, `get_ab_test_stats`, `restart_ab_test`, `update_ab_test_variant`, `create_ab_test`, `add_ab_test_variant`, `delete_ab_test_variant`, and `delete_ab_test`. `update_sequence`, `update_sequence_node`, and `update_template` cannot edit sequence variant copy. If `update_ab_test_variant` is missing from the tool list, enable it on the Sequenzy connector instead of writing through another email tool. The **Safer agent access** preset includes the required `ab_tests:read`, `ab_tests:write`, and `sequences:write` scopes
 
 ## AI Generation
