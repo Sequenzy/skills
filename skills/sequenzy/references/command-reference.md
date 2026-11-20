@@ -510,7 +510,7 @@ Behavior:
 - `tags update`: `PATCH /api/v1/tags/:tagId` with `{ name?, color? }` (`--name`, `--color` or both); `--name` renames the tag on every subscriber and is refused with a usage list while a sequence, segment, campaign, email, sync rule, goal or integration still uses it
 - `tags merge <tagId> --into <targetTagId>`: `POST /api/v1/tags/:tagId/merge` with `{ targetTagId }`; subscribers with the merged tag get the kept tag and the merged tag is deleted (needs `tags:write` and `tags:delete`)
 - a rename or merge of a tag on more than 20,000 subscribers answers `202` with `status: "processing"`: the subscribers move in the background, `tags list` shows the change in progress (`changeInProgress` in JSON), and other renames, merges and deletes answer `409 tag_in_progress` until it finishes
-- `tags delete`: `DELETE /api/v1/tags/:tagId`
+- `tags delete`: `DELETE /api/v1/tags/:tagId`; deleting a Polar product tag also stops tagging that product until a tag named after the product exists again, and renaming or merging one makes later purchases use the new tag
 - tag names are normalized to lowercase with dashes, so `VIP Customer` becomes `vip-customer`
 - the color defaults to `gray`; valid colors are `gray`, `red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, and `rose`
 - system tags cannot be updated or deleted
