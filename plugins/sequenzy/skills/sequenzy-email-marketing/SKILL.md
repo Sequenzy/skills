@@ -38,7 +38,7 @@ Marketers can manage marketing content, subscribers, campaigns and sequences, in
 1. Draft with `create_campaign` (or `create_campaign_for_audience` for a selection the user already made). `generate_email` and `generate_subject_lines` write copy in the company's brand style. Read `get_design_md` before writing blocks yourself: blocks start on the saved AI style's theme and font with the logo and footer added, so leave those out and do not pass `emailPreset` unless asked. To match a past email exactly, pass its `emailId` as `templateId`. Write lists as a `list` block, never `<ul>`/`<ol>` in a text block.
 2. Review with `render_email` and run `check_email`. Fix every `error` issue, especially `links.broken`; `restricted` links only refused an automated check and need a manual look.
 3. Confirm the audience with `get_campaign_audience` and send a test with `send_test_email`. A test is a real email that is queued, not proof of delivery; check it with `get_email_send`.
-4. Schedule with `schedule_campaign` only after the user approves the content, audience and time. There is no "send now": schedule a time a few minutes ahead. `unschedule_campaign`, `pause_campaign` and `cancel_campaign` stop it.
+4. Schedule with `schedule_campaign` only after the user approves the content, audience and time. There is no "send now": schedule a time a few minutes ahead. `unschedule_campaign`, `pause_campaign` and `cancel_campaign` stop it. To fix a mistake in a campaign that is already sending, call `pause_campaign`, then `update_campaign` with only content fields (`subject`, `previewText`, `html`, `blocks`, `emailPreset`), then `resume_campaign`: recipients not yet sent it get the fix, and emails already sent do not change. Translations are sent as saved, so update them too when the response warns about them.
 5. Report results with `get_campaign_stats` and `get_link_click_stats`.
 
 Campaign A/B tests use the `*_ab_test*` tools. Select a winner or change a running test only when the user asks.
@@ -53,6 +53,7 @@ Campaign A/B tests use the `*_ab_test*` tools. Select a winner or change a runni
 ### Templates and transactional email
 
 - Templates: `list_templates`, `get_template`, `create_template`, `update_template`. Conditional content needs block JSON (`get_email_block_schema`), not raw HTML.
+- Product grids: a repeat block's children are one product's layout. Choose which products show with its `productSource` (`excludePurchased: true` hides what the recipient bought, hand-picked lists included), never with one conditional copy of the card per product inside the children.
 - Transactional email: `list_transactional_emails` and `send_email`. Pass one stable idempotency key per logical email and keep the returned `emailSendId`. Queued does not mean delivered; check with `get_email_send`.
 
 ### Sending setup and deliverability

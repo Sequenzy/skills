@@ -345,6 +345,7 @@ Guidance:
 - use `--prompt` for AI-generated draft content; do not combine it with HTML or block flags
 - use `--label` on `list` to filter by campaign label, and on `create` or `update` to assign replacement labels
 - use block JSON when the user needs conditional content or an exact editor-compatible structure
+- for product grids, a repeat block's children are one product's layout: choose which products show with its `productSource` (`excludePurchased: true` hides what the recipient bought, hand-picked `specific` lists included; `filters.inStockOnly`), never with one conditional copy of the card per product inside the children, which repeats every copy for every product
 - use `--reply-to` when the user knows the reply profile email and it already exists for the company
 - use `--reply-profile` when the user already has the reply profile ID
 - do not pass `--reply-to` and `--reply-profile` together
@@ -399,6 +400,7 @@ Decide between cancel, pause, and resume:
 - use `cancel` when the send should not continue at all; it is permanent and works from scheduled, sending, paused, waiting-approval, and rejected statuses
 - use `pause` when the user wants to stop a send temporarily and may continue it; it only works while the campaign is in sending status
 - use `resume` to continue a paused campaign, optionally spreading the remaining delivery with `--spread-over-hours` (1-72)
+- when a campaign is already sending with a mistake in it (wrong link, typo), do not cancel and rebuild it: `pause`, fix the content with `campaigns update` (content flags only: subject, preview text, HTML or blocks, email preset), then `resume`. Recipients not yet sent the campaign get the fix; emails already sent stay as they were. Tell the user how many were already sent (`sequenzy stats --campaign <id>`) because those keep the mistake, and update any translations before resuming
 - campaigns paused automatically because company sending was paused or the account was banned cannot be resumed on their own while that company-level pause is active; the API returns a 409 that names the cause, and they restart automatically when company sending is restored (unless an admin chose to leave them paused, in which case `resume` works)
 - `cancel` needs no `--yes` and shows no confirmation prompt, so it is the fastest way to stop a bad send; run it first and ask questions after when the user reports a mistake
 - check `campaigns get` first when you are unsure of the current status; the API rejects transitions from the wrong status

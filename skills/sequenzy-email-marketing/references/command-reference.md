@@ -802,7 +802,9 @@ Caveats:
 - `--reply-to` resolves an existing reply profile by email and `--reply-profile` sets it directly by ID
 - `--reply-to` and `--reply-profile` are mutually exclusive
 - `campaigns get` now includes saved reply-to details when the campaign has a reply profile
-- only draft campaigns can be updated through this API path
+- draft campaigns accept every update field; a `paused` campaign accepts only content (`--subject`, `--preview-text`/`--preheader-text`, the HTML and blocks flags, `--email-preset`; MCP `subject`, `previewText`, `html`, `blocks`, `emailPreset`) and rejects any other field with a 400 that names the API field (`name`, `targetLists`, `labels`, ...)
+- to fix a mistake in a campaign that is already sending (wrong link, typo): `campaigns pause`, `campaigns update` with the corrected content, `campaigns resume`. Recipients not yet sent the campaign get the updated email; emails already sent do not change and nobody is sent it twice. A paused campaign with an A/B test cannot be edited. Translations are sent as saved: the response `warnings` name them, so update each before resuming. An update that races a resume returns 409 and saves nothing; once the campaign is sending again it returns the usual 400
+- campaigns in any other status (`sending`, `scheduled`, `sent`, ...) cannot be updated; unschedule a scheduled campaign first
 - there is no CLI command for immediate send; schedule with a near-future `--at` timestamp instead
 - `cancel` works from scheduled, sending, paused, waiting_approval, and rejected statuses; it shows no confirmation prompt so a bad send can be stopped fast
 - `pause` only works on a campaign in sending status; `resume` only works on a paused campaign
