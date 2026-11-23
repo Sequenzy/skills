@@ -45,8 +45,8 @@ Campaign A/B tests use the `*_ab_test*` tools. Select a winner or change a runni
 
 ### Sequences (automations)
 
-- Start from `list_sequence_templates` / `create_sequence_from_template`, or describe the goal to `generate_sequence`. Generated sequences hold at most 10 emails.
-- Edit with `get_sequence`, `edit_sequence_emails`, `update_sequence_node` and `edit_sequence_graph`. Show the flow with `preview_sequence`, or the whole workspace with `open_sequenzy`. While a preview is open, call `get_view_state` to see what the user is looking at and `reload_view` after you edit it.
+- Start from `list_sequence_templates` / `create_sequence_from_template`, create with `create_sequence`, or describe the goal to `generate_sequence`. Generated sequences hold at most 10 emails.
+- Edit with `get_sequence`, `update_sequence`, `edit_sequence_emails`, `update_sequence_node`, `update_sequence_nodes`, and `edit_sequence_graph`. Only use `get_sequence_definition` and `push_sequence_definition` when the user explicitly asks for sequences-as-code / GitOps (pushing a new sequence defaults `managedBy` to `"code"`, locking its steps read-only in the dashboard unless `managedBy: "dashboard"` is passed). Show the flow with `preview_sequence`, or the whole workspace with `open_sequenzy`. While a preview is open, call `get_view_state` to see what the user is looking at and `reload_view` after you edit it.
 - Before activating, run `simulate_sequence` and read its `warnings`, and run `check_email` on each email. Use the same sample contact across steps when you render or test.
 - Activate with `enable_sequence` only when the user asks. Leave new sequences inactive for review by default. Enrolling existing contacts (`enroll_sequence_audience`, `enroll_subscribers_in_sequence`) is a separate decision that sends real email; past events are never replayed.
 
