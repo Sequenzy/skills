@@ -64,7 +64,7 @@ Campaign A/B tests use the `*_ab_test*` tools. Select a winner or change a runni
 
 ### Stats
 
-`get_stats` gives an overview; `get_stats_breakdown`, `get_campaign_stats`, `get_sequence_stats` and `get_transactional_stats` go deeper. Say which date range you used. Opens and clicks are unique per email send, and rates divide by delivered email.
+`get_stats` gives an overview; `get_stats_breakdown`, `get_campaign_stats`, `get_sequence_stats`, `get_sequence_path_stats`, `list_sequence_path_subscribers`, `get_conditional_block_stats`, `list_conditional_block_subscribers`, and `get_transactional_stats` go deeper. Say which date range you used. Opens and clicks are unique per email send, and rates divide by delivered email. For sequence branch splits, rule-based if/else paths are observational (`causal: false`); compare mature cohorts (`matureConverted / matureEntrants`) so recent enrollments still inside the window do not skew rates.
 
 ### Inbox
 

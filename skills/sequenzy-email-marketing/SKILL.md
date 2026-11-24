@@ -288,6 +288,8 @@ they do not send email. See the command reference for validation and retry behav
 
 Private lists support `allowMemberUnsubscribe` in API/MCP and `--allow-member-unsubscribe` / `--no-allow-member-unsubscribe` for CLI list create/update. Default off; omission preserves on update, false clears, null is invalid. When enabled, current members see the name and may opt out; they cannot join or rejoin through preferences. Public lists ignore this stored setting.
 
+Any list supports `unsubscribeListOnly` in API/MCP and `--unsubscribe-list-only` / `--no-unsubscribe-list-only` for CLI list create/update. Default off; omission preserves on update, false clears, null is invalid. When enabled on every list targeted by a campaign (up to 10 lists, exclusions allowed) or on a `contact_added` sequence's trigger list, unsubscribing removes only those targeted list(s) instead of unsubscribing the contact globally, while preserving a secondary option to unsubscribe from all emails.
+
 ## Interactive MCP previews
 
 Use `render_email` to show a saved campaign, template or sequence email in desktop/mobile preview in MCP Apps clients. Before scheduling a campaign or activating a sequence, run `check_email` (CLI: `campaigns check`, `sequences check --node`, `templates check`) and fix `error` issues, especially `links.broken`; `restricted` links refused an automated check and only need a manual look. Use `preview_sequence` with explicit company and sequence IDs for a connected flow; click steps to render their saved emails and available A/B variants. Previews are read-only and never authorize sends, activation or enrollment. Respect personalization warnings and unavailable variant content. See the command reference for host restrictions and text-only fallbacks.

@@ -997,6 +997,8 @@ Use `sequences simulate <id>` / `simulate_sequence` to check readiness. Read its
 
 For a paid-member list, use `sequenzy lists update list_123 --allow-member-unsubscribe` to allow existing members to opt out without making the list public. Use `--no-allow-member-unsubscribe` to disable. Create supports the same flags. API and MCP use boolean `allowMemberUnsubscribe`: default false on create, omission preserves on update, false clears, null rejected. Public lists retain their normal behavior. Read the stored setting with `sequenzy lists --json` or MCP `list_lists`; after an uncertain create, inspect before retrying.
 
+For multi-brand or multi-product workspaces that share one contact pool, use `sequenzy lists update list_123 --unsubscribe-list-only` (or `create --unsubscribe-list-only`, disable with `--no-unsubscribe-list-only`, API/MCP `unsubscribeListOnly: true`) on each brand list. Campaigns whose targeted lists all have `unsubscribeListOnly` enabled (even when excluding other lists) and `contact_added` sequences triggered by that list then scope one-click and hosted unsubscribes to those targeted list(s) instead of unsubscribing the contact globally. Subscribers who leave every list they belonged to are excluded from marketing email campaigns until they join a list again.
+
 ### Capture submission history
 
 Use `sequenzy submissions <type> <id> --json` or MCP `list_capture_submissions`
