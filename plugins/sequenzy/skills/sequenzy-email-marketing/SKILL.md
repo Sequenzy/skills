@@ -5,7 +5,7 @@ description: Operate Sequenzy email marketing through the Sequenzy connector. Us
 
 # Sequenzy email marketing
 
-Sequenzy is an email marketing platform for SaaS and ecommerce teams. This skill works through the Sequenzy connector (the Sequenzy MCP server), which the user signs in to with their Sequenzy account. Every action runs as that user, limited to the companies and permission level they approved at sign-in.
+Sequenzy is an AI-native email marketing tool for SaaS. This skill works through the Sequenzy connector (the Sequenzy MCP server), which the user signs in to with their Sequenzy account. Every action runs as that user, limited to the companies and permission level they approved at sign-in.
 
 ## Ground rules
 
